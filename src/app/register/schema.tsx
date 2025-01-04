@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { categoriesArr, cardOwnerArr, paymentMethodArr } from './types';
+import { categoriesArr, cardOwnerArr, paymentMethodArr } from '../types';
 
 const expenseSchema = z.object({
   amount: z

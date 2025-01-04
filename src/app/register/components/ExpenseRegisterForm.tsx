@@ -4,8 +4,7 @@ import expenseSchema from '../schema';
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { cardOwnerArr, categoriesArr, ExpenseFormInput, paymentMethodArr } from '../types';
-// import { Expense, PaymentMethod, Category, CardOwner } from '../types';
+import { cardOwnerArr, categoriesArr, ExpenseFormInput, paymentMethodArr } from '../../types';
 
 const ExpenseForm: React.FC = () => {
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<ExpenseFormInput>({
