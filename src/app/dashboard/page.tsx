@@ -19,7 +19,6 @@ export default function Dashboard() {
           throw new Error("Network response was not ok");
         }
         const jsonData = await response.json();
-        console.log(jsonData);
         setData(jsonData);
       } catch (err) {
         setError(err instanceof Error ? err : new Error("An error occurred"));

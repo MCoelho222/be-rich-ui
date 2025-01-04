@@ -3,6 +3,7 @@ import { IFilterDropdownProps } from "./types";
 import { DataItemsKeys } from "@/app/types";
 import { useRef, useEffect } from "react";
 import { colNameAsKey } from "@/app/settings";
+import { IFilterState } from "./types";
 
 const FilterDropdown: React.FC<IFilterDropdownProps> = ({
   colname,
@@ -13,6 +14,14 @@ const FilterDropdown: React.FC<IFilterDropdownProps> = ({
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const key = colNameAsKey[colname] as DataItemsKeys;
+
+  // Ensure default values
+  const normalizedFilterState: IFilterState = {
+    selectedValues: [],
+    numberFilter: { type: 'eq', value: 0 },
+    dateRange: { start: '', end: '' },
+    ...filterState
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -33,11 +42,11 @@ const FilterDropdown: React.FC<IFilterDropdownProps> = ({
     <div className="p-4">
       <select
         className="mb-2 w-full p-2 bg-gray-800 rounded"
-        value={filterState.numberFilter?.type || "eq"}
+        value={normalizedFilterState.numberFilter?.type || "eq"}
         onChange={(e) =>
           onFilterChange({
             type: e.target.value as "gt" | "lt" | "eq",
-            value: filterState.numberFilter?.value || 0,
+            value: normalizedFilterState.numberFilter?.value || 0,
           })
         }
       >
@@ -48,10 +57,10 @@ const FilterDropdown: React.FC<IFilterDropdownProps> = ({
       <input
         type="number"
         className="w-full p-2 bg-gray-800 rounded"
-        value={filterState.numberFilter?.value || ""}
+        value={normalizedFilterState.numberFilter?.value || ""}
         onChange={(e) =>
           onFilterChange({
-            type: filterState.numberFilter?.type || "eq",
+            type: normalizedFilterState.numberFilter?.type || "eq",
             value: Number(e.target.value),
           })
         }
@@ -66,11 +75,11 @@ const FilterDropdown: React.FC<IFilterDropdownProps> = ({
         <input
           type="date"
           className="w-full p-2 bg-gray-800 rounded"
-          value={filterState.dateRange?.start || ""}
+          value={normalizedFilterState.dateRange?.start || ""}
           onChange={(e) =>
             onFilterChange({
               start: e.target.value,
-              end: filterState.dateRange?.end || "",
+              end: normalizedFilterState.dateRange?.end || "",
             })
           }
         />
@@ -80,10 +89,10 @@ const FilterDropdown: React.FC<IFilterDropdownProps> = ({
         <input
           type="date"
           className="w-full p-2 bg-gray-800 rounded"
-          value={filterState.dateRange?.end || ""}
+          value={normalizedFilterState.dateRange?.end || ""}
           onChange={(e) =>
             onFilterChange({
-              start: filterState.dateRange?.start || "",
+              start: normalizedFilterState.dateRange?.start || "",
               end: e.target.value,
             })
           }
@@ -99,11 +108,11 @@ const FilterDropdown: React.FC<IFilterDropdownProps> = ({
           <input
             type="checkbox"
             id={`${key}-${value}`}
-            checked={filterState.selectedValues?.includes(String(value))}
+            checked={normalizedFilterState.selectedValues?.includes(String(value))}
             onChange={(e) => {
               const newValues = e.target.checked
-                ? [...(filterState.selectedValues || []), String(value)]
-                : (filterState.selectedValues || []).filter(
+                ? [...(normalizedFilterState.selectedValues || []), String(value)]
+                : (normalizedFilterState.selectedValues || []).filter(
                     (v) => v !== String(value)
                   );
               onFilterChange(newValues);
