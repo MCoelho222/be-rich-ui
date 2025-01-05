@@ -1,15 +1,19 @@
+'use client'
+
 import FilterDropdown from "./FilterDropdown";
 import React, { useState, useMemo } from "react";
 import { DataItemsKeys, ColumnNames } from "../../../types";
 import { tableColNames, colNameAsKey } from "@/app/settings";
 import { formatTimestampToDate, isValidTimestamp } from "@/app/helpers/dates";
 import { IExpenseTableProps, IFilterState } from "./types";
+import { useExpense } from "@/app/contexts/ExpenseContext";
 
 const ExpenseTable: React.FC<IExpenseTableProps> = ({
   data,
   isLoading,
   error,
 }) => {
+  const { setFilteredData } = useExpense();
   const [filters, setFilters] = useState<{
     [key in DataItemsKeys]?: IFilterState;
   }>({});
@@ -29,7 +33,9 @@ const ExpenseTable: React.FC<IExpenseTableProps> = ({
   };
 
   const filteredData = useMemo(() => {
-    return data.filter((item) => {
+    let filteredDataArr = data.filter((item) => {
+      console.log(filters);
+      console.log(Object.entries(filters));
       return Object.entries(filters).every(([key, filter]) => {
         if (!filter) return true;
 
@@ -79,6 +85,8 @@ const ExpenseTable: React.FC<IExpenseTableProps> = ({
         return true;
       });
     });
+    setFilteredData(filteredDataArr);
+    return filteredDataArr;
   }, [data, filters]);
 
   // const toggleFilter = (colname: ColumnNames) => {
