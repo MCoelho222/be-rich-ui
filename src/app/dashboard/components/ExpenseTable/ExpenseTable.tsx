@@ -119,13 +119,13 @@ const ExpenseTable: React.FC<IExpenseTableProps> = ({
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="flex justify-center items-center h-screen overflow-x-auto">
+    <div className="flex flex-col h-screen items-center overflow-x-auto mt-4">
       <table className="w-5/6 bg-gray-900">
         <thead>
           <tr className="bg-transparent">
             {tableColNames.map((colname, idx) => (
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-textGrayLight uppercase tracking-wider"
                 key={idx}
                 onMouseEnter={() => setHoveredColumn(colname as ColumnNames)}
                 onMouseLeave={() => setHoveredColumn(null)}
@@ -178,7 +178,7 @@ const ExpenseTable: React.FC<IExpenseTableProps> = ({
                 }
                 return (
                   <td
-                    className="px-6 py-2 whitespace-nowrap text-xs font-medium text-gray-500"
+                    className="px-6 py-2 whitespace-nowrap text-xs font-medium text-textGrayDark"
                     key={idx}
                   >
                     {value}

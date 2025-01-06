@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import colors from 'tailwindcss/colors'; 
 
 export default {
   content: [
@@ -11,6 +12,10 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        textGrayLight: colors.gray['400'],            // #9ca3af
+        textGrayDark: colors.gray['600'],             // #374151
+        textLink: colors.sky['600'],                  // #0284c7
+        textWhite: colors.gray['200'],                // #e5e7eb
       },
     },
   },

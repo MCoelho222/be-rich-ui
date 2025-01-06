@@ -6,7 +6,7 @@ import { IResponseData } from "../types";
 import Link from "next/link";
 import StatisticDisplay from "./components/StatisticDisplay";
 import { useExpense } from "../contexts/ExpenseContext";
-
+import { calculateTotalExpense } from "../helpers/statistics";
 export default function Dashboard() {
   const { originalData, filteredData, setOriginalData } = useExpense();
   const [isLoading, setIsLoading] = useState(true);
@@ -31,12 +31,14 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
+   const totalExpense = calculateTotalExpense(filteredData);
 
   return (
     <div className="container mx-auto p-4 flex flex-col justify-center items-center">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <Link href={"/register"}>Back to register</Link>
-      <StatisticDisplay title="Total" value={250}></StatisticDisplay>
+      <div className="flex flex-row mb-4 mt-4">
+        <StatisticDisplay title="Total Expense" value={totalExpense}></StatisticDisplay>
+      </div>
+      <Link className="text-textLink" href={"/register"}>Back to register</Link>
       <ExpenseTable
         data={originalData}
         isLoading={isLoading}
