@@ -1,52 +1,34 @@
-"use client";
-// pages/your-page.tsx
-import { useEffect, useState } from "react";
-// import ExpenseTable from "./components/ExpenseTable/ExpenseTable";
-// import { IResponseData } from "../types";
-import Link from "next/link";
-import StatisticDisplay from "./components/StatisticDisplay";
-import { useExpense } from "../contexts/ExpenseContext";
-import { calculateTotalExpense } from "../helpers/statistics";
-import MainTable from "./components/MainTable";
+import { AppSidebar } from "@/app/dashboard/components/app-sidebar";
+import { ChartAreaInteractive } from "@/app/dashboard/components/chart-area-interactive";
+import { DataTable } from "@/app/dashboard/components/data-table";
+import { SectionCards } from "@/app/dashboard/components/section-cards";
+import { SiteHeader } from "@/app/dashboard/components/site-header";
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "@/app/dashboard/components/ui/sidebar";
 
-export default function Dashboard() {
-  const { originalData, filteredData, setOriginalData } = useExpense();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+import data from "./data.json";
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-        const response = await fetch(baseUrl + "/expenses/");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const jsonData = await response.json();
-        setOriginalData(jsonData);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error("An error occurred"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-  const totalExpense = calculateTotalExpense(filteredData);
-  // const originalDataNoId = originalData.map(({id, ...rest}) => rest);
+export default function Page() {
   return (
-    <div className="container mx-auto p-4 flex flex-col justify-center items-center">
-      <div className="flex flex-row mb-4 mt-4">
-        <StatisticDisplay title="Total Expense" value={totalExpense}></StatisticDisplay>
-      </div>
-      <Link className="text-textLink" href={"/register"}>Back to register</Link>
-      <MainTable rows={originalData}></MainTable>
-      {/* <ExpenseTable
-        data={originalData}
-        isLoading={isLoading}
-        error={error || undefined}
-      /> */}
-    </div>
+    <SidebarProvider>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
+              </div>
+              <DataTable data={data} />
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
+

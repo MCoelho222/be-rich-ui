@@ -1,13 +1,15 @@
 "use client"
-import { ExpenseProvider } from "./contexts/ExpenseContext";
-import { HeroUIProvider } from "@heroui/react";
+import { ThemeProvider } from "./dashboard/components/providers/theme-provider";
 const Providers = ({ children } : { children: React.ReactNode }) => {
     return (
-        <HeroUIProvider>
-            <ExpenseProvider>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
                 {children}
-            </ExpenseProvider>
-        </HeroUIProvider>
+            </ThemeProvider>
     );
 }
 
