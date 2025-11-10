@@ -1,9 +1,9 @@
-import NewEntryModal from "@components/NewEntryModal"
+import NewEntryModal from "@/components/NewEntryModal"
 
 export default function Home() {
   return (
     <div>
-      <h1>Be Rich UI</h1>
+      <NewEntryModal></NewEntryModal>
     </div>
   );
 }
