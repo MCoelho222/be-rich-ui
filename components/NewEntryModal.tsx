@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
+import { json, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CurrencyInput from "react-currency-input-field";
 
-// shadcn/ui components (ensure you've generated these)
+// shadcn/ui components
 import {
   Dialog,
   DialogTrigger,
@@ -29,11 +29,14 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+
+import axios from 'axios';
 import { PaymentMethod, Category, Source, EntryType } from "@/helpers/newEntryHelpers";
+import { toSnakeCaseKeys } from "@/utils/payloads";
 
 // ---------- Schema ----------
 const EntrySchema = z.object({
-  entryType: z.enum(EntryType, { error: "Pick an entry type" }),
+  entryType: z.enum(EntryType),
   amount: z
     .coerce
     .number({ error: "Enter a valid amount" })
@@ -52,8 +55,8 @@ const EntrySchema = z.object({
   paymentMethod: z.enum(PaymentMethod, {error: "Pick a method"})
 });
 
-type FormInput = z.input<typeof EntrySchema>;
-type FormOutput = z.output<typeof EntrySchema>;
+type FormInput = z.input<typeof EntrySchema>; // Type before parsing
+type FormOutput = z.output<typeof EntrySchema>; // Type after parsing
 
 export default function FinanceEntryModal() {
   const [open, setOpen] = useState(false);
@@ -69,20 +72,39 @@ export default function FinanceEntryModal() {
     defaultValues: {
       entryType: EntryType.EXPENSE,
       installments: 1,
-      category: Category.OTHER,
       source: Source.MARCELO,
-      description: "",
       fixed: false,
-      createdAt: new Date(),
+      category: Category.SUPERMARKET,
+      createdAt: new Date().toISOString().split("T")[0],
       paymentMethod: PaymentMethod.SANTANDER
     },
   });
 
   async function onSubmit(values: FormInput) {
-    // Replace with your mutation / server action
-    // Example payload you might send to your API
-    const payload: FormOutput = EntrySchema.parse(values);
-    console.log("Submitting:", payload);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/entries/";
+    const parsed: FormOutput = EntrySchema.parse(values);
+    const createdAtISO = new Date(parsed.createdAt).toISOString();
+    const payload = toSnakeCaseKeys({
+      ...parsed,
+      createdAt: createdAtISO
+    })
+    if (!apiUrl) {
+      console.error("NEXT_PUBLIC_API_URL is not defined");
+      // Skip network call if API URL is missing, but still reset/close the modal or handle as needed
+      reset();
+      setOpen(false);
+      return;
+    }
+    try {
+      const res = await axios.post(apiUrl, payload, {
+        headers: {
+            'Content-Type': 'application/json'
+        }}
+      );
+      console.log("Server response:", res.data);
+    } catch (error) {
+      console.error("Failed to submit entry:", error);
+    }
 
     // Simulate success
     reset();
@@ -110,91 +132,118 @@ export default function FinanceEntryModal() {
           onSubmit={handleSubmit(onSubmit)}
           className="grid gap-4 py-2"
         >
-          {/* Kind */}
-          <div className="grid gap-2">
-            <Label htmlFor="entryType">Type *</Label>
-            <Controller
-              name="entryType"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger id="entryType">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={EntryType.INCOME}>Income</SelectItem>
-                    <SelectItem value={EntryType.EXPENSE}>Expense</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.entryType && (
-              <p className="text-sm text-red-500">{errors.entryType.message}</p>
-            )}
-          </div>
+          {/* Entry type */}
+          <div className="flex flex-row gap-4">
 
-          {/* Amount */}
-          <div className="grid gap-2">
-            <Label htmlFor="amount">Amount *</Label>
-            <Controller
-              name="amount"
-              control={control}
-              render={({ field }) => (
-                <CurrencyInput
-                  id="amount"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  prefix="R$ "
-                  decimalScale={2}
-                  decimalsLimit={2}
-                  intlConfig={{ locale: "pt-BR", currency: "BRL" }}
-                  value={Number.isFinite(field.value) ? field.value as number : undefined}
-                  onValueChange={(val) => field.onChange(Number(val || 0))}
-                />
+            <div className="grid gap-2">
+              <Label htmlFor="entryType">Type *</Label>
+              <Controller
+                name="entryType"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger id="entryType">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EntryType.INCOME}>Income</SelectItem>
+                      <SelectItem value={EntryType.EXPENSE}>Expense</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.entryType && (
+                <p className="text-sm text-red-500">{errors.entryType.message}</p>
               )}
-            />
-            {errors.amount && (
-              <p className="text-sm text-red-500">{errors.amount.message}</p>
-            )}
+            </div>
+
+            {/* Amount */}
+            <div className="grid gap-2">
+              <Label htmlFor="amount">Amount *</Label>
+              <Controller
+                name="amount"
+                control={control}
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="amount"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    prefix="R$ "
+                    decimalScale={2}
+                    decimalsLimit={2}
+                    intlConfig={{ locale: "pt-BR", currency: "BRL" }}
+                    value={
+                      typeof field.value === "number" && !isNaN(field.value)
+                        ? field.value.toString()
+                        : undefined
+                    }
+                    onValueChange={(val) => {
+                      const parsed = val ? parseFloat(val.replace(",", ".")) : 0;
+                      field.onChange(parsed);
+                    }}
+                  />
+                )}
+              />
+              {errors.amount && (
+                <p className="text-sm text-red-500">{errors.amount.message}</p>
+              )}
+            </div>
           </div>
 
           {/* Date */}
           <div className="grid gap-2">
             <Label htmlFor="createdAt">Date *</Label>
-            <Input id="createdAt" type="createdAt" {...register("createdAt")} />
+            <Input id="createdAt" type="date" {...register("createdAt")} />
             {errors.createdAt && (
               <p className="text-sm text-red-500">{errors.createdAt.message as string}</p>
             )}
           </div>
 
           {/* Category */}
-          <div className="grid gap-2">
-            <Label htmlFor="category">Category *</Label>
-            <Input id="category" placeholder="e.g. Groceries, Salary" {...register("category")} />
-            {errors.category && (
-              <p className="text-sm text-red-500">{errors.category.message}</p>
-            )}
-          </div>
+          <div className="flex flex-row gap-4">
 
-          {/* Payment method */}
-          <div className="grid gap-2">
-            <Label htmlFor="paymentMethod">Payment method</Label>
-            <Controller
-              name="paymentMethod"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger id="paymentMethod">
-                    <SelectValue placeholder="Select a method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">Card</SelectItem>
-                    <SelectItem value="bank">Bank transfer</SelectItem>
-                    <SelectItem value="pix">PIX</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="grid gap-2">
+              <Label htmlFor="category">Catgerory *</Label>
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(Category).map((cat) => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.category && (
+                <p className="text-sm text-red-500">{errors.category.message}</p>
               )}
-            />
+            </div>
+
+            {/* Payment method */}
+            <div className="grid gap-2">
+              <Label htmlFor="paymentMethod">Payment method</Label>
+              <Controller
+                name="paymentMethod"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="paymentMethod">
+                      <SelectValue placeholder="Select a method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(PaymentMethod).map((method) => (
+                        <SelectItem key={method} value={method}>{method}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
           </div>
 
           {/* Recurring */}
@@ -220,7 +269,7 @@ export default function FinanceEntryModal() {
             <Textarea id="description" placeholder="Optional details" {...register("description")} />
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
