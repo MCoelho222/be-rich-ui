@@ -60,6 +60,7 @@ type FormOutput = z.output<typeof EntrySchema>; // Type after parsing
 
 export default function FinanceEntryModal() {
   const [open, setOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState<EntryType | null>(null);
 
   const {
     register,
@@ -67,6 +68,7 @@ export default function FinanceEntryModal() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue
   } = useForm<FormInput>({
     resolver: zodResolver(EntrySchema),
     defaultValues: {
@@ -111,6 +113,15 @@ export default function FinanceEntryModal() {
     setOpen(false);
   }
 
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      // Closing: reset everything
+      reset();
+      setSelectedType(null);
+    }
+    setOpen(value);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -128,33 +139,66 @@ export default function FinanceEntryModal() {
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="grid gap-4 py-2"
-        >
-          {/* Entry type */}
-          <div className="flex flex-row gap-4">
+        {/* STEP 1: choose Income / Expense */}
+        {!selectedType && (
+          <div className="grid gap-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              What kind of entry do you want to add?
+            </p>
+            <div className="flex gap-3">
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => {
+                  setSelectedType(EntryType.INCOME);
+                  setValue("entryType", EntryType.INCOME);
+                }}
+              >
+                Income
+              </Button>
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => {
+                  setSelectedType(EntryType.EXPENSE);
+                  setValue("entryType", EntryType.EXPENSE);
+                }}
+              >
+                Expense
+              </Button>
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => handleOpenChange(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
 
-            <div className="grid gap-2">
-              <Label htmlFor="entryType">Type *</Label>
-              <Controller
-                name="entryType"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger id="entryType">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={EntryType.INCOME}>Income</SelectItem>
-                      <SelectItem value={EntryType.EXPENSE}>Expense</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.entryType && (
-                <p className="text-sm text-red-500">{errors.entryType.message}</p>
-              )}
+        {/* STEP 2: show the appropriate form */}
+        {selectedType && (
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-2">
+            {/* Selected type badge instead of select */}
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <span className="font-medium">Type:</span>{" "}
+                {selectedType === EntryType.INCOME ? "Income" : "Expense"}
+              </div>
+              {/* If you want a “Change type” option */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedType(null);
+                }}
+              >
+                Change
+              </Button>
             </div>
 
             {/* Amount */}
@@ -184,100 +228,153 @@ export default function FinanceEntryModal() {
                 )}
               />
               {errors.amount && (
-                <p className="text-sm text-red-500">{errors.amount.message}</p>
+                <p className="text-sm text-red-500">
+                  {errors.amount.message}
+                </p>
               )}
             </div>
-          </div>
 
-          {/* Date */}
-          <div className="grid gap-2">
-            <Label htmlFor="createdAt">Date *</Label>
-            <Input id="createdAt" type="date" {...register("createdAt")} />
-            {errors.createdAt && (
-              <p className="text-sm text-red-500">{errors.createdAt.message as string}</p>
+            {/* Date */}
+            <div className="grid gap-2">
+              <Label htmlFor="createdAt">Date *</Label>
+              <Input id="createdAt" type="date" {...register("createdAt")} />
+              {errors.createdAt && (
+                <p className="text-sm text-red-500">
+                  {errors.createdAt.message as string}
+                </p>
+              )}
+            </div>
+
+            {/* Only for EXPENSE: category + payment method + installments + source (if you want) */}
+            {selectedType === EntryType.EXPENSE && (
+              <>
+                <div className="flex flex-row gap-4">
+                  {/* Category */}
+                  <div className="grid gap-2 flex-1">
+                    <Label htmlFor="category">Category *</Label>
+                    <Controller
+                      name="category"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger id="category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.values(Category).map((cat) => (
+                              <SelectItem key={cat} value={cat}>
+                                {cat}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.category && (
+                      <p className="text-sm text-red-500">
+                        {errors.category.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Payment method */}
+                  <div className="grid gap-2 flex-1">
+                    <Label htmlFor="paymentMethod">Payment method *</Label>
+                    <Controller
+                      name="paymentMethod"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger id="paymentMethod">
+                            <SelectValue placeholder="Select a method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.values(PaymentMethod).map((method) => (
+                              <SelectItem key={method} value={method}>
+                                {method}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.paymentMethod && (
+                      <p className="text-sm text-red-500">
+                        {errors.paymentMethod.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Installments */}
+                <div className="grid gap-2">
+                  <Label htmlFor="installments">Installments *</Label>
+                  <Input
+                    id="installments"
+                    type="number"
+                    min={1}
+                    {...register("installments", { valueAsNumber: true })}
+                  />
+                  {errors.installments && (
+                    <p className="text-sm text-red-500">
+                      {errors.installments.message}
+                    </p>
+                  )}
+                </div>
+              </>
             )}
-          </div>
 
-          {/* Category */}
-          <div className="flex flex-row gap-4">
-
-            <div className="grid gap-2">
-              <Label htmlFor="category">Catgerory *</Label>
+            {/* Recurring (both Income and Expense) */}
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-1">
+                <Label htmlFor="recurring">Recurring</Label>
+                <p className="text-xs text-muted-foreground">
+                  Apply this entry monthly until you cancel it.
+                </p>
+              </div>
               <Controller
-                name="category"
+                name="fixed"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(Category).map((cat) => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.category && (
-                <p className="text-sm text-red-500">{errors.category.message}</p>
-              )}
-            </div>
-
-            {/* Payment method */}
-            <div className="grid gap-2">
-              <Label htmlFor="paymentMethod">Payment method</Label>
-              <Controller
-                name="paymentMethod"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger id="paymentMethod">
-                      <SelectValue placeholder="Select a method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(PaymentMethod).map((method) => (
-                        <SelectItem key={method} value={method}>{method}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Switch
+                    id="fixed"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                 )}
               />
             </div>
-          </div>
 
-          {/* Recurring */}
-          <div className="flex items-center justify-between rounded-lg border p-3">
-            <div className="space-y-1">
-              <Label htmlFor="recurring">Recurring</Label>
-              <p className="text-xs text-muted-foreground">
-                Apply this entry monthly until you cancel it.
-              </p>
+            {/* Notes (both Income and Expense) */}
+            <div className="grid gap-2">
+              <Label htmlFor="description">Notes</Label>
+              <Textarea
+                id="description"
+                placeholder="Optional details"
+                {...register("description")}
+              />
             </div>
-            <Controller
-              name="fixed"
-              control={control}
-              render={({ field }) => (
-                <Switch id="fixed" checked={field.value} onCheckedChange={field.onChange} />
-              )}
-            />
-          </div>
 
-          {/* Description */}
-          <div className="grid gap-2">
-            <Label htmlFor="description">Notes</Label>
-            <Textarea id="description" placeholder="Optional details" {...register("description")} />
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving…" : "Save entry"}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving…" : "Save entry"}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
