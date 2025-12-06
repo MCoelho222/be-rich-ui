@@ -32,7 +32,7 @@ export enum Source {
   OTHER = "Other",
 }
 
-export enum EntryType {
+export enum EntryMode {
   INCOME = "Income",
   EXPENSE = "Expense",
 }

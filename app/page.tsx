@@ -1,9 +1,14 @@
-import NewEntryModal from "@/components/NewEntryModal"
+"use client";
+import Link from "next/link";
 
-export default function Home() {
+
+const Home = () => {
+  
   return (
-    <div>
-      <NewEntryModal></NewEntryModal>
+    <div className="text-xl text-center flex flex-row justify-center items-center h-screen">
+      <Link href="/dashboard">Go to Dashboard</Link>
     </div>
   );
 }
+
+export default Home;

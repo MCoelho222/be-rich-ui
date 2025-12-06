@@ -1,8 +1,6 @@
 "use client";
-
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { json, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CurrencyInput from "react-currency-input-field";
 
@@ -30,37 +28,15 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-import axios from 'axios';
-import { PaymentMethod, Category, Source, EntryType } from "@/helpers/newEntryHelpers";
+import axios from "axios";
+import { EntrySchema } from "@/schema/entriesSchema";
+import { FormInputType, FormOutputType } from "@/types/entryType";
 import { toSnakeCaseKeys } from "@/utils/payloads";
+import { PaymentMethod, Category, Source, EntryMode } from "@/helpers/entriesHelper";
 
-// ---------- Schema ----------
-const EntrySchema = z.object({
-  entryType: z.enum(EntryType),
-  amount: z
-    .coerce
-    .number({ error: "Enter a valid amount" })
-    .positive({error: "Must be greater than zero"}),
-  installments: z
-    .coerce
-    .number({error: "Enter a valid integer"})
-    .int()
-    .min(1, {error: "Must be at least 1"})
-    .default(1),
-  createdAt: z.coerce.date({ error: "Pick a date" }),
-  category: z.enum(Category, { error: "Pick a category" }),
-  source: z.enum(Source, { error: "Pick a source" }),
-  description: z.string().max(200, { error: "Max 200 characters" }).optional(),
-  fixed: z.boolean({ error: "Invalid boolean" }).default(false),
-  paymentMethod: z.enum(PaymentMethod, {error: "Pick a method"})
-});
-
-type FormInput = z.input<typeof EntrySchema>; // Type before parsing
-type FormOutput = z.output<typeof EntrySchema>; // Type after parsing
-
-export default function FinanceEntryModal() {
+export default function EntryModal() {
   const [open, setOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState<EntryType | null>(null);
+  const [selectedType, setSelectedType] = useState<EntryMode | null>(null);
 
   const {
     register,
@@ -68,31 +44,30 @@ export default function FinanceEntryModal() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setValue
-  } = useForm<FormInput>({
+    setValue,
+  } = useForm<FormInputType>({
     resolver: zodResolver(EntrySchema),
     defaultValues: {
-      entryType: EntryType.EXPENSE,
+      entryType: EntryMode.EXPENSE,
       installments: 1,
       source: Source.MARCELO,
       fixed: false,
       category: Category.SUPERMARKET,
       createdAt: new Date().toISOString().split("T")[0],
-      paymentMethod: PaymentMethod.SANTANDER
+      paymentMethod: PaymentMethod.SANTANDER,
     },
   });
 
-  async function onSubmit(values: FormInput) {
+  async function onSubmit(values: FormInputType) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/entries/";
-    const parsed: FormOutput = EntrySchema.parse(values);
+    const parsed: FormOutputType = EntrySchema.parse(values);
     const createdAtISO = new Date(parsed.createdAt).toISOString();
     const payload = toSnakeCaseKeys({
       ...parsed,
-      createdAt: createdAtISO
-    })
-    if (!apiUrl) {
+      createdAt: createdAtISO,
+    });
+    if (!apiUrl || apiUrl.includes("undefined")) {
       console.error("NEXT_PUBLIC_API_URL is not defined");
-      // Skip network call if API URL is missing, but still reset/close the modal or handle as needed
       reset();
       setOpen(false);
       return;
@@ -100,9 +75,9 @@ export default function FinanceEntryModal() {
     try {
       const res = await axios.post(apiUrl, payload, {
         headers: {
-            'Content-Type': 'application/json'
-        }}
-      );
+          "Content-Type": "application/json",
+        },
+      });
       console.log("Server response:", res.data);
     } catch (error) {
       console.error("Failed to submit entry:", error);
@@ -142,16 +117,14 @@ export default function FinanceEntryModal() {
         {/* STEP 1: choose Income / Expense */}
         {!selectedType && (
           <div className="grid gap-4 py-4">
-            <p className="text-sm text-muted-foreground">
-              What kind of entry do you want to add?
-            </p>
+            <p className="text-sm text-muted-foreground">What kind of entry do you want to add?</p>
             <div className="flex gap-3">
               <Button
                 className="flex-1"
                 variant="outline"
                 onClick={() => {
-                  setSelectedType(EntryType.INCOME);
-                  setValue("entryType", EntryType.INCOME);
+                  setSelectedType(EntryMode.INCOME);
+                  setValue("entryType", EntryMode.INCOME);
                 }}
               >
                 Income
@@ -160,19 +133,15 @@ export default function FinanceEntryModal() {
                 className="flex-1"
                 variant="outline"
                 onClick={() => {
-                  setSelectedType(EntryType.EXPENSE);
-                  setValue("entryType", EntryType.EXPENSE);
+                  setSelectedType(EntryMode.EXPENSE);
+                  setValue("entryType", EntryMode.EXPENSE);
                 }}
               >
                 Expense
               </Button>
             </div>
             <div className="flex justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => handleOpenChange(false)}
-              >
+              <Button type="button" variant="ghost" onClick={() => handleOpenChange(false)}>
                 Cancel
               </Button>
             </div>
@@ -186,7 +155,7 @@ export default function FinanceEntryModal() {
             <div className="flex items-center justify-between">
               <div className="text-sm">
                 <span className="font-medium">Type:</span>{" "}
-                {selectedType === EntryType.INCOME ? "Income" : "Expense"}
+                {selectedType === EntryMode.INCOME ? "Income" : "Expense"}
               </div>
               {/* If you want a “Change type” option */}
               <Button
@@ -227,11 +196,7 @@ export default function FinanceEntryModal() {
                   />
                 )}
               />
-              {errors.amount && (
-                <p className="text-sm text-red-500">
-                  {errors.amount.message}
-                </p>
-              )}
+              {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
             </div>
 
             {/* Date */}
@@ -239,14 +204,12 @@ export default function FinanceEntryModal() {
               <Label htmlFor="createdAt">Date *</Label>
               <Input id="createdAt" type="date" {...register("createdAt")} />
               {errors.createdAt && (
-                <p className="text-sm text-red-500">
-                  {errors.createdAt.message as string}
-                </p>
+                <p className="text-sm text-red-500">{errors.createdAt.message as string}</p>
               )}
             </div>
 
             {/* Only for EXPENSE: category + payment method + installments + source (if you want) */}
-            {selectedType === EntryType.EXPENSE && (
+            {selectedType === EntryMode.EXPENSE && (
               <>
                 <div className="flex flex-row gap-4">
                   {/* Category */}
@@ -256,10 +219,7 @@ export default function FinanceEntryModal() {
                       name="category"
                       control={control}
                       render={({ field }) => (
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <SelectTrigger id="category">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
@@ -274,9 +234,7 @@ export default function FinanceEntryModal() {
                       )}
                     />
                     {errors.category && (
-                      <p className="text-sm text-red-500">
-                        {errors.category.message}
-                      </p>
+                      <p className="text-sm text-red-500">{errors.category.message}</p>
                     )}
                   </div>
 
@@ -287,10 +245,7 @@ export default function FinanceEntryModal() {
                       name="paymentMethod"
                       control={control}
                       render={({ field }) => (
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <SelectTrigger id="paymentMethod">
                             <SelectValue placeholder="Select a method" />
                           </SelectTrigger>
@@ -305,9 +260,7 @@ export default function FinanceEntryModal() {
                       )}
                     />
                     {errors.paymentMethod && (
-                      <p className="text-sm text-red-500">
-                        {errors.paymentMethod.message}
-                      </p>
+                      <p className="text-sm text-red-500">{errors.paymentMethod.message}</p>
                     )}
                   </div>
                 </div>
@@ -322,9 +275,7 @@ export default function FinanceEntryModal() {
                     {...register("installments", { valueAsNumber: true })}
                   />
                   {errors.installments && (
-                    <p className="text-sm text-red-500">
-                      {errors.installments.message}
-                    </p>
+                    <p className="text-sm text-red-500">{errors.installments.message}</p>
                   )}
                 </div>
               </>
@@ -342,11 +293,7 @@ export default function FinanceEntryModal() {
                 name="fixed"
                 control={control}
                 render={({ field }) => (
-                  <Switch
-                    id="fixed"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Switch id="fixed" checked={field.value} onCheckedChange={field.onChange} />
                 )}
               />
             </div>
@@ -362,11 +309,7 @@ export default function FinanceEntryModal() {
             </div>
 
             <DialogFooter className="gap-2 sm:gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleOpenChange(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
