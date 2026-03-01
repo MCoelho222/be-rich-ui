@@ -1,14 +1,25 @@
-const DisplayValue = ({ value }: { value: number }) => {
-  const numAsString = String(value);
-  const splitNum = numAsString.split(".");
-  const intNum = splitNum[0];
-  const decimalNum = splitNum[1];
-  return (
-    <>
-      <span className="text-xl">{intNum}</span>
-      {decimalNum && <span className="text-sm">,{decimalNum}</span>}
-    </>
-  )
+interface IDisplayValue {
+  value: number;
+  asCurrency: boolean;
+  title: string;
 }
 
-export default DisplayValue
+const DisplayValue = ({ value, asCurrency, title }: IDisplayValue) => {
+  const stringNum = String(value);
+  const splitStringNum = stringNum.split(".");
+  const intPart = splitStringNum[0];
+  const cents = splitStringNum[1] ? splitStringNum[1] : "00";
+  if (splitStringNum.length > 1) {
+  }
+  return (
+    <div className="flex flex-col">
+      <span className="text-xl">{title}</span>
+      <div className="inline-flex items-end">
+        <span className="text-7xl font-semibold leading-none">{intPart}</span>
+        {asCurrency && <span className="text-base leading-none pb-1">,{cents}</span>}
+      </div>
+    </div>
+  );
+};
+
+export default DisplayValue;

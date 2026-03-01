@@ -47,7 +47,7 @@ const Dashboard = () => {
         <EntryModal />
       </div>
       <div className="flex flex-row justify-center">
-        {entries.length > 0 && <DisplayValue value={totalExpense} />}
+        {entries.length > 0 && <DisplayValue value={totalExpense} title="Total Income" asCurrency/>}
       </div>
       <div className="mt-8 flex flex-row justify-center">
         <EntryTable entries={entries} />
