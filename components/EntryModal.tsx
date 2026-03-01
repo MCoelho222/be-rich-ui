@@ -28,15 +28,15 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-import axios from "axios";
 import { EntrySchema } from "@/schema/entriesSchema";
 import { FormInputType, FormOutputType } from "@/types/entryType";
-import { toSnakeCaseKeys } from "@/utils/payloads";
 import { PaymentMethod, Category, Source, EntryMode } from "@/helpers/entriesHelper";
+import { useEntries } from "@/context/EntriesContext";
 
 export default function EntryModal() {
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<EntryMode | null>(null);
+  const { addEntry } = useEntries();
 
   const {
     register,
@@ -59,33 +59,14 @@ export default function EntryModal() {
   });
 
   async function onSubmit(values: FormInputType) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/entries/";
-    const parsed: FormOutputType = EntrySchema.parse(values);
-    const createdAtISO = new Date(parsed.createdAt).toISOString();
-    const payload = toSnakeCaseKeys({
-      ...parsed,
-      createdAt: createdAtISO,
-    });
-    if (!apiUrl || apiUrl.includes("undefined")) {
-      console.error("NEXT_PUBLIC_API_URL is not defined");
+    try {
+      const parsed: FormOutputType = EntrySchema.parse(values);
+      await addEntry(parsed);
       reset();
       setOpen(false);
-      return;
-    }
-    try {
-      const res = await axios.post(apiUrl, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("Server response:", res.data);
     } catch (error) {
       console.error("Failed to submit entry:", error);
     }
-
-    // Simulate success
-    reset();
-    setOpen(false);
   }
 
   const handleOpenChange = (value: boolean) => {

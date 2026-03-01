@@ -12,7 +12,7 @@ const DisplayValue = ({ value, asCurrency, title }: IDisplayValue) => {
   if (splitStringNum.length > 1) {
   }
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col text-slate-400">
       <span className="text-xl">{title}</span>
       <div className="inline-flex items-end">
         <span className="text-7xl font-semibold leading-none">{intPart}</span>

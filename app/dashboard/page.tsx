@@ -1,17 +1,20 @@
 "use client";
 import EntryModal from "@/components/EntryModal";
 import EntryTable from "@/components/EntryTable";
-import { useEffect, useState } from "react";
-import { Entry, EntryRead } from "@/types/entryType";
 import DisplayValue from "@/components/DisplayValue";
+import DatePeriodSelector from "@/components/DatePeriodSelector";
 import { calculateFiltered } from "@/utils/calculus";
+import { EntriesProvider, useEntries } from "@/context/EntriesContext";
+import { useEffect, useState, useCallback } from "react";
+import { Entry, EntryRead } from "@/types/entryType";
 import { camelizeKeysShallow } from "@/utils/payloads";
 import axios from "axios";
+import { sortEntriesByDate, filterEntriesByPeriod } from "@/utils/dates";
 
-const Dashboard = () => {
-  const [entries, setEntries] = useState<Entry[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const DashboardContent = () => {
+  const { entries, setEntries, setLoading, setError } = useEntries();
+  const [filteredEntries, setFilteredEntries] = useState<Entry[]>([]);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   useEffect(() => {
     const loadEntries = async () => {
@@ -29,8 +32,9 @@ const Dashboard = () => {
           throw new Error("Failed to load entries");
         }
         const data = res.data as EntryRead[];
-        const dataCamelized = data.map((entry) => camelizeKeysShallow(entry))
-        setEntries(dataCamelized);
+        const dataCamelized = data.map((entry) => camelizeKeysShallow(entry));
+        const sortedByCreatedAt = sortEntriesByDate(dataCamelized);
+        setEntries(sortedByCreatedAt);
       } catch (err) {
         console.error("Error loading entries:", err);
         setError("Could not load entries.");
@@ -39,20 +43,50 @@ const Dashboard = () => {
       }
     };
     loadEntries();
+  }, [setEntries, setLoading, setError]);
+
+  const handlePeriodChange = useCallback(
+    (startDate: string, endDate: string) => {
+      const filtered = filterEntriesByPeriod(entries, startDate, endDate);
+      setFilteredEntries(filtered);
+      setIsFiltered(true);
+    },
+    [entries]
+  );
+
+  const handleClearFilter = useCallback(() => {
+    setFilteredEntries([]);
+    setIsFiltered(false);
   }, []);
-  const totalExpense = calculateFiltered(entries, "sum", "amount", "Income");
+
+  const displayedEntries = isFiltered ? filteredEntries : entries;
+  const totalExpense = calculateFiltered(displayedEntries, "sum", "amount", "Income");
+
   return (
     <div className="p-6">
       <div className="absolute bottom-7 right-5">
         <EntryModal />
       </div>
-      <div className="flex flex-row justify-center">
-        {entries.length > 0 && <DisplayValue value={totalExpense} title="Total Income" asCurrency/>}
+      <div className="flex flex-row justify-center mb-6">
+        <DatePeriodSelector onPeriodChange={handlePeriodChange} onClear={handleClearFilter} />
       </div>
-      <div className="mt-8 flex flex-row justify-center">
-        <EntryTable entries={entries} />
+      <div className="flex flex-row justify-center">
+        {displayedEntries.length > 0 && (
+          <DisplayValue value={totalExpense} title="Total Income" asCurrency />
+        )}
+      </div>
+      <div className="mt-8 flex flex-col items-center gap-4">
+        <EntryTable entries={displayedEntries} />
       </div>
     </div>
+  );
+};
+
+const Dashboard = () => {
+  return (
+    <EntriesProvider>
+      <DashboardContent />
+    </EntriesProvider>
   );
 };
 
