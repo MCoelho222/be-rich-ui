@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CurrencyInput from "react-currency-input-field";
+import { colorClasses } from "@/config/colors";
 
 // shadcn/ui components
 import {
@@ -81,7 +82,7 @@ export default function EntryModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="rounded-2xl shadow-sm">New entry</Button>
+        <Button className="rounded-xl shadow-sm bg-slate-600">New entry</Button>
       </DialogTrigger>
 
       {/* Custom overlay to blur the page */}
@@ -177,7 +178,9 @@ export default function EntryModal() {
                   />
                 )}
               />
-              {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
+              {errors.amount && (
+                <p className={`text-sm ${colorClasses.state.error}`}>{errors.amount.message}</p>
+              )}
             </div>
 
             {/* Date */}
@@ -185,7 +188,9 @@ export default function EntryModal() {
               <Label htmlFor="createdAt">Date *</Label>
               <Input id="createdAt" type="date" {...register("createdAt")} />
               {errors.createdAt && (
-                <p className="text-sm text-red-500">{errors.createdAt.message as string}</p>
+                <p className={`text-sm ${colorClasses.state.error}`}>
+                  {errors.createdAt.message as string}
+                </p>
               )}
             </div>
 
@@ -215,7 +220,9 @@ export default function EntryModal() {
                       )}
                     />
                     {errors.category && (
-                      <p className="text-sm text-red-500">{errors.category.message}</p>
+                      <p className={`text-sm ${colorClasses.state.error}`}>
+                        {errors.category.message}
+                      </p>
                     )}
                   </div>
 
@@ -241,7 +248,9 @@ export default function EntryModal() {
                       )}
                     />
                     {errors.paymentMethod && (
-                      <p className="text-sm text-red-500">{errors.paymentMethod.message}</p>
+                      <p className={`text-sm ${colorClasses.state.error}`}>
+                        {errors.paymentMethod.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -256,7 +265,9 @@ export default function EntryModal() {
                     {...register("installments", { valueAsNumber: true })}
                   />
                   {errors.installments && (
-                    <p className="text-sm text-red-500">{errors.installments.message}</p>
+                    <p className={`text-sm ${colorClasses.state.error}`}>
+                      {errors.installments.message}
+                    </p>
                   )}
                 </div>
               </>

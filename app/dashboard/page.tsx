@@ -3,13 +3,16 @@ import EntryModal from "@/components/EntryModal";
 import EntryTable from "@/components/EntryTable";
 import DisplayValue from "@/components/DisplayValue";
 import DatePeriodSelector from "@/components/DatePeriodSelector";
-import { calculateFiltered } from "@/utils/calculus";
+import { getStat } from "@/utils/stats";
 import { EntriesProvider, useEntries } from "@/context/EntriesContext";
 import { useEffect, useState, useCallback } from "react";
 import { Entry, EntryRead } from "@/types/entryType";
 import { camelizeKeysShallow } from "@/utils/payloads";
 import axios from "axios";
-import { sortEntriesByDate, filterEntriesByPeriod } from "@/utils/dates";
+import { sortEntriesByDate } from "@/utils/dates";
+import { colorClasses } from "@/config/colors";
+import { filterByDateRange, filterEntries, getValuesFromKey } from "@/utils/filtering";
+import { EntryMode } from "@/helpers/entriesHelper";
 
 const DashboardContent = () => {
   const { entries, setEntries, setLoading, setError } = useEntries();
@@ -47,7 +50,7 @@ const DashboardContent = () => {
 
   const handlePeriodChange = useCallback(
     (startDate: string, endDate: string) => {
-      const filtered = filterEntriesByPeriod(entries, startDate, endDate);
+      const filtered = filterByDateRange(entries, { startDate, endDate });
       setFilteredEntries(filtered);
       setIsFiltered(true);
     },
@@ -60,7 +63,12 @@ const DashboardContent = () => {
   }, []);
 
   const displayedEntries = isFiltered ? filteredEntries : entries;
-  const totalExpense = calculateFiltered(displayedEntries, "sum", "amount", "Income");
+  const incomes = filterEntries(displayedEntries, { entryType: EntryMode.INCOME }) as Entry[];
+  const amountsIncome = getValuesFromKey(incomes, "amount");
+  const totalIncome = getStat(amountsIncome, "sum");
+  const expenses = filterEntries(displayedEntries, { entryType: EntryMode.EXPENSE }) as Entry[];
+  const amountsExpense = getValuesFromKey(expenses, "amount");
+  const totalExpense = getStat(amountsExpense, "sum");
 
   return (
     <div className="p-6">
@@ -70,9 +78,22 @@ const DashboardContent = () => {
       <div className="flex flex-row justify-center mb-6">
         <DatePeriodSelector onPeriodChange={handlePeriodChange} onClear={handleClearFilter} />
       </div>
-      <div className="flex flex-row justify-center">
+      <div className="flex flex-row justify-center gap-10 mb-20 mt-20">
         {displayedEntries.length > 0 && (
-          <DisplayValue value={totalExpense} title="Total Income" asCurrency />
+          <>
+            <DisplayValue
+              value={totalIncome}
+              title="Total Income"
+              color={colorClasses.financial.income}
+              asCurrency
+            />
+            <DisplayValue
+              value={totalExpense}
+              title="Total Expense"
+              color={colorClasses.financial.expense}
+              asCurrency
+            />
+          </>
         )}
       </div>
       <div className="mt-8 flex flex-col items-center gap-4">
