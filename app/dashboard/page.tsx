@@ -84,13 +84,13 @@ const DashboardContent = () => {
             <DisplayValue
               value={totalIncome}
               title="Total Income"
-              color={colorClasses.financial.income}
+              color={colorClasses.text.primary}
               asCurrency
             />
             <DisplayValue
               value={totalExpense}
               title="Total Expense"
-              color={colorClasses.financial.expense}
+              color={colorClasses.text.primary}
               asCurrency
             />
           </>

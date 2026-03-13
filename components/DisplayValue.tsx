@@ -18,7 +18,7 @@ const DisplayValue = ({ value, asCurrency, title, color }: IDisplayValue) => {
     <div className={`flex flex-col font-semibold ${colorClasses.text.secondary}`}>
       {title && <span className="text-xl">{title}</span>}
       <div className="inline-flex items-end">
-        <span className={`text-7xl font-medium leading-none ${color || ""}`}>{intPart}</span>
+        <span className={`text-6xl font-medium leading-none ${color || ""}`}>{intPart}</span>
         {asCurrency && (
           <span className={`text-base leading-none pb-1 ${color || ""}`}>,{cents}</span>
         )}

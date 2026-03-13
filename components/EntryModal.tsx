@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CurrencyInput from "react-currency-input-field";
@@ -30,14 +30,31 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { EntrySchema } from "@/schema/entriesSchema";
-import { FormInputType, FormOutputType } from "@/types/entryType";
+import { FormInputType, FormOutputType, Entry } from "@/types/entryType";
 import { PaymentMethod, Category, Source, EntryMode } from "@/helpers/entriesHelper";
 import { useEntries } from "@/context/EntriesContext";
+import { put } from "@/http/apiClient";
+import { toSnakeCaseKeys } from "@/utils/payloads";
 
-export default function EntryModal() {
-  const [open, setOpen] = useState(false);
+interface EntryModalProps {
+  entryToEdit?: Entry;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  mode?: "add" | "edit";
+}
+
+export default function EntryModal({
+  entryToEdit,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  mode = "add",
+}: EntryModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<EntryMode | null>(null);
-  const { addEntry } = useEntries();
+  const { addEntry, setEntries, entries } = useEntries();
+
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
 
   const {
     register,
@@ -59,10 +76,44 @@ export default function EntryModal() {
     },
   });
 
+  // When editing, populate form with entry data
+  useEffect(() => {
+    if (mode === "edit" && entryToEdit) {
+      setSelectedType(entryToEdit.entryType as EntryMode);
+      setValue("entryType", entryToEdit.entryType as EntryMode);
+      setValue("amount", entryToEdit.amount);
+      setValue("createdAt", new Date(entryToEdit.createdAt).toISOString().split("T")[0]);
+      setValue("category", entryToEdit.category);
+      setValue("paymentMethod", entryToEdit.paymentMethod);
+      setValue("installments", entryToEdit.installments);
+      setValue("source", entryToEdit.source);
+      setValue("fixed", entryToEdit.fixed);
+      setValue("description", entryToEdit.description || "");
+    }
+  }, [mode, entryToEdit, setValue]);
+
   async function onSubmit(values: FormInputType) {
     try {
       const parsed: FormOutputType = EntrySchema.parse(values);
-      await addEntry(parsed);
+
+      if (mode === "edit" && entryToEdit?.id) {
+        // Update existing entry
+        const createdAtISO = new Date(parsed.createdAt).toISOString();
+        const payload = toSnakeCaseKeys({
+          ...parsed,
+          createdAt: createdAtISO,
+        });
+
+        await put(`/entries/${entryToEdit.id}`, payload);
+
+        // Update context
+        const updatedEntry = { ...parsed, id: entryToEdit.id };
+        setEntries(entries.map((e) => (e.id === entryToEdit.id ? updatedEntry : e)));
+      } else {
+        // Add new entry
+        await addEntry(parsed);
+      }
+
       reset();
       setOpen(false);
     } catch (error) {
@@ -81,18 +132,22 @@ export default function EntryModal() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="rounded-xl shadow-sm bg-slate-600">New entry</Button>
-      </DialogTrigger>
+      {mode === "add" && (
+        <DialogTrigger asChild>
+          <Button className="rounded-xl shadow-sm bg-slate-600">New entry</Button>
+        </DialogTrigger>
+      )}
 
       {/* Custom overlay to blur the page */}
       <DialogOverlay className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
 
       <DialogContent className="sm:max-w-lg rounded-2xl border shadow-2xl">
         <DialogHeader>
-          <DialogTitle>Add income/expense</DialogTitle>
+          <DialogTitle>{mode === "edit" ? "Edit Entry" : "Add income/expense"}</DialogTitle>
           <DialogDescription>
-            Record a new financial entry. All fields with * are required.
+            {mode === "edit"
+              ? "Update the entry details below."
+              : "Record a new financial entry. All fields with * are required."}
           </DialogDescription>
         </DialogHeader>
 
@@ -162,10 +217,8 @@ export default function EntryModal() {
                   <CurrencyInput
                     id="amount"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    prefix="R$ "
                     decimalScale={2}
                     decimalsLimit={2}
-                    intlConfig={{ locale: "pt-BR", currency: "BRL" }}
                     value={
                       typeof field.value === "number" && !isNaN(field.value)
                         ? field.value.toString()
@@ -305,7 +358,7 @@ export default function EntryModal() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving…" : "Save entry"}
+                {isSubmitting ? "Saving…" : mode === "edit" ? "Update entry" : "Save entry"}
               </Button>
             </DialogFooter>
           </form>
