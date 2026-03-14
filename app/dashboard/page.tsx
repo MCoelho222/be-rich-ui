@@ -38,6 +38,12 @@ const DashboardContent = () => {
         const dataCamelized = data.map((entry) => camelizeKeysShallow(entry));
         const sortedByCreatedAt = sortEntriesByDate(dataCamelized);
         setEntries(sortedByCreatedAt);
+
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        const filtered = filterByDateRange(sortedByCreatedAt, { startDate: firstDay });
+        setFilteredEntries(sortEntriesByDate(filtered));
+        setIsFiltered(true);
       } catch (err) {
         console.error("Error loading entries:", err);
         setError("Could not load entries.");
@@ -46,7 +52,7 @@ const DashboardContent = () => {
       }
     };
     loadEntries();
-  }, [setEntries, setLoading, setError]);
+  }, [setEntries, setFilteredEntries, setLoading, setError]);
 
   const handlePeriodChange = useCallback(
     (startDate: string, endDate: string) => {
@@ -76,7 +82,13 @@ const DashboardContent = () => {
         <EntryModal />
       </div>
       <div className="flex flex-row justify-center mb-6">
-        <DatePeriodSelector onPeriodChange={handlePeriodChange} onClear={handleClearFilter} />
+        <DatePeriodSelector
+          onPeriodChange={handlePeriodChange}
+          onClear={handleClearFilter}
+          defaultStartDate={
+            new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0]
+          }
+        />
       </div>
       <div className="flex flex-row justify-center gap-10 mb-20 mt-20">
         {displayedEntries.length > 0 && (

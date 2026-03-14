@@ -8,11 +8,18 @@ import { colorClasses } from "@/config/colors";
 interface DatePeriodSelectorProps {
   onPeriodChange: (startDate: string, endDate: string) => void;
   onClear?: () => void;
+  defaultStartDate?: string;
+  defaultEndDate?: string;
 }
 
-const DatePeriodSelector = ({ onPeriodChange, onClear }: DatePeriodSelectorProps) => {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+const DatePeriodSelector = ({
+  onPeriodChange,
+  onClear,
+  defaultStartDate = "",
+  defaultEndDate = "",
+}: DatePeriodSelectorProps) => {
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
 
   useEffect(() => {
     if (startDate || (startDate && endDate)) {

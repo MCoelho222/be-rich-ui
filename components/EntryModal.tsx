@@ -79,6 +79,7 @@ export default function EntryModal({
   // When editing, populate form with entry data
   useEffect(() => {
     if (mode === "edit" && entryToEdit) {
+      // console.log(entryToEdit)
       setSelectedType(entryToEdit.entryType as EntryMode);
       setValue("entryType", entryToEdit.entryType as EntryMode);
       setValue("amount", entryToEdit.amount);
@@ -92,9 +93,16 @@ export default function EntryModal({
     }
   }, [mode, entryToEdit, setValue]);
 
+  // Sync selectedType to form value
+  useEffect(() => {
+    if (selectedType) {
+      setValue("entryType", selectedType);
+    }
+  }, [selectedType, setValue]);
+
   async function onSubmit(values: FormInputType) {
     try {
-      const parsed: FormOutputType = EntrySchema.parse(values);
+      let parsed: FormOutputType = EntrySchema.parse(values);
 
       if (mode === "edit" && entryToEdit?.id) {
         // Update existing entry
@@ -111,6 +119,12 @@ export default function EntryModal({
         setEntries(entries.map((e) => (e.id === entryToEdit.id ? updatedEntry : e)));
       } else {
         // Add new entry
+        if (parsed.entryType === EntryMode.INCOME) {
+          const keys = ["entryType", "amount", "createdAt", "description", "source", "fixed"];
+          parsed = Object.fromEntries(
+            Object.entries(parsed).filter(([key]) => keys.includes(key))
+          ) as FormOutputType;
+        }
         await addEntry(parsed);
       }
 
@@ -139,9 +153,11 @@ export default function EntryModal({
       )}
 
       {/* Custom overlay to blur the page */}
-      <DialogOverlay className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+      <DialogOverlay className="fixed inset-0 bg-slate-300/20 backdrop-blur-sm" />
 
-      <DialogContent className="sm:max-w-lg rounded-2xl border shadow-2xl">
+      <DialogContent
+        className={`sm:max-w-lg rounded-2xl border shadow-2xl ${colorClasses.text.muted}`}
+      >
         <DialogHeader>
           <DialogTitle>{mode === "edit" ? "Edit Entry" : "Add income/expense"}</DialogTitle>
           <DialogDescription>
@@ -188,6 +204,13 @@ export default function EntryModal({
         {/* STEP 2: show the appropriate form */}
         {selectedType && (
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-2">
+            {/* Hidden field to store entry type */}
+            <Controller
+              name="entryType"
+              control={control}
+              render={({ field }) => <input type="hidden" {...field} />}
+            />
+
             {/* Selected type badge instead of select */}
             <div className="flex items-center justify-between">
               <div className="text-sm">
@@ -235,16 +258,42 @@ export default function EntryModal({
                 <p className={`text-sm ${colorClasses.state.error}`}>{errors.amount.message}</p>
               )}
             </div>
-
-            {/* Date */}
-            <div className="grid gap-2">
-              <Label htmlFor="createdAt">Date *</Label>
-              <Input id="createdAt" type="date" {...register("createdAt")} />
-              {errors.createdAt && (
-                <p className={`text-sm ${colorClasses.state.error}`}>
-                  {errors.createdAt.message as string}
-                </p>
-              )}
+            <div className="flex gap-4">
+              {/* Date */}
+              <div className="grid gap-2">
+                <Label htmlFor="createdAt">Date *</Label>
+                <Input id="createdAt" type="date" {...register("createdAt")} />
+                {errors.createdAt && (
+                  <p className={`text-sm ${colorClasses.state.error}`}>
+                    {errors.createdAt.message as string}
+                  </p>
+                )}
+              </div>
+              {/* Source */}
+              <div className="grid gap-2">
+                <Label htmlFor="category">Source *</Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger id="source">
+                        <SelectValue placeholder="Select source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(Source).map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.category && (
+                  <p className={`text-sm ${colorClasses.state.error}`}>{errors.category.message}</p>
+                )}
+              </div>
             </div>
 
             {/* Only for EXPENSE: category + payment method + installments + source (if you want) */}
