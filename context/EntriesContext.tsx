@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Entry, EntryRead } from "@/types/entryType";
+import { Entry } from "@/types/entryType";
 import { toSnakeCaseKeys, camelizeKeysShallow } from "@/utils/payloads";
 import axios from "axios";
 
@@ -37,12 +37,13 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
         ...entry,
         createdAt: createdAtISO,
       });
-
+      console.log(payload)
       const res = await axios.post(apiUrl, payload, {
         headers: {
           "Content-Type": "application/json",
         },
       });
+      console.log(res.data)
 
       // Add the newly created entry to state
       const newEntry = camelizeKeysShallow(res.data) as Entry;

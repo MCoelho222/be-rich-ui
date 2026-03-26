@@ -18,3 +18,18 @@ export function sortEntriesByDate(entries: Entry[], desc: boolean = true): Entry
   });
 }
 
+export const getFisrtDayDateString = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const firstDayString = firstDay.toISOString().split('T')[0];
+
+  return firstDayString
+}
+
+export const getLastDayDateString = () => {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const lastDayString = lastDay.toISOString().split('T')[0];
+
+  return lastDayString
+}

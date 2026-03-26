@@ -1,49 +1,46 @@
 "use client";
-import EntryModal from "@/components/EntryModal";
-import EntryTable from "@/components/EntryTable";
+import EntryModal from "@/components/ExpenseEntryModal";
+import EntryTable from "@/components/ExpensesTable";
 import DisplayValue from "@/components/DisplayValue";
 import DatePeriodSelector from "@/components/DatePeriodSelector";
 import { getStat } from "@/utils/stats";
 import { EntriesProvider, useEntries } from "@/context/EntriesContext";
 import { useEffect, useState, useCallback } from "react";
-import { Entry, EntryRead } from "@/types/entryType";
+import { Entry, ExpenseRead, IncomeRead } from "@/types/entryType";
 import { camelizeKeysShallow } from "@/utils/payloads";
 import axios from "axios";
-import { sortEntriesByDate } from "@/utils/dates";
+import { getFisrtDayDateString, getLastDayDateString, sortEntriesByDate } from "@/utils/dates";
 import { colorClasses } from "@/config/colors";
 import { filterByDateRange, filterEntries, getValuesFromKey } from "@/utils/filtering";
 import { EntryMode } from "@/helpers/entriesHelper";
+import { fetchAll } from "@/http/requests";
+import { buildUnifiedExpenseReadEntries } from "@/utils/entriesNormalizer";
 
 const DashboardContent = () => {
   const { entries, setEntries, setLoading, setError } = useEntries();
   const [filteredEntries, setFilteredEntries] = useState<Entry[]>([]);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [startDate, setStartDate] = useState<string>(getFisrtDayDateString());
+  const [endDate, setEndDate] = useState<string>(getLastDayDateString());
 
   useEffect(() => {
     const loadEntries = async () => {
       try {
         setLoading(true);
         setError(null);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/entries/";
-        const res = await axios.get(apiUrl, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        const data = await fetchAll(startDate, endDate, headers);
 
-        if (res.status < 200 || res.status >= 300) {
-          throw new Error("Failed to load entries");
+        if (data.error) {
+          throw new Error(data.error);
         }
-        const data = res.data as EntryRead[];
-        const dataCamelized = data.map((entry) => camelizeKeysShallow(entry));
+
+        const unifiedEntries = buildUnifiedExpenseReadEntries(data);
+        const dataCamelized = unifiedEntries.map((entry) => camelizeKeysShallow(entry));
         const sortedByCreatedAt = sortEntriesByDate(dataCamelized);
         setEntries(sortedByCreatedAt);
-
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-        const filtered = filterByDateRange(sortedByCreatedAt, { startDate: firstDay });
-        setFilteredEntries(sortEntriesByDate(filtered));
-        setIsFiltered(true);
       } catch (err) {
         console.error("Error loading entries:", err);
         setError("Could not load entries.");
@@ -52,20 +49,24 @@ const DashboardContent = () => {
       }
     };
     loadEntries();
-  }, [setEntries, setFilteredEntries, setLoading, setError]);
+  }, [startDate, endDate]);
 
   const handlePeriodChange = useCallback(
     (startDate: string, endDate: string) => {
-      const filtered = filterByDateRange(entries, { startDate, endDate });
-      setFilteredEntries(filtered);
-      setIsFiltered(true);
+      setStartDate(startDate);
+      setEndDate(endDate);
+      // const filtered = filterByDateRange(entries, { startDate, endDate });
+      // setFilteredEntries(filtered);
+      // setIsFiltered(true);
     },
     [entries]
   );
 
   const handleClearFilter = useCallback(() => {
-    setFilteredEntries([]);
-    setIsFiltered(false);
+    setStartDate(getFisrtDayDateString());
+    setEndDate(getLastDayDateString());
+    // setFilteredEntries([]);
+    // setIsFiltered(false);
   }, []);
 
   const displayedEntries = isFiltered ? filteredEntries : entries;
@@ -85,9 +86,8 @@ const DashboardContent = () => {
         <DatePeriodSelector
           onPeriodChange={handlePeriodChange}
           onClear={handleClearFilter}
-          defaultStartDate={
-            new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0]
-          }
+          defaultStartDate={getFisrtDayDateString()}
+          defaultEndDate={getLastDayDateString()}
         />
       </div>
       <div className="flex flex-row justify-center gap-10 mb-20 mt-20">

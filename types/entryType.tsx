@@ -1,20 +1,33 @@
 import { z } from "zod";
-import { EntrySchema } from "@/schema/entriesSchema";
-import { EntryMode, PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
+import { ExpenseEntrySchema, IncomeEntrySchema } from "@/schema/entriesSchema";
+import { PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
 
-export type FormInputType = z.input<typeof EntrySchema>; // Type before parsing
-export type FormOutputType = z.output<typeof EntrySchema>; // Type after parsing
-export type Entry = z.infer<typeof EntrySchema>; // Type after parsing
+export type FormInputExpenseType = z.input<typeof ExpenseEntrySchema>; // Type before parsing
+export type FormOutputExpenseType = z.output<typeof ExpenseEntrySchema>; // Type after parsing
+export type ExpenseEntry = z.infer<typeof ExpenseEntrySchema>; // Type after parsing
 
-export interface EntryRead {
+export type FormInputIncomeType = z.input<typeof IncomeEntrySchema>; // Type before parsing
+export type FormOutputIncomeType = z.output<typeof IncomeEntrySchema>; // Type after parsing
+export type IncomeEntry = z.infer<typeof IncomeEntrySchema>; // Type after parsing
+
+export interface ExpenseRead {
     id: string;
     amount: number;
-    entry_type: EntryMode;
-    fixed: boolean;
-    installments: number;
     payment_method: PaymentMethod;
+    installments: number;
     category: Category;
     description: string;
     source: Source;
     created_at: string;
+    updated_at: string;
+}
+
+export interface IncomeRead {
+    id: string;
+    amount: number;
+    installments: number;
+    description: string;
+    source: Source;
+    created_at: string;
+    updated_at: string;
 }

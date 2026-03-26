@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { colorClasses } from "@/config/colors";
+import { getFisrtDayDateString, getLastDayDateString } from "@/utils/dates";
 
 interface DatePeriodSelectorProps {
   onPeriodChange: (startDate: string, endDate: string) => void;
@@ -29,8 +30,8 @@ const DatePeriodSelector = ({
   }, [startDate, endDate]);
 
   const handleClear = () => {
-    setStartDate("");
-    setEndDate("");
+    setStartDate(getFisrtDayDateString());
+    setEndDate(getLastDayDateString());
     if (onClear) {
       onClear();
     }

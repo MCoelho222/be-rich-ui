@@ -7,7 +7,7 @@ import { useEntries } from "@/context/EntriesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";
-import EntryModal from "./EntryModal";
+import EntryModal from "./ExpenseEntryModal";
 import { useState } from "react";
 import {
   Dialog,
