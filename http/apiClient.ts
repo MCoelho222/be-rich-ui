@@ -37,7 +37,6 @@ export const apiRequest = async <T = unknown>(
   if (payload) {
     config.data = payload;
   }
-
   return axios(config);
 };
 

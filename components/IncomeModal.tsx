@@ -29,28 +29,33 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-import { IncomeEntrySchema } from "@/schema/entriesSchema";
-import { FormInputIncomeType, FormOutputIncomeType, ExpenseEntry, IncomeEntry } from "@/types/entryType";
+import { IncomeSchema } from "@/schema/entriesSchema";
+import {
+  FormInputIncomeType,
+  FormOutputIncomeType,
+  ExpenseEntry,
+  IncomeEntry,
+} from "@/types/entryType";
 import { Source } from "@/helpers/entriesHelper";
-import { useEntries } from "@/context/EntriesContext";
+import { useIncomes } from "@/context/IncomesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
 
-interface EntryModalProps {
-  entryToEdit?: ExpenseEntry | IncomeEntry;
+interface IncomeModalProps {
+  incomeToEdit?: ExpenseEntry | IncomeEntry;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   mode?: "add" | "edit";
 }
 
-export default function IncomeEntryModal({
-  entryToEdit,
+export default function IncomeModal({
+  incomeToEdit,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   mode = "add",
-}: EntryModalProps) {
+}: IncomeModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const { addEntry, setEntries, entries } = useEntries();
+  const { addIncome, setIncomes, incomes } = useIncomes();
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -63,7 +68,7 @@ export default function IncomeEntryModal({
     reset,
     setValue,
   } = useForm<FormInputIncomeType>({
-    resolver: zodResolver(IncomeEntrySchema),
+    resolver: zodResolver(IncomeSchema),
     defaultValues: {
       // entryType: EntryMode.EXPENSE,
       // installments: 1,
@@ -75,22 +80,23 @@ export default function IncomeEntryModal({
     },
   });
 
-  // When editing, populate form with entry data
+  // When editing, populate form with income data
   useEffect(() => {
-    if (mode === "edit" && entryToEdit) {
-      setValue("amount", entryToEdit.amount);
-      setValue("createdAt", new Date(entryToEdit.createdAt).toISOString().split("T")[0]);
-      setValue("installments", entryToEdit.installments);
-      setValue("source", entryToEdit.source);
-      setValue("description", entryToEdit.description || "");
+    if (mode === "edit" && incomeToEdit) {
+      setValue("amount", incomeToEdit.amount);
+      setValue("createdAt", new Date(incomeToEdit.createdAt).toISOString().split("T")[0]);
+      setValue("installments", incomeToEdit.installments);
+      setValue("source", incomeToEdit.source);
+      setValue("fixed", incomeToEdit.fixed);
+      setValue("description", incomeToEdit.description || "");
     }
-  }, [mode, entryToEdit, setValue]);
+  }, [mode, incomeToEdit, setValue]);
 
   async function onSubmit(values: FormInputIncomeType) {
     try {
-      let parsed: FormOutputIncomeType = IncomeEntrySchema.parse(values);
+      let parsed: FormOutputIncomeType = IncomeSchema.parse(values);
 
-      if (mode === "edit" && entryToEdit?.id) {
+      if (mode === "edit" && incomeToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
@@ -98,14 +104,14 @@ export default function IncomeEntryModal({
           createdAt: createdAtISO,
         });
 
-        await put(`${process.env.NEXT_INCOME_ENDPOINT}/${entryToEdit.id}`, payload);
+        await put(`${process.env.NEXT_PUBLIC_INCOME_ENDPOINT}/${incomeToEdit.id}`, payload);
 
         // Update context
-        const updatedEntry = { ...parsed, id: entryToEdit.id };
-        setEntries(entries.map((e) => (e.id === entryToEdit.id ? updatedEntry : e)));
+        const updatedIncome = { ...parsed, id: incomeToEdit.id };
+        setIncomes(incomes.map((e) => (e.id === incomeToEdit.id ? updatedIncome : e)));
       } else {
         // Update context and make a POST request
-        await addEntry(parsed);
+        await addIncome(parsed);
       }
       reset();
       setOpen(false);
@@ -223,9 +229,7 @@ export default function IncomeEntryModal({
               {...register("installments", { valueAsNumber: true })}
             />
             {errors.installments && (
-              <p className={`text-sm ${colorClasses.state.error}`}>
-                {errors.installments.message}
-              </p>
+              <p className={`text-sm ${colorClasses.state.error}`}>{errors.installments.message}</p>
             )}
           </div>
 

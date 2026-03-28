@@ -34,10 +34,10 @@ export async function fetchAll(
   headers?: Record<string, string>
 ): Promise<IFetchAllResult> {
   try {
-    const expenseEndpoint = process.env.NEXT_EXPENSE_ENDPOINT;
-    const expenseFixedEndpoint = process.env.NEXT_EXPENSE_FIXED_ENDPOINT;
-    const incomeEndpoint = process.env.NEXT_INCOME_ENDPOINT;
-    const incomeFixedEndpoint = process.env.NEXT_INCOME_FIXED_ENDPOINT;
+    const expenseEndpoint = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
+    const expenseFixedEndpoint = process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT;
+    const incomeEndpoint = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
+    const incomeFixedEndpoint = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
 
     if (!expenseEndpoint || !expenseFixedEndpoint || !incomeEndpoint || !incomeFixedEndpoint) {
       return {
@@ -50,7 +50,7 @@ export async function fetchAll(
     }
 
     const query = buildQuery({ startDate, endDate });
-
+    console.log("1");
     const [expensesRes, expensesFixedRes, incomesRes, incomesFixedRes] = await Promise.all([
       apiRequest<ExpenseRead[]>("GET", `${expenseEndpoint}${query}`, undefined, headers),
       apiRequest<ExpenseRead[]>("GET", `${expenseFixedEndpoint}${query}`, undefined, headers),

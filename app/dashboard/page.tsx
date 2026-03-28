@@ -1,51 +1,66 @@
 "use client";
-import EntryModal from "@/components/ExpenseEntryModal";
-import EntryTable from "@/components/ExpensesTable";
+import ExpensesTable from "@/components/ExpensesTable";
+import IncomesTable from "@/components/IncomesTable";
 import DisplayValue from "@/components/DisplayValue";
 import DatePeriodSelector from "@/components/DatePeriodSelector";
 import { getStat } from "@/utils/stats";
-import { EntriesProvider, useEntries } from "@/context/EntriesContext";
+import { ExpensesProvider, useExpenses } from "@/context/ExpensesContext";
+import { IncomesProvider, useIncomes } from "@/context/IncomesContext";
 import { useEffect, useState, useCallback } from "react";
-import { Entry, ExpenseRead, IncomeRead } from "@/types/entryType";
 import { camelizeKeysShallow } from "@/utils/payloads";
-import axios from "axios";
 import { getFisrtDayDateString, getLastDayDateString, sortEntriesByDate } from "@/utils/dates";
 import { colorClasses } from "@/config/colors";
-import { filterByDateRange, filterEntries, getValuesFromKey } from "@/utils/filtering";
-import { EntryMode } from "@/helpers/entriesHelper";
 import { fetchAll } from "@/http/requests";
-import { buildUnifiedExpenseReadEntries } from "@/utils/entriesNormalizer";
+import { addFixedKey } from "@/utils/entriesNormalizer";
+import ExpenseModal from "@/components/ExpenseModal";
+import IncomeModal from "@/components/IncomeModal";
+import { getValuesFromKey } from "@/utils/filtering";
 
 const DashboardContent = () => {
-  const { entries, setEntries, setLoading, setError } = useEntries();
-  const [filteredEntries, setFilteredEntries] = useState<Entry[]>([]);
-  const [isFiltered, setIsFiltered] = useState(false);
+  const { expenses, setExpenses, setLoadingExpense, setErrorExpense } = useExpenses();
+  const { incomes, setIncomes, setLoadingIncome, setErrorIncome } = useIncomes();
   const [startDate, setStartDate] = useState<string>(getFisrtDayDateString());
   const [endDate, setEndDate] = useState<string>(getLastDayDateString());
 
   useEffect(() => {
     const loadEntries = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const headers = {
-          "Content-Type": "application/json",
-        };
-        const data = await fetchAll(startDate, endDate, headers);
+        setLoadingExpense(true);
+        setLoadingIncome(true);
+        setErrorExpense(null);
+        setErrorIncome(null);
 
+        const data = await fetchAll(startDate, endDate, { "Content-Type": "application/json" });
+
+        console.log(data)
         if (data.error) {
           throw new Error(data.error);
         }
 
-        const unifiedEntries = buildUnifiedExpenseReadEntries(data);
-        const dataCamelized = unifiedEntries.map((entry) => camelizeKeysShallow(entry));
-        const sortedByCreatedAt = sortEntriesByDate(dataCamelized);
-        setEntries(sortedByCreatedAt);
+        delete data.error;
+
+        const dataWithFixed = {
+          expenses: data.expenses?.map((expense) => addFixedKey(expense, false)) ?? [],
+          expensesFixed: data.expensesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
+          incomes: data.incomes?.map((expense) => addFixedKey(expense, false)) ?? [],
+          incomesFixed: data.incomesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
+        };
+
+        const expensesUnified = [...dataWithFixed.expenses, ...dataWithFixed.expensesFixed];
+        const incomesUnified = [...dataWithFixed.incomes, ...dataWithFixed.incomesFixed];
+
+        expensesUnified.map(camelizeKeysShallow);
+        incomesUnified.map(camelizeKeysShallow);
+
+        setExpenses(sortEntriesByDate(expensesUnified));
+        setIncomes(sortEntriesByDate(incomesUnified));
       } catch (err) {
         console.error("Error loading entries:", err);
-        setError("Could not load entries.");
+        setErrorExpense("Could not load expenses.");
+        setErrorIncome("Could not load incomes.");
       } finally {
-        setLoading(false);
+        setLoadingExpense(false);
+        setLoadingIncome(false);
       }
     };
     loadEntries();
@@ -55,32 +70,25 @@ const DashboardContent = () => {
     (startDate: string, endDate: string) => {
       setStartDate(startDate);
       setEndDate(endDate);
-      // const filtered = filterByDateRange(entries, { startDate, endDate });
-      // setFilteredEntries(filtered);
-      // setIsFiltered(true);
     },
-    [entries]
+    [expenses, incomes]
   );
 
   const handleClearFilter = useCallback(() => {
     setStartDate(getFisrtDayDateString());
     setEndDate(getLastDayDateString());
-    // setFilteredEntries([]);
-    // setIsFiltered(false);
   }, []);
 
-  const displayedEntries = isFiltered ? filteredEntries : entries;
-  const incomes = filterEntries(displayedEntries, { entryType: EntryMode.INCOME }) as Entry[];
   const amountsIncome = getValuesFromKey(incomes, "amount");
   const totalIncome = getStat(amountsIncome, "sum");
-  const expenses = filterEntries(displayedEntries, { entryType: EntryMode.EXPENSE }) as Entry[];
   const amountsExpense = getValuesFromKey(expenses, "amount");
   const totalExpense = getStat(amountsExpense, "sum");
 
   return (
     <div className="p-6">
       <div className="absolute bottom-7 right-5">
-        <EntryModal />
+        <ExpenseModal />
+        <IncomeModal />
       </div>
       <div className="flex flex-row justify-center mb-6">
         <DatePeriodSelector
@@ -91,25 +99,27 @@ const DashboardContent = () => {
         />
       </div>
       <div className="flex flex-row justify-center gap-10 mb-20 mt-20">
-        {displayedEntries.length > 0 && (
-          <>
-            <DisplayValue
-              value={totalIncome}
-              title="Total Income"
-              color={colorClasses.text.primary}
-              asCurrency
-            />
-            <DisplayValue
-              value={totalExpense}
-              title="Total Expense"
-              color={colorClasses.text.primary}
-              asCurrency
-            />
-          </>
-        )}
+        {expenses.length > 0 ||
+          (incomes.length > 0 && (
+            <>
+              <DisplayValue
+                value={totalIncome}
+                title="Total Income"
+                color={colorClasses.text.primary}
+                asCurrency
+              />
+              <DisplayValue
+                value={totalExpense}
+                title="Total Expense"
+                color={colorClasses.text.primary}
+                asCurrency
+              />
+            </>
+          ))}
       </div>
       <div className="mt-8 flex flex-col items-center gap-4">
-        <EntryTable entries={displayedEntries} />
+        <ExpensesTable entries={expenses} />
+        <IncomesTable entries={incomes} />
       </div>
     </div>
   );
@@ -117,9 +127,11 @@ const DashboardContent = () => {
 
 const Dashboard = () => {
   return (
-    <EntriesProvider>
-      <DashboardContent />
-    </EntriesProvider>
+    <ExpensesProvider>
+      <IncomesProvider>
+        <DashboardContent />
+      </IncomesProvider>
+    </ExpensesProvider>
   );
 };
 

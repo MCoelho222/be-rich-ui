@@ -29,3 +29,10 @@ export const buildUnifiedExpenseReadEntries = ({
     ...incomesFixed.map(normalizeIncomeToExpenseRead),
   ];
 };
+
+export const addFixedKey = (entry: ExpenseRead | IncomeRead, fixed: boolean) => {
+  return {
+    ...entry,
+    fixed
+  }
+}

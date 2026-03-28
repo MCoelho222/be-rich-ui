@@ -29,28 +29,28 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
-import { ExpenseEntrySchema } from "@/schema/entriesSchema";
+import { ExpenseSchema } from "@/schema/entriesSchema";
 import { FormInputExpenseType, FormOutputExpenseType, ExpenseEntry } from "@/types/entryType";
 import { PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
-import { useEntries } from "@/context/EntriesContext";
+import { useExpenses } from "@/context/ExpensesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
 
-interface ExpenseEntryModalProps {
-  entryToEdit?: ExpenseEntry;
+interface ExpenseModalProps {
+  expenseToEdit?: ExpenseEntry;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   mode?: "add" | "edit";
 }
 
-export default function ExpenseEntryModal({
-  entryToEdit,
+export default function ExpenseModal({
+  expenseToEdit,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   mode = "add",
-}: ExpenseEntryModalProps) {
+}: ExpenseModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const { addEntry, setEntries, entries } = useEntries();
+  const { addExpense, setExpenses, expenses } = useExpenses();
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -63,7 +63,7 @@ export default function ExpenseEntryModal({
     reset,
     setValue,
   } = useForm<FormInputExpenseType>({
-    resolver: zodResolver(ExpenseEntrySchema),
+    resolver: zodResolver(ExpenseSchema),
     defaultValues: {
       // entryType: EntryMode.EXPENSE,
       // installments: 1,
@@ -77,22 +77,23 @@ export default function ExpenseEntryModal({
 
   // When editing, populate form with entry data
   useEffect(() => {
-    if (mode === "edit" && entryToEdit) {
-      setValue("amount", entryToEdit.amount);
-      setValue("createdAt", new Date(entryToEdit.createdAt).toISOString().split("T")[0]);
-      setValue("category", entryToEdit.category);
-      setValue("paymentMethod", entryToEdit.paymentMethod);
-      setValue("installments", entryToEdit.installments);
-      setValue("source", entryToEdit.source);
-      setValue("description", entryToEdit.description || "");
+    if (mode === "edit" && expenseToEdit) {
+      setValue("amount", expenseToEdit.amount);
+      setValue("createdAt", new Date(expenseToEdit.createdAt).toISOString().split("T")[0]);
+      setValue("category", expenseToEdit.category);
+      setValue("paymentMethod", expenseToEdit.paymentMethod);
+      setValue("installments", expenseToEdit.installments);
+      setValue("source", expenseToEdit.source);
+      setValue("fixed", expenseToEdit.fixed);
+      setValue("description", expenseToEdit.description || "");
     }
-  }, [mode, entryToEdit, setValue]);
+  }, [mode, expenseToEdit, setValue]);
 
   async function onSubmit(values: FormInputExpenseType) {
     try {
-      let parsed: FormOutputExpenseType = ExpenseEntrySchema.parse(values);
+      let parsed: FormOutputExpenseType = ExpenseSchema.parse(values);
 
-      if (mode === "edit" && entryToEdit?.id) {
+      if (mode === "edit" && expenseToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
@@ -100,14 +101,14 @@ export default function ExpenseEntryModal({
           createdAt: createdAtISO,
         });
 
-        await put(`${process.env.NEXT_EXPENSE_ENDPOINT}/${entryToEdit.id}`, payload);
+        await put(`${process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT}/${expenseToEdit.id}`, payload);
 
         // Update context
-        const updatedEntry = { ...parsed, id: entryToEdit.id };
-        setEntries(entries.map((e) => (e.id === entryToEdit.id ? updatedEntry : e)));
+        const updatedExpense = { ...parsed, id: expenseToEdit.id };
+        setExpenses(expenses.map((e) => (e.id === expenseToEdit.id ? updatedExpense : e)));
       } else {
         // Update context and make a POST request
-        await addEntry(parsed);
+        await addExpense(parsed);
       }
 
       reset();
@@ -148,7 +149,6 @@ export default function ExpenseEntryModal({
           </DialogDescription>
         </DialogHeader>
 
-        
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-2">
           {/* Amount */}
           <div className="grid gap-2">
@@ -240,9 +240,7 @@ export default function ExpenseEntryModal({
                 )}
               />
               {errors.category && (
-                <p className={`text-sm ${colorClasses.state.error}`}>
-                  {errors.category.message}
-                </p>
+                <p className={`text-sm ${colorClasses.state.error}`}>{errors.category.message}</p>
               )}
             </div>
 
@@ -285,9 +283,7 @@ export default function ExpenseEntryModal({
               {...register("installments", { valueAsNumber: true })}
             />
             {errors.installments && (
-              <p className={`text-sm ${colorClasses.state.error}`}>
-                {errors.installments.message}
-              </p>
+              <p className={`text-sm ${colorClasses.state.error}`}>{errors.installments.message}</p>
             )}
           </div>
 

@@ -1,13 +1,12 @@
 "use client";
-import { Entry } from "@/types/entryType";
+import { IncomeEntry } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
-import { niceLabel } from "@/utils/stringFormat";
-import { useEntries } from "@/context/EntriesContext";
+import { useIncomes } from "@/context/IncomesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";
-import EntryModal from "./ExpenseEntryModal";
+import IncomeModal from "./IncomeModal";
 import { useState } from "react";
 import {
   Dialog,
@@ -20,47 +19,47 @@ import {
 import { Button } from "./ui/button";
 import { del } from "@/http/apiClient";
 
-interface EntryTableProps {
-  entries?: Entry[];
+interface IncomesTableProps {
+  entries?: IncomeEntry[];
 }
 
-const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
-  const { entries: contextEntries, loading, error, setEntries } = useEntries();
+const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
+  const { incomes: contextIncomes, loadingIncome, errorIncome, setIncomes } = useIncomes();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
+  const [incomeToDelete, setIncomeToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [entryToEdit, setEntryToEdit] = useState<Entry | null>(null);
+  const [incomeToEdit, setIncomeToEdit] = useState<IncomeEntry | null>(null);
 
   // Use prop entries if provided, otherwise use context entries
-  const entries = propEntries !== undefined ? propEntries : contextEntries;
+  const entries = propEntries !== undefined ? propEntries : contextIncomes;
 
-  const handleEditClick = (entry: Entry) => {
-    setEntryToEdit(entry);
+  const handleEditClick = (entry: IncomeEntry) => {
+    setIncomeToEdit(entry);
     setEditDialogOpen(true);
   };
 
   const handleDeleteClick = (entryId: string) => {
-    setEntryToDelete(entryId);
+    setIncomeToDelete(entryId);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!entryToDelete) return;
+    if (!incomeToDelete) return;
 
     try {
       setIsDeleting(true);
       // Make DELETE request to API
-      await del(`/entries/${entryToDelete}`);
+      await del(`${process.env.NEXT_PUBLIC_INCOME_ENDPOINT}/${incomeToDelete}`);
 
       // Remove the deleted entry from context
-      const updatedEntries = contextEntries.filter((entry) => entry.id !== entryToDelete);
-      setEntries(updatedEntries);
+      const updatedIncomes = contextIncomes.filter((entry) => entry.id !== incomeToDelete);
+      setIncomes(updatedIncomes);
 
       setDeleteDialogOpen(false);
-      setEntryToDelete(null);
+      setIncomeToDelete(null);
     } catch (err) {
-      console.error("Failed to delete entry:", err);
+      console.error("Failed to delete income:", err);
       // You could add toast notification here
     } finally {
       setIsDeleting(false);
@@ -69,9 +68,9 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
 
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
-    setEntryToDelete(null);
+    setIncomeToDelete(null);
   };
-  if (loading) {
+  if (loadingIncome) {
     return (
       <div
         className={`overflow-hidden rounded-xl border shadow-sm ${colorClasses.surface.border} ${colorClasses.surface.background}`}
@@ -83,12 +82,14 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
     );
   }
 
-  if (error) {
+  if (errorIncome) {
     return (
       <div
         className={`overflow-hidden rounded-xl border shadow-sm ${colorClasses.surface.border} ${colorClasses.surface.background}`}
       >
-        <div className={`px-4 py-10 text-center text-sm ${colorClasses.state.error}`}>{error}</div>
+        <div className={`px-4 py-10 text-center text-sm ${colorClasses.state.error}`}>
+          {errorIncome}
+        </div>
       </div>
     );
   }
@@ -96,14 +97,14 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
   return (
     <>
       {/* Edit Dialog */}
-      {entryToEdit && (
-        <EntryModal
+      {incomeToEdit && (
+        <IncomeModal
           mode="edit"
-          entryToEdit={entryToEdit}
+          incomeToEdit={incomeToEdit}
           open={editDialogOpen}
           onOpenChange={(open) => {
             setEditDialogOpen(open);
-            if (!open) setEntryToEdit(null);
+            if (!open) setIncomeToEdit(null);
           }}
         />
       )}
@@ -114,7 +115,7 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this entry? This action cannot be undone.
+              Are you sure you want to delete this income? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -137,30 +138,27 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
               >
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Description</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3 text-right">Amount</th>
                 <th className="px-4 py- text-right">Installments</th>
                 <th className="px-4 py-3 text-center">Cycle</th>
                 <th className="px-4 py-3">Source</th>
-                <th className="px-4 py-3">Payment Method</th>
                 <th className="px-4 py-3">Action</th>
               </tr>
             </thead>
 
             <tbody className="">
-              {entries.length === 0 && (
+              {contextIncomes.length === 0 && (
                 <tr>
                   <td
                     colSpan={7}
                     className={`px-4 py-10 text-center text-sm ${colorClasses.text.secondary}`}
                   >
-                    No entries yet. Add one to see it here.
+                    No Incomes yet. Add one to see it here.
                   </td>
                 </tr>
               )}
 
-              {entries.map((entry, index) => (
+              {contextIncomes.map((entry, index) => (
                 <tr
                   key={entry.id}
                   className={`transition-colors ${colorClasses.interactive.hover} ${colorClasses.text.primary}`}
@@ -171,22 +169,6 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
 
                   <td className="max-w-xs px-4 py-3">
                     <span className="line-clamp-2">{entry.description || "—"}</span>
-                  </td>
-
-                  <td className="px-4 py-3">
-                    {entry.category ? niceLabel(entry.category) : entry.category}
-                  </td>
-
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex px-2 py-0.5 ${
-                        entry.entryType === "Income"
-                          ? colorClasses.financial.income
-                          : colorClasses.financial.expense
-                      }`}
-                    >
-                      {entry.entryType}
-                    </span>
                   </td>
 
                   <td className="px-4 py-3 text-right">{formatCurrency(entry.amount)}</td>
@@ -201,9 +183,6 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
                   </td>
                   <td className="px-4 py-3">{entry.source}</td>
 
-                  <td className="px-4 py-3">
-                    <span className="px-2 py-0.5">{entry.paymentMethod}</span>
-                  </td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5">
                       <EditIcon onClick={() => handleEditClick(entry)} />
@@ -220,4 +199,4 @@ const EntryTable = ({ entries: propEntries }: EntryTableProps) => {
   );
 };
 
-export default EntryTable;
+export default IncomesTable;
