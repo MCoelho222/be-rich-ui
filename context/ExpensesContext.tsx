@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { ExpenseEntry } from "@/types/entryType";
-import { toSnakeCaseKeys, camelizeKeysShallow } from "@/utils/payloads";
+import { ExpenseEntry, ExpenseRead } from "@/types/entryType";
+import { toSnakeCaseKeys, camelizeKeysExpense } from "@/utils/payloads";
 import { post, put, del } from "@/http/apiClient";
 
 interface ExpensesContextType {
@@ -24,74 +24,74 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
   const [errorExpense, setErrorExpense] = useState<string | null>(null);
 
   const addExpense = async (expenseEntry: ExpenseEntry) => {
-    const url = expenseEntry.fixed ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT
+    const url = expenseEntry.fixed
+      ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT
+      : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
       try {
-        delete expenseEntry.fixed
-  
+        delete expenseEntry.fixed;
+
         const createdAtISO = new Date(expenseEntry.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
           ...expenseEntry,
           createdAt: createdAtISO,
         });
-  
-        const res = await post(
-          url,
-          payload, {
-            "Content-Type": "application/json",
-          })
+
+        const res = await post(url, payload, {
+          "Content-Type": "application/json",
+        });
 
         // Add the newly created expense to state
-        const newEntry = camelizeKeysShallow(res.data) as ExpenseEntry;
+        const newEntry = camelizeKeysExpense(res?.data as ExpenseRead) as ExpenseEntry;
         setExpenses((prev) => [newEntry, ...prev]);
       } catch (err) {
         console.error("Failed to add expense:", err);
         throw err;
       }
     } else {
-      console.error("Url is not set")
+      console.error("Url is not set");
     }
   };
 
   const updateExpense = async (expenseEntryId: string, expenseEntry: ExpenseEntry) => {
-    const url = expenseEntry.fixed ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT
+    const url = expenseEntry.fixed
+      ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT
+      : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
-      delete expenseEntry.fixed
+      delete expenseEntry.fixed;
       try {
         const createdAtISO = new Date(expenseEntry.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
           ...expenseEntry,
           createdAt: createdAtISO,
         });
-  
-        const res = await put(
-          url,
-          payload, {
-            "Content-Type": "application/json",
-          }
-        );
-  
+
+        const res = await put(url, payload, {
+          "Content-Type": "application/json",
+        });
+
         // Update the expense in state
-        const updatedExpense = camelizeKeysShallow(res.data) as ExpenseEntry;
+        const updatedExpense = camelizeKeysExpense(res.data as ExpenseRead) as ExpenseEntry;
         setExpenses((prev) => prev.map((e) => (e.id === expenseEntryId ? updatedExpense : e)));
       } catch (err) {
         console.error("Failed to update expense:", err);
         throw err;
       }
     } else {
-      console.error("Url is not set")
+      console.error("Url is not set");
     }
   };
 
   const deleteExpense = async (expenseEntryId: string, fixed: boolean) => {
-    const url = fixed ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT
+    const url = fixed
+      ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT
+      : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
       try {
         await del(url, {
-            "Content-Type": "application/json",
-          },
-        );
-  
+          "Content-Type": "application/json",
+        });
+
         // Remove the deleted expense from state
         setExpenses((prev) => prev.filter((expenseEntry) => expenseEntry.id !== expenseEntryId));
       } catch (err) {
@@ -99,7 +99,7 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
         throw err;
       }
     } else {
-      console.error("Url is not set")
+      console.error("Url is not set");
     }
   };
 
@@ -114,7 +114,7 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
         setErrorExpense,
         addExpense,
         updateExpense,
-        deleteExpense
+        deleteExpense,
       }}
     >
       {children}

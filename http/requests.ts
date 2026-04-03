@@ -50,19 +50,45 @@ export async function fetchAll(
     }
 
     const query = buildQuery({ startDate, endDate });
-    console.log("1");
-    const [expensesRes, expensesFixedRes, incomesRes, incomesFixedRes] = await Promise.all([
+    const [expensesRes, expensesFixedRes, incomesRes, incomesFixedRes] = await Promise.allSettled([
       apiRequest<ExpenseRead[]>("GET", `${expenseEndpoint}${query}`, undefined, headers),
       apiRequest<ExpenseRead[]>("GET", `${expenseFixedEndpoint}${query}`, undefined, headers),
       apiRequest<IncomeRead[]>("GET", `${incomeEndpoint}${query}`, undefined, headers),
       apiRequest<IncomeRead[]>("GET", `${incomeFixedEndpoint}${query}`, undefined, headers),
     ]);
 
+    const errors: string[] = [];
+
+    const getErrorMessage = (reason: unknown): string => {
+      if (reason instanceof Error) {
+        return reason.message;
+      }
+
+      return "Unknown error";
+    };
+
+    if (expensesRes.status === "rejected") {
+      errors.push(`Expenses: ${getErrorMessage(expensesRes.reason)}`);
+    }
+
+    if (expensesFixedRes.status === "rejected") {
+      errors.push(`Fixed expenses: ${getErrorMessage(expensesFixedRes.reason)}`);
+    }
+
+    if (incomesRes.status === "rejected") {
+      errors.push(`Incomes: ${getErrorMessage(incomesRes.reason)}`);
+    }
+
+    if (incomesFixedRes.status === "rejected") {
+      errors.push(`Fixed incomes: ${getErrorMessage(incomesFixedRes.reason)}`);
+    }
+
     return {
-      expenses: expensesRes.data,
-      expensesFixed: expensesFixedRes.data,
-      incomes: incomesRes.data,
-      incomesFixed: incomesFixedRes.data,
+      expenses: expensesRes.status === "fulfilled" ? expensesRes.value.data : [],
+      expensesFixed: expensesFixedRes.status === "fulfilled" ? expensesFixedRes.value.data : [],
+      incomes: incomesRes.status === "fulfilled" ? incomesRes.value.data : [],
+      incomesFixed: incomesFixedRes.status === "fulfilled" ? incomesFixedRes.value.data : [],
+      error: errors.length ? errors.join(" | ") : undefined,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to load entries";

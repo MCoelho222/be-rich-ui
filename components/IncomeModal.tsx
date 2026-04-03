@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import CurrencyInput from "react-currency-input-field";
 import { colorClasses } from "@/config/colors";
 
 // shadcn/ui components
@@ -70,13 +69,9 @@ export default function IncomeModal({
   } = useForm<FormInputIncomeType>({
     resolver: zodResolver(IncomeSchema),
     defaultValues: {
-      // entryType: EntryMode.EXPENSE,
-      // installments: 1,
-      // source: Source.MARCELO,
+      installments: 1,
       fixed: false,
-      // category: Category.SUPERMARKET,
       createdAt: new Date().toISOString().split("T")[0],
-      // paymentMethod: PaymentMethod.SANTANDER,
     },
   });
 
@@ -103,8 +98,15 @@ export default function IncomeModal({
           ...parsed,
           createdAt: createdAtISO,
         });
+        
+        let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
 
-        await put(`${process.env.NEXT_PUBLIC_INCOME_ENDPOINT}/${incomeToEdit.id}`, payload);
+        if (payload.fixed) {
+          url = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
+          delete payload.fixed;
+        }
+
+        await put(`${url}/${incomeToEdit.id}`, payload);
 
         // Update context
         const updatedIncome = { ...parsed, id: incomeToEdit.id };
@@ -155,26 +157,13 @@ export default function IncomeModal({
           {/* Amount */}
           <div className="grid gap-2">
             <Label htmlFor="amount">Amount *</Label>
-            <Controller
-              name="amount"
-              control={control}
-              render={({ field }) => (
-                <CurrencyInput
-                  id="amount"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  decimalScale={2}
-                  decimalsLimit={2}
-                  value={
-                    typeof field.value === "number" && !isNaN(field.value)
-                      ? field.value.toString()
-                      : undefined
-                  }
-                  onValueChange={(val) => {
-                    const parsed = val ? parseFloat(val.replace(",", ".")) : 0;
-                    field.onChange(parsed);
-                  }}
-                />
-              )}
+            <Input
+              id="amount"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              {...register("amount", { valueAsNumber: true })}
             />
             {errors.amount && (
               <p className={`text-sm ${colorClasses.state.error}`}>{errors.amount.message}</p>

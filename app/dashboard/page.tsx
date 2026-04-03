@@ -7,7 +7,7 @@ import { getStat } from "@/utils/stats";
 import { ExpensesProvider, useExpenses } from "@/context/ExpensesContext";
 import { IncomesProvider, useIncomes } from "@/context/IncomesContext";
 import { useEffect, useState, useCallback } from "react";
-import { camelizeKeysShallow } from "@/utils/payloads";
+import { camelizeKeysIncome, camelizeKeysExpense } from "@/utils/payloads";
 import { getFisrtDayDateString, getLastDayDateString, sortEntriesByDate } from "@/utils/dates";
 import { colorClasses } from "@/config/colors";
 import { fetchAll } from "@/http/requests";
@@ -32,25 +32,28 @@ const DashboardContent = () => {
 
         const data = await fetchAll(startDate, endDate, { "Content-Type": "application/json" });
 
-        console.log(data)
         if (data.error) {
-          throw new Error(data.error);
+          console.error(data.error);
         }
-
+        
         delete data.error;
 
+        const camelizedData = {
+          expenses: data.expenses?.map(camelizeKeysExpense),
+          expensesFixed: data.expensesFixed?.map(camelizeKeysExpense),
+          incomes: data.incomes?.map(camelizeKeysIncome),
+          incomesFixed: data.incomesFixed?.map(camelizeKeysIncome),
+        }
+
         const dataWithFixed = {
-          expenses: data.expenses?.map((expense) => addFixedKey(expense, false)) ?? [],
-          expensesFixed: data.expensesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
-          incomes: data.incomes?.map((expense) => addFixedKey(expense, false)) ?? [],
-          incomesFixed: data.incomesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
+          expenses: camelizedData.expenses?.map((expense) => addFixedKey(expense, false)) ?? [],
+          expensesFixed: camelizedData.expensesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
+          incomes: camelizedData.incomes?.map((income) => addFixedKey(income, false)) ?? [],
+          incomesFixed: camelizedData.incomesFixed?.map((income) => addFixedKey(income, true)) ?? [],
         };
 
         const expensesUnified = [...dataWithFixed.expenses, ...dataWithFixed.expensesFixed];
         const incomesUnified = [...dataWithFixed.incomes, ...dataWithFixed.incomesFixed];
-
-        expensesUnified.map(camelizeKeysShallow);
-        incomesUnified.map(camelizeKeysShallow);
 
         setExpenses(sortEntriesByDate(expensesUnified));
         setIncomes(sortEntriesByDate(incomesUnified));
@@ -99,23 +102,20 @@ const DashboardContent = () => {
         />
       </div>
       <div className="flex flex-row justify-center gap-10 mb-20 mt-20">
-        {expenses.length > 0 ||
-          (incomes.length > 0 && (
-            <>
-              <DisplayValue
-                value={totalIncome}
-                title="Total Income"
-                color={colorClasses.text.primary}
-                asCurrency
-              />
-              <DisplayValue
-                value={totalExpense}
-                title="Total Expense"
-                color={colorClasses.text.primary}
-                asCurrency
-              />
-            </>
-          ))}
+        {(expenses.length > 0 || incomes.length > 0) && (
+          <>
+            <DisplayValue
+              value={totalIncome}
+              title="Total Income"
+              color={colorClasses.financial.income}
+            />
+            <DisplayValue
+              value={totalExpense}
+              title="Total Expense"
+              color={colorClasses.financial.expense}
+            />
+          </>
+        )}
       </div>
       <div className="mt-8 flex flex-col items-center gap-4">
         <ExpensesTable entries={expenses} />

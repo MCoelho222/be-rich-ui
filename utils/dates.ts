@@ -1,4 +1,4 @@
-import { Entry } from "@/types/entryType";
+import { IncomeEntry, ExpenseEntry } from "@/types/entryType";
 
 export function formatDate(value: Date | string) {
   const d = value instanceof Date ? value : new Date(value);
@@ -10,7 +10,7 @@ export function formatWeekday(value: Date | string) {
   return d.toLocaleDateString("en-US", { weekday: "short" });
 }
 
-export function sortEntriesByDate(entries: Entry[], desc: boolean = true): Entry[] {
+export function sortEntriesByDate(entries: IncomeEntry[] | ExpenseEntry[], desc: boolean = true): IncomeEntry[] | ExpenseEntry[] {
   return [...entries].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();
     const dateB = new Date(b.createdAt).getTime();

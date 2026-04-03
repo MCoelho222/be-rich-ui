@@ -1,4 +1,3 @@
-import { Entry } from "@/types/entryType";
 
 export function getStat(
   data: number[],

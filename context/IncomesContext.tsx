@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { IncomeEntry } from "@/types/entryType";
-import { toSnakeCaseKeys, camelizeKeysShallow } from "@/utils/payloads";
+import { IncomeEntry, IncomeRead } from "@/types/entryType";
+import { toSnakeCaseKeys, camelizeKeysIncome } from "@/utils/payloads";
 import { post, put, del } from "@/http/apiClient";
 
 interface IncomesContextType {
@@ -27,6 +27,7 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
     const url = incomeEntry.fixed ? process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_INCOME_ENDPOINT
     if (url) {
       try {
+        const isFixed = incomeEntry.fixed
         delete incomeEntry.fixed
   
         const createdAtISO = new Date(incomeEntry.createdAt).toISOString();
@@ -42,8 +43,9 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
           })
 
         // Add the newly created income to state
-        const newEntry = camelizeKeysShallow(res.data) as IncomeEntry;
-        setIncomes((prev) => [newEntry, ...prev]);
+        const newIncome = camelizeKeysIncome(res?.data as IncomeRead) as IncomeEntry;
+        newIncome.fixed = isFixed
+        setIncomes((prev) => [newIncome, ...prev]);
       } catch (err) {
         console.error("Failed to add income:", err);
         throw err;
@@ -72,7 +74,7 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
         );
   
         // Update the income in state
-        const updatedIncome = camelizeKeysShallow(res.data) as IncomeEntry;
+        const updatedIncome = camelizeKeysIncome(res?.data as IncomeRead) as IncomeEntry;
         setIncomes((prev) => prev.map((e) => (e.id === incomeEntryId ? updatedIncome : e)));
       } catch (err) {
         console.error("Failed to update income:", err);

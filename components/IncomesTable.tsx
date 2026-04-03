@@ -30,7 +30,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeEntry | null>(null);
-
+  
   // Use prop entries if provided, otherwise use context entries
   const entries = propEntries !== undefined ? propEntries : contextIncomes;
 
@@ -76,7 +76,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
         className={`overflow-hidden rounded-xl border shadow-sm ${colorClasses.surface.border} ${colorClasses.surface.background}`}
       >
         <div className={`px-4 py-10 text-center text-sm ${colorClasses.text.secondary}`}>
-          Loading entries...
+          Loading incomes...
         </div>
       </div>
     );

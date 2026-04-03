@@ -1,4 +1,6 @@
-import { Entry } from "@/types/entryType";
+import { IncomeEntry, ExpenseEntry } from "@/types/entryType";
+
+type Entry = IncomeEntry | ExpenseEntry;
 
 /**
  * Extract all values from a specific key across all entries
@@ -9,33 +11,33 @@ import { Entry } from "@/types/entryType";
  *
  * @example
  * const amounts = getValuesFromKey(entries, "amount") // [100, 50, 200, ...]
- * const categories = getValuesFromKey(entries, "category") // ["Supermarket", "Transport", ...]
+ * const sources = getValuesFromKey(entries, "source") // ["Bank", "Cash", ...]
  */
-export function getValuesFromKey<K extends keyof Entry>(entries: Entry[], key: K): Entry[K][] {
+export function getValuesFromKey<T extends Entry, K extends keyof T>(entries: T[], key: K): T[K][] {
   return entries.map((entry) => entry[key]);
 }
 
 /**
  * Filter entries by exact match on a key
  */
-export function filterByExactMatch<K extends keyof Entry>(
-  entries: Entry[],
+export function filterByExactMatch<T extends Entry, K extends keyof T>(
+  entries: T[],
   key: K,
-  value: Entry[K]
-): Entry[] {
+  value: T[K]
+): T[] {
   return entries.filter((entry) => entry[key] === value);
 }
 
 /**
  * Filter entries by date range
  */
-export function filterByDateRange(
-  entries: Entry[],
+export function filterByDateRange<T extends Entry>(
+  entries: T[],
   options: {
     startDate?: Date | string;
     endDate?: Date | string;
   }
-): Entry[] {
+): T[] {
   const { startDate, endDate } = options;
 
   if (!startDate && !endDate) {
@@ -64,13 +66,13 @@ export function filterByDateRange(
 /**
  * Filter entries by amount range
  */
-export function filterByAmountRange(
-  entries: Entry[],
+export function filterByAmountRange<T extends Entry>(
+  entries: T[],
   options: {
     minAmount?: number;
     maxAmount?: number;
   }
-): Entry[] {
+): T[] {
   const { minAmount, maxAmount } = options;
 
   return entries.filter((entry) => {
@@ -83,7 +85,7 @@ export function filterByAmountRange(
 /**
  * Filter entries by text search in description
  */
-export function filterByDescription(entries: Entry[], searchTerm: string): Entry[] {
+export function filterByDescription<T extends Entry>(entries: T[], searchTerm: string): T[] {
   if (!searchTerm) return entries;
 
   const term = searchTerm.toLowerCase();
@@ -108,13 +110,12 @@ export function filterByDescription(entries: Entry[], searchTerm: string): Entry
  * // Returns objects with only createdAt and amount
  * filterEntries(entries, { startDate: "2026-01-01" }, ["createdAt", "amount"])
  */
-export function filterEntries(
-  entries: Entry[],
+export function filterEntries<T extends Entry>(
+  entries: T[],
   filters: {
-    entryType?: Entry["entryType"];
-    category?: Entry["category"];
+    category?: ExpenseEntry["category"];
     source?: Entry["source"];
-    paymentMethod?: Entry["paymentMethod"];
+    paymentMethod?: ExpenseEntry["paymentMethod"];
     fixed?: boolean;
     minAmount?: number;
     maxAmount?: number;
@@ -123,21 +124,22 @@ export function filterEntries(
     searchTerm?: string;
   },
   selectKeys?: (keyof Entry)[]
-): Entry[] | Partial<Entry>[] {
+): T[] | Partial<T>[] {
   let result = entries;
 
   // Apply exact match filters
-  if (filters.entryType !== undefined) {
-    result = filterByExactMatch(result, "entryType", filters.entryType);
-  }
   if (filters.category !== undefined) {
-    result = filterByExactMatch(result, "category", filters.category);
+    result = result.filter(
+      (entry) => "category" in entry && entry.category === filters.category
+    ) as T[];
   }
   if (filters.source !== undefined) {
     result = filterByExactMatch(result, "source", filters.source);
   }
   if (filters.paymentMethod !== undefined) {
-    result = filterByExactMatch(result, "paymentMethod", filters.paymentMethod);
+    result = result.filter(
+      (entry) => "paymentMethod" in entry && entry.paymentMethod === filters.paymentMethod
+    ) as T[];
   }
   if (filters.fixed !== undefined) {
     result = filterByExactMatch(result, "fixed", filters.fixed);
@@ -166,9 +168,9 @@ export function filterEntries(
   // Project to selected keys if specified
   if (selectKeys && selectKeys.length > 0) {
     return result.map((entry) => {
-      const projected: Partial<Entry> = {};
+      const projected: Partial<T> = {};
       selectKeys.forEach((key) => {
-        (projected as any)[key] = entry[key];
+        (projected as any)[key] = entry[key as keyof T];
       });
       return projected;
     });

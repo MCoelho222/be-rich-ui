@@ -1,4 +1,4 @@
-import { ExpenseRead, IncomeRead } from "@/types/entryType";
+import { ExpenseRead, IncomeRead, IncomeEntry, ExpenseEntry } from "@/types/entryType";
 
 interface IFetchAllPayload {
   expenses: ExpenseRead[];
@@ -30,7 +30,7 @@ export const buildUnifiedExpenseReadEntries = ({
   ];
 };
 
-export const addFixedKey = (entry: ExpenseRead | IncomeRead, fixed: boolean) => {
+export const addFixedKey = (entry: ExpenseEntry | IncomeEntry, fixed: boolean) => {
   return {
     ...entry,
     fixed
