@@ -26,7 +26,7 @@ interface IncomesTableProps {
 const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
   const { incomes: contextIncomes, loadingIncome, errorIncome, setIncomes } = useIncomes();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [incomeToDelete, setIncomeToDelete] = useState<string | null>(null);
+  const [incomeToDelete, setIncomeToDelete] = useState<[string, boolean | undefined] | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeEntry | null>(null);
@@ -39,8 +39,8 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
     setEditDialogOpen(true);
   };
 
-  const handleDeleteClick = (entryId: string) => {
-    setIncomeToDelete(entryId);
+  const handleDeleteClick = (entryId: string, isFixed?: boolean) => {
+    setIncomeToDelete([entryId, isFixed]);
     setDeleteDialogOpen(true);
   };
 
@@ -49,11 +49,18 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
 
     try {
       setIsDeleting(true);
+
+      let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
+      
+      if (incomeToDelete[1]) {
+        url = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
+      }
+
       // Make DELETE request to API
-      await del(`${process.env.NEXT_PUBLIC_INCOME_ENDPOINT}/${incomeToDelete}`);
+      await del(`${url}/${incomeToDelete[0]}`);
 
       // Remove the deleted entry from context
-      const updatedIncomes = contextIncomes.filter((entry) => entry.id !== incomeToDelete);
+      const updatedIncomes = contextIncomes.filter((entry) => entry.id !== incomeToDelete[0]);
       setIncomes(updatedIncomes);
 
       setDeleteDialogOpen(false);
@@ -186,7 +193,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5">
                       <EditIcon onClick={() => handleEditClick(entry)} />
-                      <DeleteIcon onClick={() => entry.id && handleDeleteClick(entry.id)} />
+                      <DeleteIcon onClick={() => entry.id && handleDeleteClick(entry.id, entry.fixed)} />
                     </span>
                   </td>
                 </tr>
