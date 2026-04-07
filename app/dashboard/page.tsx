@@ -21,6 +21,7 @@ const DashboardContent = () => {
   const { incomes, setIncomes, setLoadingIncome, setErrorIncome } = useIncomes();
   const [startDate, setStartDate] = useState<string>(getFisrtDayDateString());
   const [endDate, setEndDate] = useState<string>(getLastDayDateString());
+  const [activeTab, setActiveTab] = useState<"expenses" | "incomes">("expenses");
 
   useEffect(() => {
     const loadEntries = async () => {
@@ -35,7 +36,7 @@ const DashboardContent = () => {
         if (data.error) {
           console.error(data.error);
         }
-        
+
         delete data.error;
 
         const camelizedData = {
@@ -43,13 +44,15 @@ const DashboardContent = () => {
           expensesFixed: data.expensesFixed?.map(camelizeKeysExpense),
           incomes: data.incomes?.map(camelizeKeysIncome),
           incomesFixed: data.incomesFixed?.map(camelizeKeysIncome),
-        }
+        };
 
         const dataWithFixed = {
           expenses: camelizedData.expenses?.map((expense) => addFixedKey(expense, false)) ?? [],
-          expensesFixed: camelizedData.expensesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
+          expensesFixed:
+            camelizedData.expensesFixed?.map((expense) => addFixedKey(expense, true)) ?? [],
           incomes: camelizedData.incomes?.map((income) => addFixedKey(income, false)) ?? [],
-          incomesFixed: camelizedData.incomesFixed?.map((income) => addFixedKey(income, true)) ?? [],
+          incomesFixed:
+            camelizedData.incomesFixed?.map((income) => addFixedKey(income, true)) ?? [],
         };
 
         const expensesUnified = [...dataWithFixed.expenses, ...dataWithFixed.expensesFixed];
@@ -118,8 +121,36 @@ const DashboardContent = () => {
         )}
       </div>
       <div className="mt-8 flex flex-col items-center gap-4">
-        <ExpensesTable entries={expenses} />
-        <IncomesTable entries={incomes} />
+        {/* Tabs */}
+        <div className="flex gap-2 border-b w-full max-w-4xl">
+          <button
+            onClick={() => setActiveTab("expenses")}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === "expenses"
+                ? `border-b-2 border-rose-400 ${colorClasses.financial.expense}`
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Expenses ({expenses.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("incomes")}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === "incomes"
+                ? `border-b-2 border-emerald-500 ${colorClasses.financial.income}`
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Incomes ({incomes.length})
+          </button>
+        </div>
+
+        {/* Table Content */}
+        {activeTab === "expenses" ? (
+          <ExpensesTable entries={expenses} />
+        ) : (
+          <IncomesTable entries={incomes} />
+        )}
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import { IncomeEntry, IncomeRead } from "@/types/entryType";
 import { toSnakeCaseKeys, camelizeKeysIncome } from "@/utils/payloads";
 import { post, put, del } from "@/http/apiClient";
-
+import { setFinalUrl } from "@/utils/urls";
 interface IncomesContextType {
   incomes: IncomeEntry[];
   setIncomes: (expenses: IncomeEntry[]) => void;
@@ -24,55 +24,56 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
   const [errorIncome, setErrorIncome] = useState<string | null>(null);
 
   const addIncome = async (incomeEntry: IncomeEntry) => {
-    const url = incomeEntry.fixed ? process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_INCOME_ENDPOINT
+    let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT
+
     if (url) {
+      const isFixed = incomeEntry.fixed ? true : false;
+      delete incomeEntry.fixed;
+      url = setFinalUrl(url, isFixed);
       try {
-        const isFixed = incomeEntry.fixed
-        delete incomeEntry.fixed
-  
+
         const createdAtISO = new Date(incomeEntry.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
           ...incomeEntry,
           createdAt: createdAtISO,
         });
-  
-        const res = await post(
-          url,
-          payload, {
-            "Content-Type": "application/json",
-          })
+
+        const res = await post(url, payload, {
+          "Content-Type": "application/json",
+        });
 
         // Add the newly created income to state
         const newIncome = camelizeKeysIncome(res?.data as IncomeRead) as IncomeEntry;
-        newIncome.fixed = isFixed
+        newIncome.fixed = isFixed;
+  
         setIncomes((prev) => [newIncome, ...prev]);
+
       } catch (err) {
         console.error("Failed to add income:", err);
         throw err;
       }
     } else {
-      console.error("Url is not set")
+      console.error("Url is not set");
     }
   };
 
   const updateIncome = async (incomeEntryId: string, incomeEntry: IncomeEntry) => {
-    const url = incomeEntry.fixed ? process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_INCOME_ENDPOINT
+    let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT
     if (url) {
-      delete incomeEntry.fixed
+      const isFixed = incomeEntry.fixed ? true : false;
+      delete incomeEntry.fixed;
+      url = setFinalUrl(url, isFixed);
       try {
         const createdAtISO = new Date(incomeEntry.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
           ...incomeEntry,
           createdAt: createdAtISO,
         });
-  
-        const res = await put(
-          url,
-          payload, {
-            "Content-Type": "application/json",
-          }
-        );
-  
+
+        const res = await put(url, payload, {
+          "Content-Type": "application/json",
+        });
+
         // Update the income in state
         const updatedIncome = camelizeKeysIncome(res?.data as IncomeRead) as IncomeEntry;
         setIncomes((prev) => prev.map((e) => (e.id === incomeEntryId ? updatedIncome : e)));
@@ -81,19 +82,19 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
         throw err;
       }
     } else {
-      console.error("Url is not set")
+      console.error("Url is not set");
     }
   };
 
   const deleteIncome = async (incomeEntryId: string, fixed: boolean) => {
-    const url = fixed ? process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT : process.env.NEXT_PUBLIC_INCOME_ENDPOINT
+    let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
     if (url) {
+      url = setFinalUrl(url, fixed);
       try {
         await del(url, {
-            "Content-Type": "application/json",
-          },
-        );
-  
+          "Content-Type": "application/json",
+        });
+
         // Remove the deleted income from state
         setIncomes((prev) => prev.filter((incomeEntry) => incomeEntry.id !== incomeEntryId));
       } catch (err) {
@@ -101,7 +102,7 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
         throw err;
       }
     } else {
-      console.error("Url is not set")
+      console.error("Url is not set");
     }
   };
 
@@ -116,7 +117,7 @@ export const IncomesProvider = ({ children }: { children: ReactNode }) => {
         setErrorIncome,
         addIncome,
         updateIncome,
-        deleteIncome
+        deleteIncome,
       }}
     >
       {children}

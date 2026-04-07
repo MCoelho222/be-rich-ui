@@ -3,6 +3,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import { ExpenseEntry, ExpenseRead } from "@/types/entryType";
 import { toSnakeCaseKeys, camelizeKeysExpense } from "@/utils/payloads";
 import { post, put, del } from "@/http/apiClient";
+import { setFinalUrl } from "@/utils/urls";
 
 interface ExpensesContextType {
   expenses: ExpenseEntry[];
@@ -24,13 +25,12 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
   const [errorExpense, setErrorExpense] = useState<string | null>(null);
 
   const addExpense = async (expenseEntry: ExpenseEntry) => {
-    const url = expenseEntry.fixed
-      ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT
-      : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
+    let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
+      const isFixed = expenseEntry.fixed ? true : false;
+      delete expenseEntry.fixed;
+      url = setFinalUrl(url, isFixed);
       try {
-        delete expenseEntry.fixed;
-
         const createdAtISO = new Date(expenseEntry.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
           ...expenseEntry,
@@ -43,6 +43,7 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
 
         // Add the newly created expense to state
         const newEntry = camelizeKeysExpense(res?.data as ExpenseRead) as ExpenseEntry;
+
         setExpenses((prev) => [newEntry, ...prev]);
       } catch (err) {
         console.error("Failed to add expense:", err);
@@ -54,11 +55,11 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateExpense = async (expenseEntryId: string, expenseEntry: ExpenseEntry) => {
-    const url = expenseEntry.fixed
-      ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT
-      : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
+    let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
+      const isFixed = expenseEntry.fixed ? true : false;
       delete expenseEntry.fixed;
+      url = setFinalUrl(url, isFixed);
       try {
         const createdAtISO = new Date(expenseEntry.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
@@ -83,10 +84,9 @@ export const ExpensesProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteExpense = async (expenseEntryId: string, fixed: boolean) => {
-    const url = fixed
-      ? process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT
-      : process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
+    let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
+      url = setFinalUrl(url, fixed);
       try {
         await del(url, {
           "Content-Type": "application/json",
