@@ -3,7 +3,7 @@ import { ExpenseEntry } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
 import { niceLabel } from "@/utils/stringFormat";
-import { useExpenses } from "@/context/ExpensesContext";
+import { useExpenses } from "@/context/EntriesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";

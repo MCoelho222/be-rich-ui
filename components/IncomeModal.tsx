@@ -36,7 +36,7 @@ import {
   IncomeEntry,
 } from "@/types/entryType";
 import { Source } from "@/helpers/entriesHelper";
-import { useIncomes } from "@/context/IncomesContext";
+import { useIncomes } from "@/context/EntriesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
 
@@ -98,7 +98,7 @@ export default function IncomeModal({
           ...parsed,
           createdAt: createdAtISO,
         });
-        
+
         let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
 
         if (payload.fixed) {

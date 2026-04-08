@@ -2,7 +2,7 @@
 import { IncomeEntry } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
-import { useIncomes } from "@/context/IncomesContext";
+import { useIncomes } from "@/context/EntriesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";
@@ -30,7 +30,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeEntry | null>(null);
-  
+
   // Use prop entries if provided, otherwise use context entries
   const entries = propEntries !== undefined ? propEntries : contextIncomes;
 
@@ -51,7 +51,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
       setIsDeleting(true);
 
       let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
-      
+
       if (incomeToDelete[1]) {
         url = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
       }
@@ -193,7 +193,9 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5">
                       <EditIcon onClick={() => handleEditClick(entry)} />
-                      <DeleteIcon onClick={() => entry.id && handleDeleteClick(entry.id, entry.fixed)} />
+                      <DeleteIcon
+                        onClick={() => entry.id && handleDeleteClick(entry.id, entry.fixed)}
+                      />
                     </span>
                   </td>
                 </tr>

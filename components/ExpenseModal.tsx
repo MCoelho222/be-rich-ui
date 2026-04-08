@@ -31,7 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { ExpenseSchema } from "@/schema/entriesSchema";
 import { FormInputExpenseType, FormOutputExpenseType, ExpenseEntry } from "@/types/entryType";
 import { PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
-import { useExpenses } from "@/context/ExpensesContext";
+import { useExpenses } from "@/context/EntriesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
 
@@ -95,7 +95,7 @@ export default function ExpenseModal({
           ...parsed,
           createdAt: createdAtISO,
         });
-        
+
         let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
 
         if (payload.fixed) {

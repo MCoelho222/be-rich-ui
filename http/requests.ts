@@ -1,9 +1,11 @@
+import { setFixedQueryParam } from "@/utils/urls";
 import { apiRequest } from "./apiClient";
 import { ExpenseRead, IncomeRead } from "@/types/entryType";
 
 interface IFetchAll {
   startDate?: string;
   endDate?: string;
+  isFixed?: boolean;
 }
 interface IFetchAllResult {
   expenses: ExpenseRead[];
@@ -13,7 +15,7 @@ interface IFetchAllResult {
   error?: string;
 }
 
-const buildQuery = ({ startDate, endDate }: IFetchAll): string => {
+const buildQuery = ({ startDate, endDate, isFixed }: IFetchAll): string => {
   const params = new URLSearchParams();
 
   if (startDate) {
@@ -22,6 +24,10 @@ const buildQuery = ({ startDate, endDate }: IFetchAll): string => {
 
   if (endDate) {
     params.set("end_date", endDate);
+  }
+
+  if (isFixed) {
+    params.set("is_fixed", "true");
   }
 
   const queryString = params.toString();
@@ -35,11 +41,9 @@ export async function fetchAll(
 ): Promise<IFetchAllResult> {
   try {
     const expenseEndpoint = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
-    const expenseFixedEndpoint = process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT;
     const incomeEndpoint = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
-    const incomeFixedEndpoint = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
 
-    if (!expenseEndpoint || !expenseFixedEndpoint || !incomeEndpoint || !incomeFixedEndpoint) {
+    if (!expenseEndpoint || !incomeEndpoint) {
       return {
         expenses: [],
         expensesFixed: [],
@@ -48,13 +52,14 @@ export async function fetchAll(
         error: "Missing API endpoint configuration.",
       };
     }
-
+    const isFixed = true;
     const query = buildQuery({ startDate, endDate });
+    const queryFixed = buildQuery({ startDate, endDate, isFixed });
     const [expensesRes, expensesFixedRes, incomesRes, incomesFixedRes] = await Promise.allSettled([
       apiRequest<ExpenseRead[]>("GET", `${expenseEndpoint}${query}`, undefined, headers),
-      apiRequest<ExpenseRead[]>("GET", `${expenseFixedEndpoint}${query}`, undefined, headers),
+      apiRequest<ExpenseRead[]>("GET", `${expenseEndpoint}${queryFixed}`, undefined, headers),
       apiRequest<IncomeRead[]>("GET", `${incomeEndpoint}${query}`, undefined, headers),
-      apiRequest<IncomeRead[]>("GET", `${incomeFixedEndpoint}${query}`, undefined, headers),
+      apiRequest<IncomeRead[]>("GET", `${incomeEndpoint}${queryFixed}`, undefined, headers),
     ]);
 
     const errors: string[] = [];
