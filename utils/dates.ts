@@ -1,4 +1,4 @@
-import { IncomeEntry, ExpenseEntry } from "@/types/entryType";
+import { IncomeCamel, ExpenseCamel } from "@/types/entryType";
 
 export function formatDate(value: Date | string) {
   const d = value instanceof Date ? value : new Date(value);
@@ -10,7 +10,7 @@ export function formatWeekday(value: Date | string) {
   return d.toLocaleDateString("en-US", { weekday: "short" });
 }
 
-export function sortEntriesByDate(entries: IncomeEntry[] | ExpenseEntry[], desc: boolean = true): IncomeEntry[] | ExpenseEntry[] {
+export function sortEntriesByDate(entries: IncomeCamel[] | ExpenseCamel[], desc: boolean = true): IncomeCamel[] | ExpenseCamel[] {
   return [...entries].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();
     const dateB = new Date(b.createdAt).getTime();

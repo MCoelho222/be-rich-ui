@@ -29,25 +29,30 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { ExpenseSchema } from "@/schema/entriesSchema";
-import { FormInputExpenseType, FormOutputExpenseType, ExpenseEntry } from "@/types/entryType";
+import { FormInputExpenseType, FormOutputExpenseType, ExpenseCamel } from "@/types/entryType";
 import { PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
 import { useExpenses } from "@/context/EntriesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
 
-interface ExpenseModalProps {
-  expenseToEdit?: ExpenseEntry;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  mode?: "add" | "edit";
-}
+// Discriminated union for type-safe props based on mode
+type ExpenseModalProps =
+  | {
+      mode: "add";
+      expenseToEdit?: never;
+      open?: boolean;
+      onOpenChange?: (open: boolean) => void;
+    }
+  | {
+      mode: "edit";
+      expenseToEdit: ExpenseCamel;
+      open?: boolean;
+      onOpenChange?: (open: boolean) => void;
+    };
 
-export default function ExpenseModal({
-  expenseToEdit,
-  open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
-  mode = "add",
-}: ExpenseModalProps) {
+export default function ExpenseModal(props: ExpenseModalProps) {
+  const { open: controlledOpen, onOpenChange: controlledOnOpenChange, mode } = props;
+  const expenseToEdit = props.mode === "edit" ? props.expenseToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
   const { addExpense, setExpenses, expenses } = useExpenses();
 
@@ -77,7 +82,7 @@ export default function ExpenseModal({
       setValue("createdAt", new Date(expenseToEdit.createdAt).toISOString().split("T")[0]);
       setValue("category", expenseToEdit.category);
       setValue("paymentMethod", expenseToEdit.paymentMethod);
-      setValue("installments", expenseToEdit.installments);
+      setValue("installments", expenseToEdit.installment.split("/")[1]);
       setValue("source", expenseToEdit.source);
       setValue("fixed", expenseToEdit.fixed);
       setValue("description", expenseToEdit.description || "");
@@ -91,6 +96,7 @@ export default function ExpenseModal({
       if (mode === "edit" && expenseToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
+        delete parsed.installments;
         const payload = toSnakeCaseKeys({
           ...parsed,
           createdAt: createdAtISO,
@@ -106,7 +112,16 @@ export default function ExpenseModal({
         await put(`${url}/${expenseToEdit.id}`, payload);
 
         // Update context
-        const updatedExpense = { ...parsed, id: expenseToEdit.id };
+        const updatedExpense: ExpenseCamel = {
+          ...expenseToEdit,
+          amount: parsed.amount,
+          category: parsed.category!,
+          paymentMethod: parsed.paymentMethod!,
+          source: parsed.source,
+          fixed: parsed.fixed,
+          description: parsed.description || "",
+          createdAt: new Date(parsed.createdAt).toISOString(),
+        };
         setExpenses(expenses.map((e) => (e.id === expenseToEdit.id ? updatedExpense : e)));
       } else {
         // Update context and make a POST request
@@ -132,7 +147,7 @@ export default function ExpenseModal({
     <Dialog open={open} onOpenChange={setOpen}>
       {mode === "add" && (
         <DialogTrigger asChild>
-          <Button className="rounded-xl shadow-sm bg-slate-600">New Expense</Button>
+          <Button className="rounded-xl shadow-sm bg-slate-600 m-2">New Expense</Button>
         </DialogTrigger>
       )}
 
@@ -263,18 +278,22 @@ export default function ExpenseModal({
           </div>
 
           {/* Installments */}
-          <div className="grid gap-2">
-            <Label htmlFor="installments">Installments *</Label>
-            <Input
-              id="installments"
-              type="number"
-              min={1}
-              {...register("installments", { valueAsNumber: true })}
-            />
-            {errors.installments && (
-              <p className={`text-sm ${colorClasses.state.error}`}>{errors.installments.message}</p>
-            )}
-          </div>
+          {mode == "add" && (
+            <div className="grid gap-2">
+              <Label htmlFor="installments">Installments *</Label>
+              <Input
+                id="installments"
+                type="number"
+                min={1}
+                {...register("installments", { valueAsNumber: true })}
+              />
+              {errors.installments && (
+                <p className={`text-sm ${colorClasses.state.error}`}>
+                  {errors.installments.message}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Recurring */}
           <div className="flex items-center justify-between rounded-lg border p-3">

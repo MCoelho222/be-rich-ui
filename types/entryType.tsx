@@ -14,7 +14,7 @@ export interface ExpenseRead {
   id: string;
   amount: number;
   payment_method: PaymentMethod;
-  installments: number;
+  installment: string;
   category: Category;
   description: string;
   source: Source;
@@ -22,12 +22,36 @@ export interface ExpenseRead {
   updated_at: string;
 }
 
+export interface ExpenseCamel {
+  id: string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  installment: string;
+  category: Category;
+  description: string;
+  source: Source;
+  fixed?: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface IncomeRead {
   id: string;
   amount: number;
-  installments: number;
+  installment: string;
   description: string;
   source: Source;
   created_at: string;
   updated_at: string;
+}
+
+export interface IncomeCamel {
+  id: string;
+  amount: number;
+  installment: string;
+  description: string;
+  source: Source;
+  fixed?: boolean;
+  createdAt: string;
+  updatedAt?: string;
 }

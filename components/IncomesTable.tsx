@@ -1,5 +1,5 @@
 "use client";
-import { IncomeEntry } from "@/types/entryType";
+import { IncomeEntry, IncomeCamel } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
 import { useIncomes } from "@/context/EntriesContext";
@@ -19,22 +19,15 @@ import {
 import { Button } from "./ui/button";
 import { del } from "@/http/apiClient";
 
-interface IncomesTableProps {
-  entries?: IncomeEntry[];
-}
-
-const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
+const IncomesTable = () => {
   const { incomes: contextIncomes, loadingIncome, errorIncome, setIncomes } = useIncomes();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [incomeToDelete, setIncomeToDelete] = useState<[string, boolean | undefined] | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [incomeToEdit, setIncomeToEdit] = useState<IncomeEntry | null>(null);
+  const [incomeToEdit, setIncomeToEdit] = useState<IncomeCamel | null>(null);
 
-  // Use prop entries if provided, otherwise use context entries
-  const entries = propEntries !== undefined ? propEntries : contextIncomes;
-
-  const handleEditClick = (entry: IncomeEntry) => {
+  const handleEditClick = (entry: IncomeCamel) => {
     setIncomeToEdit(entry);
     setEditDialogOpen(true);
   };
@@ -146,7 +139,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Description</th>
                 <th className="px-4 py-3 text-right">Amount</th>
-                <th className="px-4 py- text-right">Installments</th>
+                <th className="px-4 py- text-right">Installment</th>
                 <th className="px-4 py-3 text-center">Cycle</th>
                 <th className="px-4 py-3">Source</th>
                 <th className="px-4 py-3">Action</th>
@@ -180,7 +173,7 @@ const IncomesTable = ({ entries: propEntries }: IncomesTableProps) => {
 
                   <td className="px-4 py-3 text-right">{formatCurrency(entry.amount)}</td>
 
-                  <td className="px-4 py-3 text-right">{entry.installments}</td>
+                  <td className="px-4 py-3 text-right">{entry.installment}</td>
                   <td className="px-4 py-3 text-center">
                     {entry.fixed ? (
                       <span className={`px-2 py-0.5 ${colorClasses.financial.fixed}`}>Fixed</span>

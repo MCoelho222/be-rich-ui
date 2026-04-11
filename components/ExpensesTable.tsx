@@ -1,5 +1,5 @@
 "use client";
-import { ExpenseEntry } from "@/types/entryType";
+import { ExpenseCamel } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
 import { niceLabel } from "@/utils/stringFormat";
@@ -7,7 +7,7 @@ import { useExpenses } from "@/context/EntriesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";
-import EntryModal from "./ExpenseModal";
+import ExpenseModal from "./ExpenseModal";
 import { useState } from "react";
 import {
   Dialog,
@@ -20,22 +20,16 @@ import {
 import { Button } from "./ui/button";
 import { del } from "@/http/apiClient";
 
-interface ExpensesTableProps {
-  entries?: ExpenseEntry[];
-}
 
-const ExpensesTable = ({ entries: propExpenses }: ExpensesTableProps) => {
+const ExpensesTable = () => {
   const { expenses: contextExpenses, loadingExpense, errorExpense, setExpenses } = useExpenses();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [expenseToEdit, setExpenseToEdit] = useState<ExpenseEntry | null>(null);
+  const [expenseToEdit, setExpenseToEdit] = useState<ExpenseCamel | null>(null);
 
-  // Use prop entries if provided, otherwise use context entries
-  const entries = propExpenses !== undefined ? propExpenses : contextExpenses;
-
-  const handleEditClick = (entry: ExpenseEntry) => {
+  const handleEditClick = (entry: ExpenseCamel) => {
     setExpenseToEdit(entry);
     setEditDialogOpen(true);
   };
@@ -99,7 +93,7 @@ const ExpensesTable = ({ entries: propExpenses }: ExpensesTableProps) => {
     <>
       {/* Edit Dialog */}
       {expenseToEdit && (
-        <EntryModal
+        <ExpenseModal
           mode="edit"
           expenseToEdit={expenseToEdit}
           open={editDialogOpen}
@@ -141,7 +135,7 @@ const ExpensesTable = ({ entries: propExpenses }: ExpensesTableProps) => {
                 <th className="px-4 py-3">Description</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3 text-right">Amount</th>
-                <th className="px-4 py- text-right">Installments</th>
+                <th className="px-4 py- text-right">Installment</th>
                 <th className="px-4 py-3 text-center">Cycle</th>
                 <th className="px-4 py-3">Source</th>
                 <th className="px-4 py-3">Payment Method</th>
@@ -180,7 +174,7 @@ const ExpensesTable = ({ entries: propExpenses }: ExpensesTableProps) => {
 
                   <td className="px-4 py-3 text-right">{formatCurrency(entry.amount)}</td>
 
-                  <td className="px-4 py-3 text-right">{entry.installments}</td>
+                  <td className="px-4 py-3 text-right">{entry.installment}</td>
                   <td className="px-4 py-3 text-center">
                     {entry.fixed ? (
                       <span className={`px-2 py-0.5 ${colorClasses.financial.fixed}`}>Fixed</span>

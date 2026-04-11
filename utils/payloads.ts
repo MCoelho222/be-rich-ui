@@ -1,4 +1,4 @@
-import { IncomeEntry, ExpenseEntry, IncomeRead, ExpenseRead } from "@/types/entryType";
+import { IncomeCamel, ExpenseCamel, IncomeRead, ExpenseRead } from "@/types/entryType";
 
 export function toSnakeCaseKeys<T extends Record<string, any>>(obj: T) {
   return Object.fromEntries(
@@ -13,20 +13,20 @@ function snakeToCamel(str: string) {
   return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
-export function camelizeKeysIncome(entry: IncomeRead): IncomeEntry {
+export function camelizeKeysIncome(entry: IncomeRead): IncomeCamel {
   const result: Record<string, any> = {};
   for (const key in entry) {
     const camelKey = snakeToCamel(key);
     result[camelKey] = entry[key as keyof IncomeRead];
   }
-  return result as IncomeEntry;
+  return result as IncomeCamel;
 }
 
-export function camelizeKeysExpense(entry: ExpenseRead): ExpenseEntry {
+export function camelizeKeysExpense(entry: ExpenseRead): ExpenseCamel {
   const result: Record<string, any> = {};
   for (const key in entry) {
     const camelKey = snakeToCamel(key);
     result[camelKey] = entry[key as keyof ExpenseRead];
   }
-  return result as ExpenseEntry;
+  return result as ExpenseCamel;
 }

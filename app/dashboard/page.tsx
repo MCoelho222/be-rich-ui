@@ -42,8 +42,8 @@ const DashboardContent = () => {
   return (
     <div className="p-6">
       <div className="absolute bottom-7 right-5">
-        <ExpenseModal />
-        <IncomeModal />
+        <ExpenseModal mode="add" />
+        <IncomeModal mode="add" />
       </div>
       <div className="flex flex-row justify-center mb-6">
         <DatePeriodSelector
@@ -96,9 +96,9 @@ const DashboardContent = () => {
 
         {/* Table Content */}
         {activeTab === "expenses" ? (
-          <ExpensesTable entries={expenses} />
+          <ExpensesTable />
         ) : (
-          <IncomesTable entries={incomes} />
+          <IncomesTable />
         )}
       </div>
     </div>

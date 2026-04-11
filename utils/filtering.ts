@@ -1,6 +1,6 @@
-import { IncomeEntry, ExpenseEntry } from "@/types/entryType";
+import { IncomeCamel, ExpenseCamel } from "@/types/entryType";
 
-type Entry = IncomeEntry | ExpenseEntry;
+type Entry = IncomeCamel | ExpenseCamel;
 
 /**
  * Extract all values from a specific key across all entries
@@ -113,9 +113,9 @@ export function filterByDescription<T extends Entry>(entries: T[], searchTerm: s
 export function filterEntries<T extends Entry>(
   entries: T[],
   filters: {
-    category?: ExpenseEntry["category"];
+    category?: ExpenseCamel["category"];
     source?: Entry["source"];
-    paymentMethod?: ExpenseEntry["paymentMethod"];
+    paymentMethod?: ExpenseCamel["paymentMethod"];
     fixed?: boolean;
     minAmount?: number;
     maxAmount?: number;

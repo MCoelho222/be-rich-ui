@@ -1,6 +1,14 @@
-export function setFixedQueryParam(endpoint: string, isFixed: boolean) {
+export function setQueryParams(endpoint: string, isFixed: boolean, installments?: number) {
+  const params = new URLSearchParams();
+
   if (isFixed) {
-    return `${endpoint}?is_fixed=true`;
+    params.append("is_fixed", "true");
   }
-  return endpoint;
+
+  if (installments !== undefined && installments > 1) {
+    params.append("installments", installments.toString());
+  }
+
+  const queryString = params.toString();
+  return queryString ? `${endpoint}?${queryString}` : endpoint;
 }

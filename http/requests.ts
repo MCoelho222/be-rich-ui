@@ -1,4 +1,3 @@
-import { setFixedQueryParam } from "@/utils/urls";
 import { apiRequest } from "./apiClient";
 import { ExpenseRead, IncomeRead } from "@/types/entryType";
 

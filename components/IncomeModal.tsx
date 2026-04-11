@@ -29,30 +29,30 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 import { IncomeSchema } from "@/schema/entriesSchema";
-import {
-  FormInputIncomeType,
-  FormOutputIncomeType,
-  ExpenseEntry,
-  IncomeEntry,
-} from "@/types/entryType";
+import { FormInputIncomeType, FormOutputIncomeType, IncomeCamel } from "@/types/entryType";
 import { Source } from "@/helpers/entriesHelper";
 import { useIncomes } from "@/context/EntriesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
 
-interface IncomeModalProps {
-  incomeToEdit?: ExpenseEntry | IncomeEntry;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  mode?: "add" | "edit";
-}
+// Discriminated union for type-safe props based on mode
+type IncomeModalProps =
+  | {
+      mode: "add";
+      incomeToEdit?: never;
+      open?: boolean;
+      onOpenChange?: (open: boolean) => void;
+    }
+  | {
+      mode: "edit";
+      incomeToEdit: IncomeCamel;
+      open?: boolean;
+      onOpenChange?: (open: boolean) => void;
+    };
 
-export default function IncomeModal({
-  incomeToEdit,
-  open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
-  mode = "add",
-}: IncomeModalProps) {
+export default function IncomeModal(props: IncomeModalProps) {
+  const { open: controlledOpen, onOpenChange: controlledOnOpenChange, mode } = props;
+  const incomeToEdit = props.mode === "edit" ? props.incomeToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
   const { addIncome, setIncomes, incomes } = useIncomes();
 
@@ -80,7 +80,7 @@ export default function IncomeModal({
     if (mode === "edit" && incomeToEdit) {
       setValue("amount", incomeToEdit.amount);
       setValue("createdAt", new Date(incomeToEdit.createdAt).toISOString().split("T")[0]);
-      setValue("installments", incomeToEdit.installments);
+      setValue("installments", parseInt(incomeToEdit.installment.split("/")[1]));
       setValue("source", incomeToEdit.source);
       setValue("fixed", incomeToEdit.fixed);
       setValue("description", incomeToEdit.description || "");
@@ -94,6 +94,7 @@ export default function IncomeModal({
       if (mode === "edit" && incomeToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
+        delete parsed.installments;
         const payload = toSnakeCaseKeys({
           ...parsed,
           createdAt: createdAtISO,
@@ -109,7 +110,14 @@ export default function IncomeModal({
         await put(`${url}/${incomeToEdit.id}`, payload);
 
         // Update context
-        const updatedIncome = { ...parsed, id: incomeToEdit.id };
+        const updatedIncome: IncomeCamel = {
+          ...incomeToEdit,
+          amount: parsed.amount,
+          source: parsed.source,
+          fixed: parsed.fixed,
+          description: parsed.description || "",
+          createdAt: new Date(parsed.createdAt).toISOString(),
+        };
         setIncomes(incomes.map((e) => (e.id === incomeToEdit.id ? updatedIncome : e)));
       } else {
         // Update context and make a POST request
@@ -134,7 +142,7 @@ export default function IncomeModal({
     <Dialog open={open} onOpenChange={setOpen}>
       {mode === "add" && (
         <DialogTrigger asChild>
-          <Button className="rounded-xl shadow-sm bg-slate-600">New Income</Button>
+          <Button className="rounded-xl shadow-sm bg-slate-600 m-2">New Income</Button>
         </DialogTrigger>
       )}
 
@@ -209,18 +217,22 @@ export default function IncomeModal({
           </div>
 
           {/* Installments */}
-          <div className="grid gap-2">
-            <Label htmlFor="installments">Installments *</Label>
-            <Input
-              id="installments"
-              type="number"
-              min={1}
-              {...register("installments", { valueAsNumber: true })}
-            />
-            {errors.installments && (
-              <p className={`text-sm ${colorClasses.state.error}`}>{errors.installments.message}</p>
-            )}
-          </div>
+          {mode === "add" && (
+            <div className="grid gap-2">
+              <Label htmlFor="installments">Installments *</Label>
+              <Input
+                id="installments"
+                type="number"
+                min={1}
+                {...register("installments", { valueAsNumber: true })}
+              />
+              {errors.installments && (
+                <p className={`text-sm ${colorClasses.state.error}`}>
+                  {errors.installments.message}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Recurring (both Income and Expense) */}
           <div className="flex items-center justify-between rounded-lg border p-3">
