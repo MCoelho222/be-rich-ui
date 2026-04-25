@@ -32,9 +32,6 @@ import { IncomeSchema } from "@/schema/entriesSchema";
 import { FormInputIncomeType, FormOutputIncomeType, IncomeCamel } from "@/types/entryType";
 import { Source } from "@/helpers/entriesHelper";
 import { useIncomes } from "@/context/EntriesContext";
-import { put } from "@/http/apiClient";
-import { toSnakeCaseKeys } from "@/utils/payloads";
-import { setQueryParams } from "@/utils/urls";
 
 // Discriminated union for type-safe props based on mode
 type IncomeModalProps =
@@ -55,7 +52,7 @@ export default function IncomeModal(props: IncomeModalProps) {
   const { open: controlledOpen, onOpenChange: controlledOnOpenChange, mode } = props;
   const incomeToEdit = props.mode === "edit" ? props.incomeToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
-  const { addIncome, setIncomes, incomes, updateIncome } = useIncomes();
+  const { addIncome, updateIncome } = useIncomes();
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -114,7 +111,7 @@ export default function IncomeModal(props: IncomeModalProps) {
           createdAt: createdAtISO,
         };
 
-        await updateIncome(payload, parsed.fixed);
+        await updateIncome(payload, parsed.fixed, installments);
       } else {
         // Update context and make a POST request
         await addIncome(parsed);
