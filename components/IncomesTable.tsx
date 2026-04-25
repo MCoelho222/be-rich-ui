@@ -18,6 +18,7 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { del } from "@/http/apiClient";
+import { setQueryParams } from "@/utils/urls";
 
 const IncomesTable = () => {
   const { incomes: contextIncomes, loadingIncome, errorIncome, setIncomes } = useIncomes();
@@ -43,14 +44,15 @@ const IncomesTable = () => {
     try {
       setIsDeleting(true);
 
-      let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
-
-      if (incomeToDelete[1]) {
-        url = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
+      let endpoint = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
+      if (endpoint) {
+        endpoint = incomeToDelete[1] != undefined
+          ? setQueryParams(`${endpoint}/${incomeToDelete[0]}`, incomeToDelete[1])
+          : `${endpoint}/${incomeToDelete[0]}`;
+        
+        // Make DELETE request to API
+        await del(endpoint);
       }
-
-      // Make DELETE request to API
-      await del(`${url}/${incomeToDelete[0]}`);
 
       // Remove the deleted entry from context
       const updatedIncomes = contextIncomes.filter((entry) => entry.id !== incomeToDelete[0]);

@@ -34,6 +34,7 @@ import { Source } from "@/helpers/entriesHelper";
 import { useIncomes } from "@/context/EntriesContext";
 import { put } from "@/http/apiClient";
 import { toSnakeCaseKeys } from "@/utils/payloads";
+import { setQueryParams } from "@/utils/urls";
 
 // Discriminated union for type-safe props based on mode
 type IncomeModalProps =
@@ -54,7 +55,7 @@ export default function IncomeModal(props: IncomeModalProps) {
   const { open: controlledOpen, onOpenChange: controlledOnOpenChange, mode } = props;
   const incomeToEdit = props.mode === "edit" ? props.incomeToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
-  const { addIncome, setIncomes, incomes } = useIncomes();
+  const { addIncome, setIncomes, incomes, updateIncome } = useIncomes();
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -80,7 +81,9 @@ export default function IncomeModal(props: IncomeModalProps) {
     if (mode === "edit" && incomeToEdit) {
       setValue("amount", incomeToEdit.amount);
       setValue("createdAt", new Date(incomeToEdit.createdAt).toISOString().split("T")[0]);
-      setValue("installments", parseInt(incomeToEdit.installment.split("/")[1]));
+      incomeToEdit.installment
+        ? setValue("installments", parseInt(incomeToEdit.installment.split("/")[1]))
+        : setValue("installments", 1);
       setValue("source", incomeToEdit.source);
       setValue("fixed", incomeToEdit.fixed);
       setValue("description", incomeToEdit.description || "");
@@ -94,31 +97,24 @@ export default function IncomeModal(props: IncomeModalProps) {
       if (mode === "edit" && incomeToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
+        const installments = incomeToEdit.installment && (parsed.installments != parseInt(incomeToEdit.installment.split("/")[1]))
+          ? parsed.installments
+          : incomeToEdit.installment === null
+          ? parsed.installments
+          : undefined;
+
         delete parsed.installments;
-        const payload = toSnakeCaseKeys({
-          ...parsed,
-          createdAt: createdAtISO,
-        });
 
-        let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
-
-        if (payload.fixed) {
-          url = process.env.NEXT_PUBLIC_INCOME_FIXED_ENDPOINT;
-          delete payload.fixed;
-        }
-
-        await put(`${url}/${incomeToEdit.id}`, payload);
-
-        // Update context
-        const updatedIncome: IncomeCamel = {
-          ...incomeToEdit,
+        const payload = {
+          id: incomeToEdit.id,
           amount: parsed.amount,
+          installment: incomeToEdit.installment,
           source: parsed.source,
-          fixed: parsed.fixed,
           description: parsed.description || "",
-          createdAt: new Date(parsed.createdAt).toISOString(),
+          createdAt: createdAtISO,
         };
-        setIncomes(incomes.map((e) => (e.id === incomeToEdit.id ? updatedIncome : e)));
+
+        await updateIncome(payload, parsed.fixed);
       } else {
         // Update context and make a POST request
         await addIncome(parsed);
@@ -217,22 +213,20 @@ export default function IncomeModal(props: IncomeModalProps) {
           </div>
 
           {/* Installments */}
-          {mode === "add" && (
-            <div className="grid gap-2">
-              <Label htmlFor="installments">Installments *</Label>
-              <Input
-                id="installments"
-                type="number"
-                min={1}
-                {...register("installments", { valueAsNumber: true })}
-              />
-              {errors.installments && (
-                <p className={`text-sm ${colorClasses.state.error}`}>
-                  {errors.installments.message}
-                </p>
-              )}
-            </div>
-          )}
+          <div className="grid gap-2">
+            <Label htmlFor="installments">Installments *</Label>
+            <Input
+              id="installments"
+              type="number"
+              min={1}
+              {...register("installments", { valueAsNumber: true })}
+            />
+            {errors.installments && (
+              <p className={`text-sm ${colorClasses.state.error}`}>
+                {errors.installments.message}
+              </p>
+            )}
+          </div>
 
           {/* Recurring (both Income and Expense) */}
           <div className="flex items-center justify-between rounded-lg border p-3">

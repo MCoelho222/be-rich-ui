@@ -32,8 +32,6 @@ import { ExpenseSchema } from "@/schema/entriesSchema";
 import { FormInputExpenseType, FormOutputExpenseType, ExpenseCamel } from "@/types/entryType";
 import { PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
 import { useExpenses } from "@/context/EntriesContext";
-import { put } from "@/http/apiClient";
-import { toSnakeCaseKeys } from "@/utils/payloads";
 
 // Discriminated union for type-safe props based on mode
 type ExpenseModalProps =
@@ -54,7 +52,7 @@ export default function ExpenseModal(props: ExpenseModalProps) {
   const { open: controlledOpen, onOpenChange: controlledOnOpenChange, mode } = props;
   const expenseToEdit = props.mode === "edit" ? props.expenseToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
-  const { addExpense, setExpenses, expenses } = useExpenses();
+  const { addExpense, updateExpense, setExpenses, expenses } = useExpenses();
 
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -82,7 +80,9 @@ export default function ExpenseModal(props: ExpenseModalProps) {
       setValue("createdAt", new Date(expenseToEdit.createdAt).toISOString().split("T")[0]);
       setValue("category", expenseToEdit.category);
       setValue("paymentMethod", expenseToEdit.paymentMethod);
-      setValue("installments", expenseToEdit.installment.split("/")[1]);
+      expenseToEdit.installment
+        ? setValue("installments", expenseToEdit.installment.split("/")[1])
+        : setValue("installments", 1);
       setValue("source", expenseToEdit.source);
       setValue("fixed", expenseToEdit.fixed);
       setValue("description", expenseToEdit.description || "");
@@ -96,33 +96,27 @@ export default function ExpenseModal(props: ExpenseModalProps) {
       if (mode === "edit" && expenseToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
+        const installments = expenseToEdit.installment && (parsed.installments != parseInt(expenseToEdit.installment.split("/")[1]))
+          ? parsed.installments
+          : expenseToEdit.installment === null
+          ? parsed.installments
+          : undefined;
+
         delete parsed.installments;
-        const payload = toSnakeCaseKeys({
-          ...parsed,
-          createdAt: createdAtISO,
-        });
 
-        let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
-
-        if (payload.fixed) {
-          url = process.env.NEXT_PUBLIC_EXPENSE_FIXED_ENDPOINT;
-          delete payload.fixed;
-        }
-
-        await put(`${url}/${expenseToEdit.id}`, payload);
-
-        // Update context
-        const updatedExpense: ExpenseCamel = {
-          ...expenseToEdit,
+        const payload = {
+          id: expenseToEdit.id,
           amount: parsed.amount,
           category: parsed.category!,
           paymentMethod: parsed.paymentMethod!,
+          installment: expenseToEdit.installment,
           source: parsed.source,
-          fixed: parsed.fixed,
           description: parsed.description || "",
-          createdAt: new Date(parsed.createdAt).toISOString(),
+          createdAt: createdAtISO,
         };
-        setExpenses(expenses.map((e) => (e.id === expenseToEdit.id ? updatedExpense : e)));
+
+        await updateExpense(payload, parsed.fixed, installments);
+
       } else {
         // Update context and make a POST request
         await addExpense(parsed);
@@ -278,22 +272,21 @@ export default function ExpenseModal(props: ExpenseModalProps) {
           </div>
 
           {/* Installments */}
-          {mode == "add" && (
-            <div className="grid gap-2">
-              <Label htmlFor="installments">Installments *</Label>
-              <Input
-                id="installments"
-                type="number"
-                min={1}
-                {...register("installments", { valueAsNumber: true })}
-              />
-              {errors.installments && (
-                <p className={`text-sm ${colorClasses.state.error}`}>
-                  {errors.installments.message}
-                </p>
-              )}
-            </div>
-          )}
+          <div className="grid gap-2">
+            <Label htmlFor="installments">Installments *</Label>
+            <Input
+              id="installments"
+              type="number"
+              min={1}
+              {...register("installments", { valueAsNumber: true })}
+            />
+            {errors.installments && (
+              <p className={`text-sm ${colorClasses.state.error}`}>
+                {errors.installments.message}
+              </p>
+            )}
+          </div>
+          
 
           {/* Recurring */}
           <div className="flex items-center justify-between rounded-lg border p-3">

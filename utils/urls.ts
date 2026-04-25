@@ -1,4 +1,4 @@
-export function setQueryParams(endpoint: string, isFixed: boolean, installments?: number) {
+export function setQueryParams(endpoint: string, isFixed?: boolean, installments?: number) {
   const params = new URLSearchParams();
 
   if (isFixed) {

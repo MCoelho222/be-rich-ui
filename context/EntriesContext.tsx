@@ -1,6 +1,13 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { ExpenseEntry, ExpenseCamel, ExpenseRead, IncomeEntry, IncomeCamel, IncomeRead } from "@/types/entryType";
+import {
+  ExpenseEntry,
+  ExpenseCamel,
+  ExpenseRead,
+  IncomeEntry,
+  IncomeCamel,
+  IncomeRead,
+} from "@/types/entryType";
 import { toSnakeCaseKeys, camelizeKeysExpense, camelizeKeysIncome } from "@/utils/payloads";
 import { post, put, del } from "@/http/apiClient";
 import { setQueryParams } from "@/utils/urls";
@@ -30,8 +37,8 @@ interface EntriesContextType {
 
   // CRUD operations for expenses
   addExpense: (expenseEntry: ExpenseEntry) => Promise<void>;
-  updateExpense: (expenseCamelId: string, expenseCamel: ExpenseCamel) => Promise<void>;
-  deleteExpense: (expenseCamelId: string, fixed: boolean) => Promise<void>;
+  updateExpense: (expenseCamel: ExpenseCamel, isFixed?: boolean, installments?: number) => Promise<void>;
+  deleteExpense: (expenseCamelId: string, fixed?: boolean, installments?: number) => Promise<void>;
 
   // CRUD operations for incomes
   addIncome: (incomeEntry: IncomeEntry) => Promise<void>;
@@ -100,11 +107,11 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
     let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (url) {
       const isFixed = expenseEntry.fixed ? true : false;
-      const installments = expenseEntry.installments
+      const installments = expenseEntry.installments;
 
       delete expenseEntry.fixed;
-      delete expenseEntry.installments
-  
+      delete expenseEntry.installments;
+
       url = setQueryParams(url, isFixed, installments);
 
       try {
@@ -112,14 +119,16 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
         const payload = toSnakeCaseKeys({
           ...expenseEntry,
           createdAt: createdAtISO,
-          installment: null
+          installment: null,
         });
 
         const res = await post(url, payload, {
           "Content-Type": "application/json",
         });
         console.log(res.data);
+
         const newEntry = camelizeKeysExpense(res?.data as ExpenseRead) as ExpenseCamel;
+
         setExpenses((prev) => [newEntry, ...prev]);
       } catch (err) {
         console.error("Failed to add expense:", err);
@@ -130,25 +139,35 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateExpense = async (expenseCamelId: string, expenseCamel: ExpenseCamel) => {
-    let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
-    if (url) {
-      const isFixed = expenseCamel.fixed ? true : false;
-      delete expenseCamel.fixed;
-      url = setQueryParams(url, isFixed);
+  const updateExpense = async (expenseCamel: ExpenseCamel, isFixed?: boolean, installments?: number) => {
+    let endpoint = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
+    if (endpoint) {
+      const endpointWithId = `${endpoint}/${expenseCamel.id}`;
+      const finalEndpoint = setQueryParams(endpointWithId, isFixed, installments);
       try {
         const createdAtISO = new Date(expenseCamel.createdAt).toISOString();
         const payload = toSnakeCaseKeys({
-          ...expenseCamel,
+          amount: expenseCamel.amount,
+          description: expenseCamel.description,
+          category: expenseCamel.category,
+          source: expenseCamel.source,
+          paymentMethod: expenseCamel.paymentMethod,
+          installment: expenseCamel.installment,
           createdAt: createdAtISO,
         });
 
-        const res = await put(url, payload, {
-          "Content-Type": "application/json",
-        });
+        const res = await put(finalEndpoint, payload, undefined);
 
-        const updatedExpense = camelizeKeysExpense(res.data as ExpenseRead) as ExpenseCamel;
-        setExpenses((prev) => prev.map((e) => (e.id === expenseCamelId ? updatedExpense : e)));
+        const newEntry = camelizeKeysExpense(res?.data as ExpenseRead) as ExpenseCamel;
+        console.log(res?.data)
+        console.log(expenseCamel.id)
+        console.log(expenseCamel)
+        console.log(newEntry)
+        if (installments && installments > 1) {
+          await deleteExpense(expenseCamel.id, isFixed)
+        }
+        setExpenses((prev) => [newEntry, ...prev]);
+
       } catch (err) {
         console.error("Failed to update expense:", err);
         throw err;
@@ -158,14 +177,13 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const deleteExpense = async (expenseCamelId: string, fixed: boolean) => {
-    let url = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
-    if (url) {
-      url = setQueryParams(url, fixed);
+  const deleteExpense = async (expenseCamelId: string, fixed?: boolean, installments?: number) => {
+    let endpoint = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
+    if (endpoint) {
+      const endpointWithId = `${endpoint}/${expenseCamelId}`;
+      const finalEndpoint = setQueryParams(endpointWithId, fixed, installments);
       try {
-        await del(url, {
-          "Content-Type": "application/json",
-        });
+        await del(finalEndpoint);
 
         setExpenses((prev) => prev.filter((expenseCamel) => expenseCamel.id !== expenseCamelId));
       } catch (err) {
@@ -182,11 +200,11 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
     let url = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
     if (url) {
       const isFixed = incomeEntry.fixed ? true : false;
-      const installments = incomeEntry.installments
+      const installments = incomeEntry.installments;
 
       delete incomeEntry.fixed;
-      delete incomeEntry.installments
-  
+      delete incomeEntry.installments;
+
       url = setQueryParams(url, isFixed, installments);
       try {
         const createdAtISO = new Date(incomeEntry.createdAt).toISOString();
@@ -225,9 +243,7 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
           createdAt: createdAtISO,
         });
 
-        const res = await put(url, payload, {
-          "Content-Type": "application/json",
-        });
+        const res = await put(url, payload);
 
         const updatedIncome = camelizeKeysIncome(res?.data as IncomeRead) as IncomeCamel;
         setIncomes((prev) => prev.map((e) => (e.id === incomeCamelId ? updatedIncome : e)));

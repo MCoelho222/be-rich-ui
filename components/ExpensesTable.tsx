@@ -18,13 +18,11 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { del } from "@/http/apiClient";
-
 
 const ExpensesTable = () => {
-  const { expenses: contextExpenses, loadingExpense, errorExpense, setExpenses } = useExpenses();
+  const { expenses: contextExpenses, loadingExpense, errorExpense, setExpenses, deleteExpense } = useExpenses();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [expenseToDelete, setExpenseToDelete] = useState<[string, boolean | undefined] | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<ExpenseCamel | null>(null);
@@ -34,8 +32,8 @@ const ExpensesTable = () => {
     setEditDialogOpen(true);
   };
 
-  const handleDeleteClick = (entryId: string) => {
-    setExpenseToDelete(entryId);
+  const handleDeleteClick = (entryId: string, isFixed?: boolean) => {
+    setExpenseToDelete([entryId, isFixed]);
     setDeleteDialogOpen(true);
   };
 
@@ -44,11 +42,11 @@ const ExpensesTable = () => {
 
     try {
       setIsDeleting(true);
-      // Make DELETE request to API
-      await del(`${process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT}/${expenseToDelete}`);
 
+      await deleteExpense(expenseToDelete[0], expenseToDelete[1])
+      
       // Remove the deleted expense from context
-      const updatedExpenses = contextExpenses.filter((entry) => entry.id !== expenseToDelete);
+      const updatedExpenses = contextExpenses.filter((entry) => entry.id !== expenseToDelete[0]);
       setExpenses(updatedExpenses);
 
       setDeleteDialogOpen(false);
@@ -190,7 +188,7 @@ const ExpensesTable = () => {
                   <td className="px-4 py-3">
                     <span className="px-2 py-0.5">
                       <EditIcon onClick={() => handleEditClick(entry)} />
-                      <DeleteIcon onClick={() => entry.id && handleDeleteClick(entry.id)} />
+                      <DeleteIcon onClick={() => entry.id && handleDeleteClick(entry.id, entry.fixed)} />
                     </span>
                   </td>
                 </tr>

@@ -2,13 +2,6 @@ import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-interface RequestOptions {
-  method: Method;
-  endpoint: string;
-  payload?: unknown;
-  headers?: Record<string, string>;
-}
-
 /**
  * Generic API request function
  * @param method - HTTP method (GET, POST, PUT, DELETE, etc.)
@@ -33,7 +26,6 @@ export const apiRequest = async <T = unknown>(
       ...headers,
     },
   };
-
   if (payload) {
     config.data = payload;
   }

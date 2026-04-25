@@ -73,7 +73,7 @@ const DashboardContent = () => {
         {/* Tabs */}
         <div className="flex gap-2 border-b w-full max-w-4xl">
           <button
-            onClick={() => setActiveTab("expenses")}
+            onMouseEnter={() => setActiveTab("expenses")}
             className={`px-6 py-3 font-medium transition-colors ${
               activeTab === "expenses"
                 ? `border-b-2 border-rose-400 ${colorClasses.financial.expense}`
@@ -83,7 +83,7 @@ const DashboardContent = () => {
             Expenses ({expenses.length})
           </button>
           <button
-            onClick={() => setActiveTab("incomes")}
+            onMouseEnter={() => setActiveTab("incomes")}
             className={`px-6 py-3 font-medium transition-colors ${
               activeTab === "incomes"
                 ? `border-b-2 border-emerald-500 ${colorClasses.financial.income}`
@@ -95,11 +95,7 @@ const DashboardContent = () => {
         </div>
 
         {/* Table Content */}
-        {activeTab === "expenses" ? (
-          <ExpensesTable />
-        ) : (
-          <IncomesTable />
-        )}
+        {activeTab === "expenses" ? <ExpensesTable /> : <IncomesTable />}
       </div>
     </div>
   );
