@@ -5,7 +5,7 @@ import DisplayValue from "@/components/DisplayValue";
 import DatePeriodSelector from "@/components/DatePeriodSelector";
 import { getStat } from "@/utils/stats";
 import { EntriesProvider, useExpenses, useIncomes, useEntries } from "@/context/EntriesContext";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { getFisrtDayDateString, getLastDayDateString } from "@/utils/dates";
 import { colorClasses } from "@/config/colors";
 import ExpenseModal from "@/components/ExpenseModal";
@@ -15,14 +15,10 @@ import { getValuesFromKey } from "@/utils/filtering";
 const DashboardContent = () => {
   const { expenses } = useExpenses();
   const { incomes } = useIncomes();
-  const { fetchEntries } = useEntries();
-  const [startDate, setStartDate] = useState<string>(getFisrtDayDateString());
-  const [endDate, setEndDate] = useState<string>(getLastDayDateString());
+  const { setStartDate, setEndDate } = useEntries();
   const [activeTab, setActiveTab] = useState<"expenses" | "incomes">("expenses");
 
-  useEffect(() => {
-    fetchEntries(startDate, endDate);
-  }, [startDate, endDate]);
+  
 
   const handlePeriodChange = useCallback((startDate: string, endDate: string) => {
     setStartDate(startDate);

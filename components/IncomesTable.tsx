@@ -1,8 +1,8 @@
 "use client";
-import { IncomeEntry, IncomeCamel } from "@/types/entryType";
+import { IncomeCamel } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
-import { useIncomes } from "@/context/EntriesContext";
+import { useIncomes, useEntries } from "@/context/EntriesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";
@@ -21,12 +21,14 @@ import { del } from "@/http/apiClient";
 import { setQueryParams } from "@/utils/urls";
 
 const IncomesTable = () => {
-  const { incomes: contextIncomes, loadingIncome, errorIncome, setIncomes } = useIncomes();
+  const { incomes: contextIncomes, loadingIncome, errorIncome, setIncomes, deleteIncome } = useIncomes();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [incomeToDelete, setIncomeToDelete] = useState<[string, boolean | undefined] | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeCamel | null>(null);
+
+  const { fetchEntries } = useEntries();
 
   const handleEditClick = (entry: IncomeCamel) => {
     setIncomeToEdit(entry);
@@ -43,21 +45,7 @@ const IncomesTable = () => {
 
     try {
       setIsDeleting(true);
-
-      let endpoint = process.env.NEXT_PUBLIC_INCOME_ENDPOINT;
-      if (endpoint) {
-        endpoint = incomeToDelete[1] != undefined
-          ? setQueryParams(`${endpoint}/${incomeToDelete[0]}`, incomeToDelete[1])
-          : `${endpoint}/${incomeToDelete[0]}`;
-        
-        // Make DELETE request to API
-        await del(endpoint);
-      }
-
-      // Remove the deleted entry from context
-      const updatedIncomes = contextIncomes.filter((entry) => entry.id !== incomeToDelete[0]);
-      setIncomes(updatedIncomes);
-
+      await deleteIncome(incomeToDelete[0], incomeToDelete[1]);
       setDeleteDialogOpen(false);
       setIncomeToDelete(null);
     } catch (err) {

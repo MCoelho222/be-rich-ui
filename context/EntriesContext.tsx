@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import {
   ExpenseEntry,
   ExpenseCamel,
@@ -32,8 +32,13 @@ interface EntriesContextType {
   errorIncome: string | null;
   setErrorIncome: (error: string | null) => void;
 
+  // Fetching dates
+  startDate: string | undefined;
+  endDate: string | undefined;
+  setStartDate: (startDate: string | undefined) => void;
+  setEndDate: (EndDate: string | undefined) => void;
   // Fetch all entries with date filtering
-  fetchEntries: (startDate: string, endDate: string) => Promise<void>;
+  fetchEntries: () => Promise<void>;
 
   // CRUD operations for expenses
   addExpense: (expenseEntry: ExpenseEntry) => Promise<void>;
@@ -65,7 +70,14 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
   const [loadingIncome, setLoadingIncome] = useState(false);
   const [errorIncome, setErrorIncome] = useState<string | null>(null);
 
-  const fetchEntries = async (startDate: string, endDate: string) => {
+  const [startDate, setStartDate] = useState<string | undefined>(undefined);
+  const [endDate, setEndDate] = useState<string | undefined>(undefined);
+  
+  useEffect(() => {
+    fetchEntries();
+  }, [startDate, endDate]);
+  
+  const fetchEntries = async () => {
     try {
       setLoadingExpense(true);
       setLoadingIncome(true);
@@ -130,11 +142,9 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
           installment: null,
         });
 
-        const res = await post(url, payload);
+        await post(url, payload);
+        await fetchEntries();
 
-        const newEntry = camelizeKeysExpense(res?.data as ExpenseRead) as ExpenseCamel;
-
-        setExpenses((prev) => [newEntry, ...prev]);
       } catch (err) {
         console.error("Failed to add expense:", err);
         throw err;
@@ -165,14 +175,9 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
           createdAt: createdAtISO,
         });
 
-        const res = await put(finalEndpoint, payload, undefined);
+        await put(finalEndpoint, payload, undefined);
+        await fetchEntries();
 
-        const newEntry = camelizeKeysExpense(res?.data as ExpenseRead) as ExpenseCamel;
-
-        if (installments && installments > 1) {
-          await deleteExpense(expenseCamel.id, isFixed);
-        }
-        setExpenses((prev) => [newEntry, ...prev]);
       } catch (err) {
         console.error("Failed to update expense:", err);
         throw err;
@@ -185,12 +190,11 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
   const deleteExpense = async (expenseCamelId: string, fixed?: boolean, installments?: number) => {
     let endpoint = process.env.NEXT_PUBLIC_EXPENSE_ENDPOINT;
     if (endpoint) {
-      const endpointWithId = `${endpoint}/${expenseCamelId}`;
-      const finalEndpoint = setQueryParams(endpointWithId, fixed, installments);
+      const finalEndpoint = setQueryParams(`${endpoint}/${expenseCamelId}`, fixed, installments);
+
       try {
         await del(finalEndpoint);
-
-        setExpenses((prev) => prev.filter((expenseCamel) => expenseCamel.id !== expenseCamelId));
+        await fetchEntries();
       } catch (err) {
         console.error("Failed to delete expense:", err);
         throw err;
@@ -218,12 +222,9 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
           createdAt: createdAtISO,
         });
 
-        const res = await post(url, payload);
+        await post(url, payload);
+        await fetchEntries();
 
-        const newIncome = camelizeKeysIncome(res?.data as IncomeRead) as IncomeCamel;
-        newIncome.fixed = isFixed;
-
-        setIncomes((prev) => [newIncome, ...prev]);
       } catch (err) {
         console.error("Failed to add income:", err);
         throw err;
@@ -251,14 +252,9 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
           createdAt: createdAtISO,
         });
 
-        const res = await put(finalEndpoint, payload, undefined);
+        await put(finalEndpoint, payload, undefined);
+        await fetchEntries();
 
-        const newEntry = camelizeKeysIncome(res?.data as IncomeRead) as IncomeCamel;
-
-        if (installments && installments > 1) {
-          await deleteIncome(incomeCamel.id, isFixed);
-        }
-        setIncomes((prev) => [newEntry, ...prev]);
       } catch (err) {
         console.error("Failed to update income:", err);
         throw err;
@@ -275,8 +271,7 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
       const finalEndpoint = setQueryParams(endpointWithId, fixed, installments);
       try {
         await del(finalEndpoint);
-
-        setIncomes((prev) => prev.filter((incomeCamel) => incomeCamel.id !== incomeCamelId));
+        await fetchEntries();
       } catch (err) {
         console.error("Failed to delete income:", err);
         throw err;
@@ -308,6 +303,10 @@ export const EntriesProvider = ({ children }: { children: ReactNode }) => {
         addIncome,
         updateIncome,
         deleteIncome,
+        startDate,
+        endDate,
+        setStartDate,
+        setEndDate
       }}
     >
       {children}

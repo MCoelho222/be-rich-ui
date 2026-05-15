@@ -31,7 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { IncomeSchema } from "@/schema/entriesSchema";
 import { FormInputIncomeType, FormOutputIncomeType, IncomeCamel } from "@/types/entryType";
 import { Source } from "@/helpers/entriesHelper";
-import { useIncomes } from "@/context/EntriesContext";
+import { useIncomes, useEntries } from "@/context/EntriesContext";
 
 // Discriminated union for type-safe props based on mode
 type IncomeModalProps =
@@ -53,7 +53,7 @@ export default function IncomeModal(props: IncomeModalProps) {
   const incomeToEdit = props.mode === "edit" ? props.incomeToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
   const { addIncome, updateIncome } = useIncomes();
-
+  const { fetchEntries } = useEntries();
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
 
@@ -110,10 +110,8 @@ export default function IncomeModal(props: IncomeModalProps) {
           description: parsed.description || "",
           createdAt: createdAtISO,
         };
-
         await updateIncome(payload, parsed.fixed, installments);
       } else {
-        // Update context and make a POST request
         await addIncome(parsed);
       }
       reset();

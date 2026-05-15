@@ -3,7 +3,7 @@ import { ExpenseCamel } from "@/types/entryType";
 import { formatDate } from "@/utils/dates";
 import { formatCurrency } from "@/utils/numberFormat";
 import { niceLabel } from "@/utils/stringFormat";
-import { useExpenses } from "@/context/EntriesContext";
+import { useExpenses, useEntries } from "@/context/EntriesContext";
 import { colorClasses } from "@/config/colors";
 import { EditIcon } from "./ui/edit-icon";
 import { DeleteIcon } from "./ui/delete-icon";
@@ -20,12 +20,13 @@ import {
 import { Button } from "./ui/button";
 
 const ExpensesTable = () => {
-  const { expenses: contextExpenses, loadingExpense, errorExpense, setExpenses, deleteExpense } = useExpenses();
+  const { expenses: contextExpenses, loadingExpense, errorExpense, deleteExpense } = useExpenses();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<[string, boolean | undefined] | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<ExpenseCamel | null>(null);
+  const { fetchEntries } = useEntries();
 
   const handleEditClick = (entry: ExpenseCamel) => {
     setExpenseToEdit(entry);
@@ -44,16 +45,11 @@ const ExpensesTable = () => {
       setIsDeleting(true);
 
       await deleteExpense(expenseToDelete[0], expenseToDelete[1])
-      
-      // Remove the deleted expense from context
-      const updatedExpenses = contextExpenses.filter((entry) => entry.id !== expenseToDelete[0]);
-      setExpenses(updatedExpenses);
 
       setDeleteDialogOpen(false);
       setExpenseToDelete(null);
     } catch (err) {
       console.error("Failed to delete expense:", err);
-      // You could add toast notification here
     } finally {
       setIsDeleting(false);
     }

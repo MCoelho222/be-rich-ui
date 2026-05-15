@@ -178,3 +178,85 @@ export function filterEntries<T extends Entry>(
 
   return result;
 }
+
+/**
+ * Find all related installment entries for a given entry id
+ *
+ * @param id - The id of the entry to check
+ * @param entries - Array of entries to search through
+ * @returns Array of ids for all related installments, or just the original id if not an installment
+ *
+ * @example
+ * // Entry with id "123" has installment "1/3"
+ * // Returns ["123", "456", "789"] if all related installments are found
+ * const ids = findRelatedInstallments("123", entries)
+ *
+ * @example
+ * // Entry with id "999" has no installment field
+ * // Returns ["999"]
+ * const ids = findRelatedInstallments("999", entries)
+ */
+export function findRelatedInstallments<T extends Entry>(id: string, entries: T[]): string[] {
+  // Find the entry with the given id
+  const targetEntry = entries.find((entry) => entry.id === id);
+
+  if (!targetEntry) {
+    return [];
+  }
+
+  // If no installment field or it's empty, return just this id
+  if (!targetEntry.installment || targetEntry.installment.trim() === "") {
+    return [id];
+  }
+
+  // Parse installment field (e.g., "1/3" -> current: 1, total: 3)
+  const installmentMatch = targetEntry.installment.match(/^(\d+)\/(\d+)$/);
+
+  if (!installmentMatch) {
+    // Invalid installment format, return just this id
+    return [id];
+  }
+
+  const totalInstallments = parseInt(installmentMatch[2], 10);
+
+  // Find all entries that match amount, source, and description
+  const relatedEntries = entries.filter(
+    (entry) =>
+      entry.amount === targetEntry.amount &&
+      entry.source === targetEntry.source &&
+      entry.description === targetEntry.description &&
+      entry.installment &&
+      entry.installment.trim() !== ""
+  );
+
+  // Extract and validate all installment numbers
+  const installmentMap = new Map<number, string>();
+
+  for (const entry of relatedEntries) {
+    const match = entry.installment.match(/^(\d+)\/(\d+)$/);
+    if (match) {
+      const currentNum = parseInt(match[1], 10);
+      const total = parseInt(match[2], 10);
+
+      // Verify the total matches
+      if (total === totalInstallments) {
+        installmentMap.set(currentNum, entry.id);
+      }
+    }
+  }
+
+  // Verify all installments from 1 to totalInstallments are present
+  const allFound = Array.from({ length: totalInstallments }, (_, i) => i + 1).every((num) =>
+    installmentMap.has(num)
+  );
+
+  if (!allFound) {
+    // Not all installments found, return just the original id
+    return [id];
+  }
+
+  // Return ids in installment order (1/3, 2/3, 3/3)
+  return Array.from({ length: totalInstallments }, (_, i) => i + 1).map(
+    (num) => installmentMap.get(num)!
+  );
+}

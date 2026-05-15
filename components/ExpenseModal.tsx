@@ -31,7 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { ExpenseSchema } from "@/schema/entriesSchema";
 import { FormInputExpenseType, FormOutputExpenseType, ExpenseCamel } from "@/types/entryType";
 import { PaymentMethod, Category, Source } from "@/helpers/entriesHelper";
-import { useExpenses } from "@/context/EntriesContext";
+import { useExpenses, useEntries } from "@/context/EntriesContext";
 
 // Discriminated union for type-safe props based on mode
 type ExpenseModalProps =
@@ -52,8 +52,8 @@ export default function ExpenseModal(props: ExpenseModalProps) {
   const { open: controlledOpen, onOpenChange: controlledOnOpenChange, mode } = props;
   const expenseToEdit = props.mode === "edit" ? props.expenseToEdit : undefined;
   const [internalOpen, setInternalOpen] = useState(false);
-  const { addExpense, updateExpense, setExpenses, expenses } = useExpenses();
-
+  const { addExpense, updateExpense } = useExpenses();
+  const { fetchEntries } = useEntries();
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
 
@@ -96,11 +96,13 @@ export default function ExpenseModal(props: ExpenseModalProps) {
       if (mode === "edit" && expenseToEdit?.id) {
         // Update existing entry
         const createdAtISO = new Date(parsed.createdAt).toISOString();
-        const installments = expenseToEdit.installment && (parsed.installments != parseInt(expenseToEdit.installment.split("/")[1]))
-          ? parsed.installments
-          : expenseToEdit.installment === null
-          ? parsed.installments
-          : undefined;
+        const installments =
+          expenseToEdit.installment &&
+          parsed.installments != parseInt(expenseToEdit.installment.split("/")[1])
+            ? parsed.installments
+            : expenseToEdit.installment === null
+              ? parsed.installments
+              : undefined;
 
         delete parsed.installments;
 
@@ -116,7 +118,6 @@ export default function ExpenseModal(props: ExpenseModalProps) {
         };
 
         await updateExpense(payload, parsed.fixed, installments);
-
       } else {
         // Update context and make a POST request
         await addExpense(parsed);
@@ -249,7 +250,7 @@ export default function ExpenseModal(props: ExpenseModalProps) {
                 name="paymentMethod"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger id="paymentMethod">
                       <SelectValue placeholder="Select a method" />
                     </SelectTrigger>
@@ -281,12 +282,9 @@ export default function ExpenseModal(props: ExpenseModalProps) {
               {...register("installments", { valueAsNumber: true })}
             />
             {errors.installments && (
-              <p className={`text-sm ${colorClasses.state.error}`}>
-                {errors.installments.message}
-              </p>
+              <p className={`text-sm ${colorClasses.state.error}`}>{errors.installments.message}</p>
             )}
           </div>
-          
 
           {/* Recurring */}
           <div className="flex items-center justify-between rounded-lg border p-3">
