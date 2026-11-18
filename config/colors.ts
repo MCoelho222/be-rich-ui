@@ -33,7 +33,7 @@ export const colorClasses = {
 
   // Surface colors - backgrounds, panels, headers, and borders
   surface: {
-    background: "bg-white", // Main background
+    background: "bg-slate-600", // Main background
     panel: "bg-slate-50", // Panel/card background
     header: "bg-slate-700", // Table header background
     border: "border-slate-200", // Borders and dividers
