@@ -254,7 +254,7 @@ This page lists every Recurrence, in two tabs: **Expenses** and **Incomes**.
 
 ## 9. Dashboard and projections
 
-The dashboard has its own spec: [dashboard.md](dashboard.md). It covers the period selector, summary cards, projection chart, overdue panel and entry list.
+The dashboard has its own spec: [dashboard.md](dashboard.md). It covers the period selector and filters, summary cards, projection chart, category breakdown, card bills, overdue panel and entry list.
 
 ---
 
