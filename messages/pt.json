@@ -1,0 +1,99 @@
+{
+  "common": {
+    "tagline": "O dinheiro da sua casa, claro.",
+    "language": "Idioma",
+    "theme": "Tema",
+    "themeSystem": "Sistema",
+    "themeLight": "Claro",
+    "themeDark": "Escuro",
+    "logout": "Sair",
+    "profile": "Perfil",
+    "retry": "Tentar de novo",
+    "back": "Voltar",
+    "comingSoon": "Esta página está sendo construída.",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "collapse": "Recolher menu",
+    "expand": "Expandir menu"
+  },
+  "nav": {
+    "main": "Principal",
+    "dashboard": "Painel",
+    "entries": "Lançamentos",
+    "fixed": "Fixos",
+    "accounts": "Contas",
+    "categories": "Categorias",
+    "settings": "Configurações",
+    "more": "Mais",
+    "newEntry": "Novo lançamento",
+    "newExpense": "Nova despesa",
+    "newIncome": "Nova receita",
+    "newFixed": "Novo fixo",
+    "moreNew": "Outras formas de adicionar"
+  },
+  "auth": {
+    "email": "E-mail",
+    "password": "Senha",
+    "name": "Nome completo",
+    "newPassword": "Nova senha",
+    "confirmPassword": "Confirme a nova senha",
+    "login": {
+      "title": "Entrar",
+      "submit": "Entrar",
+      "forgot": "Esqueceu a senha?",
+      "newHere": "Primeira vez?",
+      "create": "Criar uma conta"
+    },
+    "signup": {
+      "title": "Crie sua conta",
+      "submit": "Criar conta",
+      "haveAccount": "Já tem uma conta?",
+      "login": "Entrar",
+      "passwordHint": "Pelo menos 8 caracteres. Uma frase curta é fácil de lembrar e difícil de adivinhar."
+    },
+    "forgot": {
+      "title": "Redefinir a senha",
+      "intro": "Informe seu e-mail e enviaremos um link para escolher uma nova senha.",
+      "submit": "Enviar link",
+      "sent": "Se este e-mail tiver uma conta, enviamos um link para ele. O link vale por 1 hora.",
+      "backToLogin": "Voltar para entrar"
+    },
+    "reset": {
+      "title": "Escolha uma nova senha",
+      "submit": "Salvar senha",
+      "done": "Sua senha foi alterada. Entre com a nova senha.",
+      "mismatch": "As senhas não conferem"
+    },
+    "invite": {
+      "title": "Entrar em {household}",
+      "intro": "{inviter} convidou você para compartilhar {household} no Be Rich.",
+      "submit": "Entrar na casa",
+      "invalid": "Este convite não é mais válido. Ele pode ter expirado, sido usado ou cancelado.",
+      "checking": "Verificando seu convite…"
+    }
+  },
+  "errors": {
+    "INVALID_CREDENTIALS": "E-mail ou senha incorretos.",
+    "RATE_LIMITED": "Muitas tentativas. Tente de novo em {minutes, plural, one {# minuto} other {# minutos}}.",
+    "EMAIL_TAKEN": "Este e-mail já tem uma conta.",
+    "TOKEN_INVALID": "Este link não é mais válido. Peça um novo.",
+    "INVITATION_INVALID": "Este convite não é mais válido.",
+    "VALIDATION_ERROR": "Alguns campos são inválidos.",
+    "NETWORK": "Não foi possível falar com o servidor. Verifique sua conexão e tente de novo.",
+    "UNKNOWN": "Algo deu errado. Tente de novo.",
+    "required": "Obrigatório",
+    "invalidEmail": "Informe um e-mail válido",
+    "passwordLength": "Use de 8 a 128 caracteres"
+  },
+  "pages": {
+    "dashboard": "Painel",
+    "entries": "Lançamentos",
+    "fixed": "Lançamentos fixos",
+    "accounts": "Contas e cartões",
+    "categories": "Categorias",
+    "settings": "Configurações",
+    "notFound": "Página não encontrada",
+    "notFoundBody": "A página que você procura não existe.",
+    "goHome": "Ir para o painel"
+  }
+}

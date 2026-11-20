@@ -1,0 +1,99 @@
+{
+  "common": {
+    "tagline": "Your household's money, clear.",
+    "language": "Language",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "logout": "Log out",
+    "profile": "Profile",
+    "retry": "Retry",
+    "back": "Back",
+    "comingSoon": "This page is being built.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "nav": {
+    "main": "Main",
+    "dashboard": "Dashboard",
+    "entries": "Entries",
+    "fixed": "Fixed",
+    "accounts": "Accounts",
+    "categories": "Categories",
+    "settings": "Settings",
+    "more": "More",
+    "newEntry": "New entry",
+    "newExpense": "New expense",
+    "newIncome": "New income",
+    "newFixed": "New fixed entry",
+    "moreNew": "More ways to add"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Full name",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm the new password",
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "forgot": "Forgot password?",
+      "newHere": "New here?",
+      "create": "Create an account"
+    },
+    "signup": {
+      "title": "Create your account",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "login": "Log in",
+      "passwordHint": "At least 8 characters. A short phrase is easy to remember and hard to guess."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "intro": "Enter your email and we'll send you a link to choose a new password.",
+      "submit": "Send link",
+      "sent": "If this email has an account, we sent a link to it. The link is valid for 1 hour.",
+      "backToLogin": "Back to log in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "submit": "Save password",
+      "done": "Your password was changed. Log in with the new one.",
+      "mismatch": "The passwords don't match"
+    },
+    "invite": {
+      "title": "Join {household}",
+      "intro": "{inviter} invited you to share {household} on Be Rich.",
+      "submit": "Join household",
+      "invalid": "This invitation is no longer valid. It may have expired, been used or been revoked.",
+      "checking": "Checking your invitation…"
+    }
+  },
+  "errors": {
+    "INVALID_CREDENTIALS": "Email or password is incorrect.",
+    "RATE_LIMITED": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+    "EMAIL_TAKEN": "This email already has an account.",
+    "TOKEN_INVALID": "This link is no longer valid. Ask for a new one.",
+    "INVITATION_INVALID": "This invitation is no longer valid.",
+    "VALIDATION_ERROR": "Some fields are invalid.",
+    "NETWORK": "Couldn't reach the server. Check your connection and try again.",
+    "UNKNOWN": "Something went wrong. Try again.",
+    "required": "Required",
+    "invalidEmail": "Enter a valid email address",
+    "passwordLength": "Use 8 to 128 characters"
+  },
+  "pages": {
+    "dashboard": "Dashboard",
+    "entries": "Entries",
+    "fixed": "Fixed entries",
+    "accounts": "Accounts and cards",
+    "categories": "Categories",
+    "settings": "Settings",
+    "notFound": "Page not found",
+    "notFoundBody": "The page you're looking for doesn't exist.",
+    "goHome": "Go to the dashboard"
+  }
+}

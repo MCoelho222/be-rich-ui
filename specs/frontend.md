@@ -30,7 +30,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 | `--fixed` | blue-400 | blue-600 | The fixed badge and fixed share |
 | `--negative` | rose-500 | rose-600 | Negative balances, the "goes negative" marker |
 | `--warning` | amber-400 | amber-700 | Overdue panel, unconverted-currency warning |
-| `--accent` / `--on-accent` | emerald-400 / emerald-950 | emerald-700 / white | Primary buttons, focus rings, active navigation, the logo tile |
+| `--brand` / `--on-brand` | emerald-400 / emerald-950 | emerald-700 / white | Primary buttons, focus rings, active navigation, the logo tile. (Named `brand` because shadcn already uses `accent` for hover backgrounds.) |
 
 - Text tokens meet WCAG AA contrast (4.5:1) on `--surface` in both themes. That is why light mode uses the darker 600/700 shades. Color is never the only signal: amounts also carry a sign or a label, and projected values carry `~`.
 - The category palette (8 colors) is the same in both themes.
@@ -57,7 +57,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 ### 1.5 Patterns
 
 - **Projected values:** `~` prefix, italic, in `--text-muted`. Projected parts of bars are hatched (diagonal stripes in the bar's color).
-- **Tabs:** the current colored underline (rose for expenses, emerald for incomes, `--accent` elsewhere). Tabs switch on click, not hover.
+- **Tabs:** the current colored underline (rose for expenses, emerald for incomes, `--brand` elsewhere). Tabs switch on click, not hover.
 - **Tables:** the current style, kept: sticky `--surface-2` header, uppercase 12px column labels, row hover, actions at the row's end. On phones each row becomes a two-line item (description and amount; date, category and badges).
 - **Badges:** small rounded pills: `Fixed` (blue), `2/5` installments (muted), `Projected` (dashed border), `Overdue` (amber).
 - **Feedback:** toasts at the bottom right (top on phones) for saved, deleted and failed actions, each with "Undo" where the API allows it.
@@ -67,9 +67,9 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 
 ### 1.6 Logo
 
-- **Mark:** a rounded square tile in `--accent` holding a rising line with an arrow tip, drawn in `--on-accent`. It reads as "money going up", and it works from 16px (favicon) to 64px.
+- **Mark:** a rounded square tile in `--brand` holding a rising line with an arrow tip, drawn in `--on-brand`. It reads as "money going up", and it works from 16px (favicon) to 64px.
 - **Lockup:** the mark followed by the "Be **Rich**" wordmark (Geist semibold, "Rich" in `--income`). The sidebar and the public pages use the lockup. The collapsed sidebar, the phone top bar, the favicon and the app icon use the mark alone.
-- **Files:** `public/logo.svg` (mark), `app/icon.svg` (favicon) and `app/apple-icon.png` (180px). The mark is also a React component, so it follows the theme tokens.
+- **Files:** `public/logo.svg` (mark) and `app/icon.svg` (favicon). An `app/apple-icon.png` (180px) comes with the final brand pass. In the app the mark is a React component (`components/brand/Logo.tsx`), so it follows the theme tokens.
 
 ---
 
@@ -80,7 +80,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 - **Toggle:** an `EN | PT` segmented control in the user menu (desktop), the "More" sheet (phone) and the top-right corner of every public page (login, signup…). Switching takes effect immediately, without a reload.
 - **Remembering it:** the choice is stored in a `brs_lang` cookie (1 year), so the server renders the right language on the first paint.
 - **Formats stay Brazilian in both languages** (ui-behavior §1.1): `R$ 1.234,56`, `05/12/2026`. Only words change, including month and weekday names (`Dec/2026` ↔ `dez/2026`, `Fri, 05/12` ↔ `sex, 05/12`).
-- **Data stays as entered:** category names, descriptions and account names are user data and are not translated. The 25 default categories are created in the signup language. Signup sends the chosen language, and the API keeps a Portuguese and an English name list (this needs a small API change: auth.md §4.1 and schemas §4.1). After signup they are ordinary user data, and renaming them is up to the household.
+- **Data stays as entered:** category names, descriptions and account names are user data and are not translated. The 25 default categories are created in the signup language. Signup sends the chosen language, and the API keeps a Portuguese and an English name list (auth.md §4.1, schemas §4.1 and §9). After signup they are ordinary user data, and renaming them is up to the household.
 - **API errors:** the UI translates by `error.code` and by field-error message keys, falling back to the API's message.
 - **Dictionaries:** `messages/en.json` and `messages/pt.json`, with identical keys grouped by page (`login.*`, `dashboard.*`, `entries.*`…). A check in `pnpm lint` fails when a key is missing from either file.
 
@@ -106,7 +106,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 ```
 
 - **Sidebar:** 232px wide on `--surface`; it can collapse to 64px (icons only), and the choice is remembered in the browser.
-- **Navigation:** the active item has an `--accent` bar at its left and brighter text.
+- **Navigation:** the active item has an `--brand` bar at its left and brighter text.
 - **User menu** (bottom): the member's initial and short name. It opens a menu with Profile, the EN/PT toggle, the theme toggle, the household name, and Log out.
 - **"+ Entry"** is a split button: the main part opens a new expense; the arrow offers "New income" and "New fixed entry". Keyboard shortcut: `N`.
 
@@ -117,7 +117,7 @@ The sidebar is collapsed to icons by default.
 
 - **Top bar:** the page title and, on pages with filters, a "Filters" button (dashboard.md §2.2).
 - **Bottom tab bar:** Dashboard · Entries · **(+)** · Fixed · More.
-  - The central **+** is a raised round `--accent` button. It opens a small sheet: "Expense" / "Income".
+  - The central **+** is a raised round `--brand` button. It opens a small sheet: "Expense" / "Income".
   - **More** opens a sheet with Accounts, Categories, Settings, the language and theme toggles, and Log out.
 - **Dialogs** become full-height bottom sheets.
 
@@ -139,7 +139,7 @@ The sidebar is collapsed to icons by default.
 | `/categories` | Categories | §6.5 |
 | `/settings` | Household, members, invitations, profile | §6.6, ui-behavior §2–§3 |
 
-- **Route guard:** a Next.js middleware sends requests without the `brs_session` cookie to `/login?next=<path>`, and sends logged-in users away from the public pages. The cookie's presence is only a hint: a 401 from any API call also returns to `/login`.
+- **Route guard:** `proxy.ts` (Next 16's middleware) sends requests without the `brs_session` cookie to `/login?next=<path>`, and sends logged-in users away from the public pages. The cookie's presence is only a hint: a 401 from any API call also returns to `/login`.
 - **Not found:** a simple 404 page in the same style, with a link to the dashboard.
 
 ---
@@ -165,7 +165,7 @@ The sidebar is collapsed to icons by default.
             └────────────────────────────────┘
 ```
 
-- **Background:** `--bg` with one soft, blurred `--accent` glow behind the card. That is the only decoration. It works in both themes.
+- **Background:** `--bg` with one soft, blurred `--brand` glow behind the card. That is the only decoration. It works in both themes.
 - **Card:** 400px wide (full width on phones, 24px margins), `--surface`.
 - **Logo:** the lockup from §1.6, centered above the tagline.
 - **Corner:** the language and theme toggles sit side by side in the top-right corner.
@@ -173,7 +173,7 @@ The sidebar is collapsed to icons by default.
 - **Errors:** one line above the button: "Email or password is incorrect" (`INVALID_CREDENTIALS`) or "Too many attempts. Try again in 5 minutes" (`RATE_LIMITED`, from `Retry-After`).
 - **After login:** go to `next` if present, otherwise the dashboard.
 - **The other public pages** use the same card:
-  - **Signup:** name, email, password with a strength hint (auth.md §6), and the household name, prefilled as "<first name>'s household".
+  - **Signup:** name, email, and password with a hint (auth.md §6). The household gets a default name in the signup language (schemas §4.1), which can be renamed in Settings.
   - **Forgot password:** email. It always answers "If this email has an account, we sent a link".
   - **Reset password:** new password twice.
   - **Invite:** shows "Marcelo invited you to join *Coelho household*", then the signup fields with the email fixed. An invalid or expired link shows a clear message and a link to log in.
@@ -260,7 +260,7 @@ lib/
   api.ts, api-types.ts (generated), queries.ts (query keys and hooks),
   format.ts (money, dates, names), period.ts (presets → from/to)
 messages/en.json, messages/pt.json
-middleware.ts
+proxy.ts                  ← route guard (Next 16's name for middleware)
 ```
 
 ### 7.4 Conventions
