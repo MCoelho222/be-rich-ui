@@ -254,32 +254,7 @@ This page lists every Recurrence, in two tabs: **Expenses** and **Incomes**.
 
 ## 9. Dashboard and projections
 
-### 9.1 Period selector
-
-The period selector offers presets: **This month** (the default), Next month, Next 3 months, Next 6 months, This year, and Custom.
-
-### 9.2 Summary cards
-
-The dashboard shows five cards: **Total balance**, Income, Expenses, **Net** (income − expenses) and **Fixed** (the fixed share of expenses).
-
-- Every value is in the default currency.
-- **Total balance** shows the current balance, with a second line "End of period: ~R$ 8.420,00" for the projected balance (schemas §14).
-- When the period includes today or future dates, the Income, Expenses and Net cards each show two lines:
-  - "**Realized** R$ 3.100,00", for stored rows with a payment date up to today;
-  - "**Projected** ~R$ 5.400,00", for the total including future rows and projected fixed occurrences (schemas §13).
-
-### 9.3 Projection chart
-
-- Monthly bars for income and expenses, plus a line for the **cumulative projected balance**, which starts from the current total balance (schemas §14.2).
-- Projected parts of each bar are hatched or lighter.
-- Months where the projected balance goes negative are highlighted, with the message: "Balance projected to go negative in Mar/2027".
-- Hovering a month shows a breakdown: realized, future installments, projected fixed entries, and the end-of-month balance.
-- An account filter shows the chart for a single account.
-
-### 9.4 Entry list
-
-- Projected occurrences appear in the list as muted rows with a "projected" badge and a **Register** action. They cannot be edited directly.
-- Overdue occurrences are listed in an "Overdue fixed entries" panel at the top of the dashboard, shown only when there are any. A note explains: "Not included in projections until registered."
+The dashboard has its own spec: [dashboard.md](dashboard.md). It covers the period selector, summary cards, projection chart, overdue panel and entry list.
 
 ---
 
