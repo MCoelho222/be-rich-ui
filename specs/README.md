@@ -4,6 +4,7 @@
 |---|---|---|
 | [schemas.md](schemas.md) | Data model, validation and business rules | Ready |
 | [ui-behavior.md](ui-behavior.md) | Forms, views and interactions | Ready |
+| [frontend.md](frontend.md) | Design language, EN/PT, app shell, routes, pages and frontend architecture | Ready |
 | [dashboard.md](dashboard.md) | The dashboard screen: widgets, filters and the endpoints they use | Ready |
 | `be-rich-api/specs/auth.md` | Signup, login, sessions, password reset, email | Ready |
 | `be-rich-api/specs/api.md` | HTTP endpoints, payloads, errors, pagination | Ready |
