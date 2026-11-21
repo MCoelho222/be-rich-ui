@@ -104,6 +104,7 @@ export async function request<T>(
 }
 
 export const api = {
+  request,
   get: <T>(path: string, query?: Query, options?: Omit<RequestOptions, "query" | "body">) =>
     request<T>("GET", path, { ...options, query }),
   post: <T>(path: string, body?: unknown, options?: Omit<RequestOptions, "body">) =>

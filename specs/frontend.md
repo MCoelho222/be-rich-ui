@@ -240,7 +240,7 @@ The redesign starts fresh inside the existing Next.js 16 / React 19 app.
 | Languages | **next-intl** (no locale in the URL) | Server and client rendering, plural rules, and the `brs_lang` cookie. |
 | Charts | **Recharts** | Composable bars and lines; hatched fills through SVG patterns. |
 | UI pieces | **shadcn/ui**: add tabs, popover, dropdown-menu, sheet, tooltip, skeleton, toggle-group, calendar, sonner (toasts) | The same family as today's components. |
-| Forms | react-hook-form + zod (as today) | Zod schemas mirror the API's validation, with the messages translated. |
+| Forms | react-hook-form + zod for the auth forms | Zod schemas mirror the API's validation, with the messages translated. The entry form keeps its own state instead: its fields depend on each other (split lines, method-dependent pickers, scope locks), and its final validation is the server's preview. |
 | Money input | `react-currency-input-field` (as today) | Configured for pt-BR separators. |
 
 ### 7.3 Structure

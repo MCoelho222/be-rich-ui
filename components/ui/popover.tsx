@@ -7,14 +7,19 @@ export const PopoverTrigger = PopoverPrimitive.Trigger;
 export const PopoverClose = PopoverPrimitive.Close;
 export const PopoverAnchor = PopoverPrimitive.Anchor;
 
+/**
+ * `container`: portal target. Inside a dialog, pass the dialog element so the popover stays
+ * within the dialog's focus trap (otherwise focusing the popover would close it).
+ */
 export function PopoverContent({
   className,
   align = "start",
   sideOffset = 6,
+  container,
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+}: React.ComponentProps<typeof PopoverPrimitive.Content> & { container?: HTMLElement | null }) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal container={container ?? undefined}>
       <PopoverPrimitive.Content
         align={align}
         sideOffset={sideOffset}

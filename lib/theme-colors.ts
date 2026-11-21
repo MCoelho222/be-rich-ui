@@ -34,3 +34,17 @@ export function useThemeColors(): ThemeColors | null {
   }, []);
   return colors;
 }
+
+/** "dark" or "light" as currently applied to <html> (the "system" choice resolved). */
+export function useResolvedTheme(): "dark" | "light" {
+  const [theme, setTheme] = useState<"dark" | "light">("light");
+  useEffect(() => {
+    const read = () =>
+      setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return theme;
+}

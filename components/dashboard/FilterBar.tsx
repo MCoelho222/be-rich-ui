@@ -22,11 +22,18 @@ import type { DashboardView, useDashboardView } from "./view";
 
 type Update = ReturnType<typeof useDashboardView>["update"];
 
-const controlClass =
+export const controlClass =
   "inline-flex h-9 items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 text-sm text-text hover:bg-surface-2 data-[state=open]:bg-surface-2";
 
+/** What the period picker needs: shared by the dashboard and the entries page. */
+export interface PeriodView {
+  preset: Preset;
+  range: { from: string; to: string };
+}
+export type PeriodUpdate = (change: { preset?: Preset; from?: string; to?: string }) => void;
+
 /** "This month · Nov/2026", or the custom dates. */
-function usePeriodLabel(view: DashboardView) {
+export function usePeriodLabel(view: PeriodView) {
   const t = useTranslations("dashboard.period");
   const locale = useLocale();
   const { from, to } = view.range;
@@ -39,13 +46,13 @@ function usePeriodLabel(view: DashboardView) {
   return { name: t(view.preset), detail };
 }
 
-function PeriodPicker({
+export function PeriodPicker({
   view,
   update,
   full,
 }: {
-  view: DashboardView;
-  update: Update;
+  view: PeriodView;
+  update: PeriodUpdate;
   full?: boolean;
 }) {
   const t = useTranslations("dashboard");
