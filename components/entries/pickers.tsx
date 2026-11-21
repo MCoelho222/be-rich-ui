@@ -128,7 +128,9 @@ export function CategoryPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        ref={(el) => setDialogEl((current) => current ?? (el?.closest("[role=dialog]") as HTMLElement | null))}
+        ref={(el) =>
+          setDialogEl((current) => current ?? (el?.closest("[role=dialog]") as HTMLElement | null))
+        }
         id={id}
         disabled={disabled}
         aria-invalid={invalid}
@@ -147,7 +149,10 @@ export function CategoryPicker({
         </span>
         <ChevronDown size={14} className="text-text-muted" aria-hidden />
       </PopoverTrigger>
-      <PopoverContent container={dialogEl} className="w-[var(--radix-popover-trigger-width)] min-w-64 p-2">
+      <PopoverContent
+        container={dialogEl}
+        className="w-[var(--radix-popover-trigger-width)] min-w-64 p-2"
+      >
         <Input
           autoFocus
           value={query}
