@@ -8,7 +8,11 @@ export type Me = Schemas["MeOut"];
 export const meKey = ["auth", "me"] as const;
 
 export function useMe() {
-  return useQuery({ queryKey: meKey, queryFn: () => api.get<Me>("auth/me"), staleTime: 5 * 60_000 });
+  return useQuery({
+    queryKey: meKey,
+    queryFn: () => api.get<Me>("auth/me"),
+    staleTime: 5 * 60_000,
+  });
 }
 
 export function useLogout() {

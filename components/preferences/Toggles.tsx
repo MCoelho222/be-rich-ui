@@ -11,7 +11,11 @@ interface ToggleProps {
   className?: string;
 }
 
-export function LanguageToggle({ size, className, saveToProfile = false }: ToggleProps & { saveToProfile?: boolean }) {
+export function LanguageToggle({
+  size,
+  className,
+  saveToProfile = false,
+}: ToggleProps & { saveToProfile?: boolean }) {
   const t = useTranslations("common");
   const { locale, setLanguage } = useLanguage();
   return (

@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { ComingSoon, PageHeader } from "@/components/shell/PageHeader";
+import { Suspense } from "react";
+import { Dashboard } from "@/components/dashboard/Dashboard";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("pages"))("dashboard") };
 }
 
-// The dashboard itself (dashboard.md) is the next step.
-export default async function DashboardPage() {
-  const t = await getTranslations("pages");
+export default function DashboardPage() {
+  // The view lives in the URL's search params, read on the client.
   return (
-    <>
-      <PageHeader title={t("dashboard")} />
-      <ComingSoon />
-    </>
+    <Suspense>
+      <Dashboard />
+    </Suspense>
   );
 }

@@ -18,12 +18,22 @@ interface SegmentedProps<T extends string> {
   className?: string;
 }
 
-export function Segmented<T extends string>({ label, value, options, onChange, size = "md", className }: SegmentedProps<T>) {
+export function Segmented<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  size = "md",
+  className,
+}: SegmentedProps<T>) {
   return (
     <div
       role="radiogroup"
       aria-label={label}
-      className={cn("inline-flex gap-0.5 rounded-lg border border-line bg-surface p-0.5", className)}
+      className={cn(
+        "inline-flex gap-0.5 rounded-lg border border-line bg-surface p-0.5",
+        className
+      )}
     >
       {options.map((option) => {
         const active = option.value === value;

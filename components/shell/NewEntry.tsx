@@ -10,21 +10,27 @@ import { toast } from "sonner";
 
 export type EntryKind = "expense" | "income" | "fixed";
 
-const NewEntryContext = createContext<{ open: (kind: EntryKind) => void }>({ open: () => undefined });
+const NewEntryContext = createContext<{ open: (kind: EntryKind) => void }>({
+  open: () => undefined,
+});
 
 export function NewEntryProvider({ children }: { children: React.ReactNode }) {
   const t = useTranslations("common");
-  const open = useCallback((kind: EntryKind) => {
-    void kind;
-    toast(t("comingSoon"));
-  }, [t]);
+  const open = useCallback(
+    (kind: EntryKind) => {
+      void kind;
+      toast(t("comingSoon"));
+    },
+    [t]
+  );
 
   // Keyboard shortcut N opens a new expense, unless the user is typing.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
       if (event.key !== "n" || event.metaKey || event.ctrlKey || event.altKey) return;
-      if (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+      if (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+        return;
       event.preventDefault();
       open("expense");
     };

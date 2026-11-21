@@ -59,7 +59,11 @@ function redirectToLogin() {
   window.location.assign(`/login?next=${encodeURIComponent(next)}`);
 }
 
-export async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
+export async function request<T>(
+  method: string,
+  path: string,
+  options: RequestOptions = {}
+): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json" };
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
   if (!SAFE_METHODS.has(method)) {

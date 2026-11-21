@@ -3,7 +3,14 @@ import { cn } from "@/lib/utils";
 
 export function LogoMark({ size = 32, className }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" role="img" aria-label="Be Rich" className={cn("shrink-0", className)}>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      role="img"
+      aria-label="Be Rich"
+      className={cn("shrink-0", className)}
+    >
       <rect width="32" height="32" rx="9" fill="var(--brand)" />
       <path
         d="M8 21.5l5-5 3.5 3L24 12M19.5 11.5H24.5V16.5"

@@ -95,5 +95,108 @@
     "notFound": "Page not found",
     "notFoundBody": "The page you're looking for doesn't exist.",
     "goHome": "Go to the dashboard"
+  },
+  "dashboard": {
+    "loadError": "Couldn't load this.",
+    "retry": "Retry",
+    "converted": "Converted to {currency} · rates as of {date}",
+    "unconverted": "Some amounts in {currencies} could not be converted and are not included in the totals.",
+    "period": {
+      "this-month": "This month",
+      "next-month": "Next month",
+      "next-3-months": "Next 3 months",
+      "next-6-months": "Next 6 months",
+      "this-year": "This year",
+      "custom": "Custom"
+    },
+    "customRange": "Custom period",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "invalidRange": "Pick an end date after the start, at most 3 years later.",
+    "allAccounts": "All accounts",
+    "archived": "archived",
+    "whose": "Whose entries",
+    "everyone": "Everyone",
+    "me": "Me",
+    "filters": "Filters",
+    "overdue": {
+      "title": "{count, plural, one {# overdue fixed entry} other {# overdue fixed entries}}",
+      "note": "Not included in projections until registered.",
+      "register": "Register",
+      "skip": "Skip",
+      "registered": "Registered.",
+      "skipped": "Skipped."
+    },
+    "cards": {
+      "total": "Total balance",
+      "household": "Household balance",
+      "endOfPeriod": "End of period",
+      "income": "Income",
+      "expenses": "Expenses",
+      "net": "Net",
+      "fixed": "Fixed",
+      "projected": "Projected",
+      "ofExpenses": "of expenses",
+      "noOpening": "Set your accounts' opening balances to see real balances.",
+      "account": "Account",
+      "now": "Now",
+      "endShort": "End",
+      "viewAccounts": "Go to accounts"
+    },
+    "chart": {
+      "title": "Projection",
+      "negative": "Balance projected to go negative in {month}",
+      "income": "Income",
+      "expenses": "Expenses",
+      "projected": "Projected",
+      "balance": "Balance",
+      "realized": "Realized",
+      "scheduled": "Scheduled",
+      "projectedFixed": "Projected fixed",
+      "endBalance": "End of month",
+      "empty": "Add your first expense or income to see the projection.",
+      "addFirst": "New expense",
+      "aria": "Monthly income, expenses and projected balance from {from} to {to}"
+    },
+    "categories": {
+      "title": "By category",
+      "expenses": "Expenses",
+      "incomes": "Incomes",
+      "showAll": "Show all ({count})",
+      "showLess": "Show less",
+      "emptyExpenses": "No expenses in this period.",
+      "emptyIncomes": "No incomes in this period."
+    },
+    "bills": {
+      "title": "Card bills",
+      "closes": "closes {date}",
+      "due": "due {date}"
+    },
+    "entries": {
+      "title": "Entries",
+      "all": "All",
+      "expenses": "Expenses",
+      "incomes": "Incomes",
+      "date": "Date",
+      "description": "Description",
+      "category": "Category",
+      "payment": "Payment",
+      "amount": "Amount",
+      "fixed": "Fixed",
+      "projected": "Projected",
+      "register": "Register",
+      "registered": "Registered.",
+      "loadMore": "Load more",
+      "empty": "No entries in this period."
+    }
+  },
+  "methods": {
+    "CREDIT": "Credit",
+    "DEBIT": "Debit",
+    "PIX": "PIX",
+    "CASH": "Cash",
+    "BOLETO": "Boleto",
+    "BANK_TRANSFER": "Transfer"
   }
 }

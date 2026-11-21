@@ -6,7 +6,11 @@ export const DropdownMenu = Menu.Root;
 export const DropdownMenuTrigger = Menu.Trigger;
 export const DropdownMenuGroup = Menu.Group;
 
-export function DropdownMenuContent({ className, sideOffset = 6, ...props }: React.ComponentProps<typeof Menu.Content>) {
+export function DropdownMenuContent({
+  className,
+  sideOffset = 6,
+  ...props
+}: React.ComponentProps<typeof Menu.Content>) {
   return (
     <Menu.Portal>
       <Menu.Content
@@ -35,10 +39,18 @@ export function DropdownMenuItem({ className, ...props }: React.ComponentProps<t
   );
 }
 
-export function DropdownMenuLabel({ className, ...props }: React.ComponentProps<typeof Menu.Label>) {
-  return <Menu.Label className={cn("px-2.5 py-1.5 text-xs text-text-muted", className)} {...props} />;
+export function DropdownMenuLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof Menu.Label>) {
+  return (
+    <Menu.Label className={cn("px-2.5 py-1.5 text-xs text-text-muted", className)} {...props} />
+  );
 }
 
-export function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typeof Menu.Separator>) {
+export function DropdownMenuSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof Menu.Separator>) {
   return <Menu.Separator className={cn("my-1.5 h-px bg-line", className)} {...props} />;
 }

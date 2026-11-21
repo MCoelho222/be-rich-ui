@@ -13,7 +13,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
             staleTime: 30_000,
             refetchOnWindowFocus: false,
             // Client errors (4xx) won't change on retry; network and 5xx might.
-            retry: (count, error) => !(error instanceof ApiError && error.status >= 400 && error.status < 500) && count < 2,
+            retry: (count, error) =>
+              !(error instanceof ApiError && error.status >= 400 && error.status < 500) &&
+              count < 2,
           },
         },
       })

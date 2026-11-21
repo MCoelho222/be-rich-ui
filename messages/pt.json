@@ -95,5 +95,108 @@
     "notFound": "Página não encontrada",
     "notFoundBody": "A página que você procura não existe.",
     "goHome": "Ir para o painel"
+  },
+  "dashboard": {
+    "loadError": "Não foi possível carregar.",
+    "retry": "Tentar de novo",
+    "converted": "Convertido para {currency} · cotação de {date}",
+    "unconverted": "Alguns valores em {currencies} não puderam ser convertidos e não estão nos totais.",
+    "period": {
+      "this-month": "Este mês",
+      "next-month": "Próximo mês",
+      "next-3-months": "Próximos 3 meses",
+      "next-6-months": "Próximos 6 meses",
+      "this-year": "Este ano",
+      "custom": "Personalizado"
+    },
+    "customRange": "Período personalizado",
+    "from": "De",
+    "to": "Até",
+    "apply": "Aplicar",
+    "invalidRange": "Escolha um fim depois do início, até 3 anos depois.",
+    "allAccounts": "Todas as contas",
+    "archived": "arquivada",
+    "whose": "De quem",
+    "everyone": "Todos",
+    "me": "Eu",
+    "filters": "Filtros",
+    "overdue": {
+      "title": "{count, plural, one {# lançamento fixo atrasado} other {# lançamentos fixos atrasados}}",
+      "note": "Fora das projeções até serem registrados.",
+      "register": "Registrar",
+      "skip": "Pular",
+      "registered": "Registrado.",
+      "skipped": "Pulado."
+    },
+    "cards": {
+      "total": "Saldo total",
+      "household": "Saldo da casa",
+      "endOfPeriod": "Fim do período",
+      "income": "Receitas",
+      "expenses": "Despesas",
+      "net": "Resultado",
+      "fixed": "Fixos",
+      "projected": "Previsto",
+      "ofExpenses": "das despesas",
+      "noOpening": "Informe o saldo inicial das contas para ver os saldos reais.",
+      "account": "Conta",
+      "now": "Agora",
+      "endShort": "Fim",
+      "viewAccounts": "Ir para contas"
+    },
+    "chart": {
+      "title": "Projeção",
+      "negative": "Saldo previsto fica negativo em {month}",
+      "income": "Receitas",
+      "expenses": "Despesas",
+      "projected": "Previsto",
+      "balance": "Saldo",
+      "realized": "Realizado",
+      "scheduled": "Agendado",
+      "projectedFixed": "Fixos previstos",
+      "endBalance": "Fim do mês",
+      "empty": "Adicione sua primeira despesa ou receita para ver a projeção.",
+      "addFirst": "Nova despesa",
+      "aria": "Receitas, despesas e saldo previsto por mês, de {from} a {to}"
+    },
+    "categories": {
+      "title": "Por categoria",
+      "expenses": "Despesas",
+      "incomes": "Receitas",
+      "showAll": "Mostrar todas ({count})",
+      "showLess": "Mostrar menos",
+      "emptyExpenses": "Nenhuma despesa neste período.",
+      "emptyIncomes": "Nenhuma receita neste período."
+    },
+    "bills": {
+      "title": "Faturas",
+      "closes": "fecha {date}",
+      "due": "vence {date}"
+    },
+    "entries": {
+      "title": "Lançamentos",
+      "all": "Todos",
+      "expenses": "Despesas",
+      "incomes": "Receitas",
+      "date": "Data",
+      "description": "Descrição",
+      "category": "Categoria",
+      "payment": "Pagamento",
+      "amount": "Valor",
+      "fixed": "Fixo",
+      "projected": "Previsto",
+      "register": "Registrar",
+      "registered": "Registrado.",
+      "loadMore": "Carregar mais",
+      "empty": "Nenhum lançamento neste período."
+    }
+  },
+  "methods": {
+    "CREDIT": "Crédito",
+    "DEBIT": "Débito",
+    "PIX": "PIX",
+    "CASH": "Dinheiro",
+    "BOLETO": "Boleto",
+    "BANK_TRANSFER": "Transferência"
   }
 }

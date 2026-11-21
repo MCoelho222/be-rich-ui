@@ -1,4 +1,12 @@
-import { ArrowDownUp, CreditCard, LayoutDashboard, Repeat, Settings, Tag, type LucideIcon } from "lucide-react";
+import {
+  ArrowDownUp,
+  CreditCard,
+  LayoutDashboard,
+  Repeat,
+  Settings,
+  Tag,
+  type LucideIcon,
+} from "lucide-react";
 
 export interface NavItem {
   href: string;

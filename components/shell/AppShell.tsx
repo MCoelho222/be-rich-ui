@@ -29,7 +29,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <NewEntryProvider>
       <div className="flex min-h-dvh bg-bg">
         <Sidebar />
-        <div className="flex min-w-0 flex-1 flex-col pb-[calc(76px+env(safe-area-inset-bottom))] sm:pb-0">{children}</div>
+        <div className="flex min-w-0 flex-1 flex-col pb-[calc(76px+env(safe-area-inset-bottom))] sm:pb-0">
+          {children}
+        </div>
         <BottomBar />
       </div>
     </NewEntryProvider>
@@ -90,7 +92,11 @@ function Sidebar() {
         title={collapsed ? t("expand") : t("collapse")}
         className="hidden h-9 items-center gap-3 rounded-lg px-2.5 text-text-muted hover:bg-surface-2 hover:text-text lg:flex"
       >
-        {collapsed ? <ChevronsRight size={18} aria-hidden /> : <ChevronsLeft size={18} aria-hidden />}
+        {collapsed ? (
+          <ChevronsRight size={18} aria-hidden />
+        ) : (
+          <ChevronsLeft size={18} aria-hidden />
+        )}
       </button>
       <div className="mt-2 border-t border-line pt-3">
         <UserMenu wide={wide} />
@@ -111,7 +117,9 @@ function SidebarLink({ item, wide }: { item: NavItem; wide: boolean }) {
       title={t(item.key)}
       className={cn(
         "flex h-10 items-center gap-3 rounded-lg px-2.5 text-sm font-medium transition-colors",
-        active ? "bg-surface-2 text-text shadow-[inset_3px_0_0_var(--brand)]" : "text-text-muted hover:bg-surface-2 hover:text-text"
+        active
+          ? "bg-surface-2 text-text shadow-[inset_3px_0_0_var(--brand)]"
+          : "text-text-muted hover:bg-surface-2 hover:text-text"
       )}
     >
       <Icon size={20} aria-hidden className="shrink-0" />
@@ -129,10 +137,15 @@ function UserMenu({ wide }: { wide: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex h-10 w-full items-center gap-2.5 rounded-lg px-1.5 text-left hover:bg-surface-2">
-        <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[13px] font-semibold text-brand">
+        <span
+          aria-hidden
+          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[13px] font-semibold text-brand"
+        >
           {name ? initial(name) : ""}
         </span>
-        <span className={cn("hidden min-w-0 flex-1 truncate text-sm font-medium", wide && "lg:block")}>
+        <span
+          className={cn("hidden min-w-0 flex-1 truncate text-sm font-medium", wide && "lg:block")}
+        >
           {name ? shortName(name) : ""}
         </span>
         <span className="sr-only">{t("profile")}</span>
@@ -197,7 +210,10 @@ function BottomBar() {
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={cn("flex flex-col items-center gap-1 text-[11px] font-medium", active ? "text-brand" : "text-text-muted")}
+        className={cn(
+          "flex flex-col items-center gap-1 text-[11px] font-medium",
+          active ? "text-brand" : "text-text-muted"
+        )}
       >
         <Icon size={22} aria-hidden />
         <span className="max-w-full truncate">{t(item.key)}</span>
@@ -223,8 +239,14 @@ function BottomBar() {
           <SheetContent title={t("newEntry")}>
             {(["expense", "income", "fixed"] as const).map((kind) => (
               <SheetClose key={kind} asChild>
-                <button type="button" onClick={() => open(kind)} className="flex h-12 items-center rounded-lg px-3 text-left text-[15px] hover:bg-surface-2">
-                  {t(kind === "expense" ? "newExpense" : kind === "income" ? "newIncome" : "newFixed")}
+                <button
+                  type="button"
+                  onClick={() => open(kind)}
+                  className="flex h-12 items-center rounded-lg px-3 text-left text-[15px] hover:bg-surface-2"
+                >
+                  {t(
+                    kind === "expense" ? "newExpense" : kind === "income" ? "newIncome" : "newFixed"
+                  )}
                 </button>
               </SheetClose>
             ))}
@@ -233,7 +255,12 @@ function BottomBar() {
       </div>
       {tab(fixed)}
       <Sheet>
-        <SheetTrigger className={cn("flex flex-col items-center gap-1 text-[11px] font-medium", moreActive ? "text-brand" : "text-text-muted")}>
+        <SheetTrigger
+          className={cn(
+            "flex flex-col items-center gap-1 text-[11px] font-medium",
+            moreActive ? "text-brand" : "text-text-muted"
+          )}
+        >
           <MoreHorizontal size={22} aria-hidden />
           {t("more")}
         </SheetTrigger>
@@ -242,7 +269,10 @@ function BottomBar() {
             const Icon = item.icon;
             return (
               <SheetClose key={item.href} asChild>
-                <Link href={item.href} className="flex h-12 items-center gap-3 rounded-lg px-3 text-[15px] hover:bg-surface-2">
+                <Link
+                  href={item.href}
+                  className="flex h-12 items-center gap-3 rounded-lg px-3 text-[15px] hover:bg-surface-2"
+                >
                   <Icon size={20} aria-hidden className="text-text-muted" />
                   {t(item.key)}
                 </Link>
@@ -252,7 +282,11 @@ function BottomBar() {
           <div className="my-2 h-px bg-line" />
           <PreferenceRows />
           <div className="my-2 h-px bg-line" />
-          <button type="button" onClick={() => logout.mutate()} className="flex h-12 items-center gap-3 rounded-lg px-3 text-left text-[15px] hover:bg-surface-2">
+          <button
+            type="button"
+            onClick={() => logout.mutate()}
+            className="flex h-12 items-center gap-3 rounded-lg px-3 text-left text-[15px] hover:bg-surface-2"
+          >
             <LogOut size={20} aria-hidden className="text-text-muted" />
             {tc("logout")}
           </button>

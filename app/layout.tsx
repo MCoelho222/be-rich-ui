@@ -36,7 +36,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       className={theme === "system" ? undefined : theme}
       suppressHydrationWarning
     >
-      <head>{theme === "system" && <script dangerouslySetInnerHTML={{ __html: systemThemeScript }} />}</head>
+      <head>
+        {theme === "system" && <script dangerouslySetInnerHTML={{ __html: systemThemeScript }} />}
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
         <NextIntlClientProvider>
           <Providers>{children}</Providers>

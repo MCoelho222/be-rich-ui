@@ -3,7 +3,12 @@
 import { ChevronDown, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LogoMark } from "@/components/brand/Logo";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNewEntry } from "./NewEntry";
 
 export function PageHeader({ title, children }: { title: string; children?: React.ReactNode }) {
@@ -53,7 +58,9 @@ export function ComingSoon() {
   const t = useTranslations("common");
   return (
     <div className="px-4 py-6 sm:px-8">
-      <div className="rounded-xl border border-dashed border-line-strong px-6 py-16 text-center text-sm text-text-muted">{t("comingSoon")}</div>
+      <div className="rounded-xl border border-dashed border-line-strong px-6 py-16 text-center text-sm text-text-muted">
+        {t("comingSoon")}
+      </div>
     </div>
   );
 }

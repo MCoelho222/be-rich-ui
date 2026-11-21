@@ -16,11 +16,16 @@ export const requiredText = (max: number) => z.string().trim().min(1, "required"
 /** Translates a schema message key; unknown keys (API messages) are shown as they are. */
 export function useFieldError() {
   const t = useTranslations("errors");
-  return (message: string | undefined) => (message ? (t.has(message as "required") ? t(message as "required") : message) : undefined);
+  return (message: string | undefined) =>
+    message ? (t.has(message as "required") ? t(message as "required") : message) : undefined;
 }
 
 /** Puts API field errors (api.md §2) on the matching form fields. Returns true if any matched. */
-export function applyFieldErrors<T extends FieldValues>(error: unknown, setError: UseFormSetError<T>, fields: Path<T>[]): boolean {
+export function applyFieldErrors<T extends FieldValues>(
+  error: unknown,
+  setError: UseFormSetError<T>,
+  fields: Path<T>[]
+): boolean {
   if (!(error instanceof ApiError)) return false;
   let matched = false;
   for (const [field, messages] of Object.entries(error.fields)) {

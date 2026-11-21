@@ -10,7 +10,14 @@ import { z } from "zod";
 import { api, ApiError } from "@/lib/api";
 import type { Me } from "@/lib/auth";
 import { useErrorMessage } from "@/lib/errors";
-import { applyFieldErrors, emailField, passwordField, requiredText, safeNext, useFieldError } from "@/lib/forms";
+import {
+  applyFieldErrors,
+  emailField,
+  passwordField,
+  requiredText,
+  safeNext,
+  useFieldError,
+} from "@/lib/forms";
 import { LANG_COOKIE, ONE_YEAR } from "@/i18n/config";
 import { AuthCard } from "./AuthCard";
 import { Field, FormError, FormNotice, PasswordField, SubmitButton } from "./fields";
@@ -33,7 +40,8 @@ export function LoginForm({ next }: { next?: string }) {
   const errorMessage = useErrorMessage();
   const form = useForm<z.infer<typeof loginSchema>>({ resolver: zodResolver(loginSchema) });
   const login = useMutation({
-    mutationFn: (body: z.infer<typeof loginSchema>) => api.post<Me>("auth/login", body, { allowUnauthenticated: true }),
+    mutationFn: (body: z.infer<typeof loginSchema>) =>
+      api.post<Me>("auth/login", body, { allowUnauthenticated: true }),
     onSuccess: (me) => enterApp(me, next ?? "/"),
   });
   const { errors } = form.formState;
@@ -41,8 +49,19 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <div className="flex flex-col gap-5">
       <AuthCard>
-        <form noValidate onSubmit={form.handleSubmit((values) => login.mutate(values))} className="flex flex-col gap-[18px]">
-          <Field label={t("email")} type="email" autoComplete="email" autoFocus error={fieldError(errors.email?.message)} {...form.register("email")} />
+        <form
+          noValidate
+          onSubmit={form.handleSubmit((values) => login.mutate(values))}
+          className="flex flex-col gap-[18px]"
+        >
+          <Field
+            label={t("email")}
+            type="email"
+            autoComplete="email"
+            autoFocus
+            error={fieldError(errors.email?.message)}
+            {...form.register("email")}
+          />
           <PasswordField
             label={t("password")}
             autoComplete="current-password"
@@ -55,7 +74,9 @@ export function LoginForm({ next }: { next?: string }) {
             {...form.register("password")}
           />
           <FormError message={login.isError ? errorMessage(login.error) : null} />
-          <SubmitButton pending={login.isPending || login.isSuccess}>{t("login.submit")}</SubmitButton>
+          <SubmitButton pending={login.isPending || login.isSuccess}>
+            {t("login.submit")}
+          </SubmitButton>
         </form>
       </AuthCard>
       <p className="text-center text-sm text-text-muted">
@@ -70,7 +91,11 @@ export function LoginForm({ next }: { next?: string }) {
 
 // --- Signup (also used to accept an invitation) --------------------------------------
 
-const signupSchema = z.object({ name: requiredText(100), email: emailField, password: passwordField });
+const signupSchema = z.object({
+  name: requiredText(100),
+  email: emailField,
+  password: passwordField,
+});
 type SignupValues = z.infer<typeof signupSchema>;
 
 function SignupFields({
@@ -92,16 +117,31 @@ function SignupFields({
   });
   const signup = useMutation({
     mutationFn: (values: SignupValues) =>
-      api.post<Me>("auth/signup", { ...values, language: locale, invitation_token: invitationToken }, { allowUnauthenticated: true }),
+      api.post<Me>(
+        "auth/signup",
+        { ...values, language: locale, invitation_token: invitationToken },
+        { allowUnauthenticated: true }
+      ),
     onSuccess: (me) => enterApp(me, "/"),
     onError: (error) => applyFieldErrors(error, form.setError, ["name", "email", "password"]),
   });
   const { errors } = form.formState;
-  const fieldErrorsShown = signup.error instanceof ApiError && Object.keys(signup.error.fields).length > 0;
+  const fieldErrorsShown =
+    signup.error instanceof ApiError && Object.keys(signup.error.fields).length > 0;
 
   return (
-    <form noValidate onSubmit={form.handleSubmit((values) => signup.mutate(values))} className="flex flex-col gap-[18px]">
-      <Field label={t("name")} autoComplete="name" autoFocus error={fieldError(errors.name?.message)} {...form.register("name")} />
+    <form
+      noValidate
+      onSubmit={form.handleSubmit((values) => signup.mutate(values))}
+      className="flex flex-col gap-[18px]"
+    >
+      <Field
+        label={t("name")}
+        autoComplete="name"
+        autoFocus
+        error={fieldError(errors.name?.message)}
+        {...form.register("name")}
+      />
       <Field
         label={t("email")}
         type="email"
@@ -117,7 +157,9 @@ function SignupFields({
         error={fieldError(errors.password?.message)}
         {...form.register("password")}
       />
-      <FormError message={signup.isError && !fieldErrorsShown ? errorMessage(signup.error) : null} />
+      <FormError
+        message={signup.isError && !fieldErrorsShown ? errorMessage(signup.error) : null}
+      />
       <SubmitButton pending={signup.isPending || signup.isSuccess}>{submitLabel}</SubmitButton>
     </form>
   );
@@ -152,7 +194,8 @@ export function InviteForm({ token }: { token: string }) {
   const t = useTranslations("auth");
   const lookup = useQuery({
     queryKey: ["invitation", token],
-    queryFn: () => api.get<InvitationLookup>("invitations/lookup", { token }, { allowUnauthenticated: true }),
+    queryFn: () =>
+      api.get<InvitationLookup>("invitations/lookup", { token }, { allowUnauthenticated: true }),
     retry: false,
   });
 
@@ -176,7 +219,9 @@ export function InviteForm({ token }: { token: string }) {
   const { household_name: household, invited_by_name: inviter, email } = lookup.data;
   return (
     <AuthCard title={t("invite.title", { household })}>
-      <p className="-mt-2 text-center text-sm text-text-muted">{t("invite.intro", { inviter, household })}</p>
+      <p className="-mt-2 text-center text-sm text-text-muted">
+        {t("invite.intro", { inviter, household })}
+      </p>
       <SignupFields invitationToken={token} lockedEmail={email} submitLabel={t("invite.submit")} />
     </AuthCard>
   );
@@ -202,9 +247,20 @@ export function ForgotPasswordForm() {
         {send.isSuccess ? (
           <FormNotice>{t("forgot.sent")}</FormNotice>
         ) : (
-          <form noValidate onSubmit={form.handleSubmit((values) => send.mutate(values))} className="flex flex-col gap-[18px]">
+          <form
+            noValidate
+            onSubmit={form.handleSubmit((values) => send.mutate(values))}
+            className="flex flex-col gap-[18px]"
+          >
             <p className="-mt-2 text-center text-sm text-text-muted">{t("forgot.intro")}</p>
-            <Field label={t("email")} type="email" autoComplete="email" autoFocus error={fieldError(form.formState.errors.email?.message)} {...form.register("email")} />
+            <Field
+              label={t("email")}
+              type="email"
+              autoComplete="email"
+              autoFocus
+              error={fieldError(form.formState.errors.email?.message)}
+              {...form.register("email")}
+            />
             <FormError message={send.isError ? errorMessage(send.error) : null} />
             <SubmitButton pending={send.isPending}>{t("forgot.submit")}</SubmitButton>
           </form>
@@ -233,11 +289,18 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const form = useForm<z.infer<typeof resetSchema>>({ resolver: zodResolver(resetSchema) });
   const reset = useMutation({
     mutationFn: (values: z.infer<typeof resetSchema>) =>
-      api.post<void>("auth/password-reset/confirm", { token, new_password: values.password }, { allowUnauthenticated: true }),
+      api.post<void>(
+        "auth/password-reset/confirm",
+        { token, new_password: values.password },
+        { allowUnauthenticated: true }
+      ),
     onSuccess: () => setDone(true),
   });
   const { errors } = form.formState;
-  const confirmError = errors.confirm?.message === "mismatch" ? t("reset.mismatch") : fieldError(errors.confirm?.message);
+  const confirmError =
+    errors.confirm?.message === "mismatch"
+      ? t("reset.mismatch")
+      : fieldError(errors.confirm?.message);
 
   return (
     <AuthCard title={t("reset.title")}>
@@ -249,9 +312,25 @@ export function ResetPasswordForm({ token }: { token: string }) {
           </Link>
         </>
       ) : (
-        <form noValidate onSubmit={form.handleSubmit((values) => reset.mutate(values))} className="flex flex-col gap-[18px]">
-          <PasswordField label={t("newPassword")} autoComplete="new-password" autoFocus hint={t("signup.passwordHint")} error={fieldError(errors.password?.message)} {...form.register("password")} />
-          <PasswordField label={t("confirmPassword")} autoComplete="new-password" error={confirmError} {...form.register("confirm")} />
+        <form
+          noValidate
+          onSubmit={form.handleSubmit((values) => reset.mutate(values))}
+          className="flex flex-col gap-[18px]"
+        >
+          <PasswordField
+            label={t("newPassword")}
+            autoComplete="new-password"
+            autoFocus
+            hint={t("signup.passwordHint")}
+            error={fieldError(errors.password?.message)}
+            {...form.register("password")}
+          />
+          <PasswordField
+            label={t("confirmPassword")}
+            autoComplete="new-password"
+            error={confirmError}
+            {...form.register("confirm")}
+          />
           <FormError message={reset.isError ? errorMessage(reset.error) : null} />
           <SubmitButton pending={reset.isPending}>{t("reset.submit")}</SubmitButton>
         </form>

@@ -4,7 +4,14 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { useLocale } from "next-intl";
 import { api } from "./api";
-import { LANG_COOKIE, ONE_YEAR, THEME_COOKIE, isTheme, type Locale, type Theme } from "@/i18n/config";
+import {
+  LANG_COOKIE,
+  ONE_YEAR,
+  THEME_COOKIE,
+  isTheme,
+  type Locale,
+  type Theme,
+} from "@/i18n/config";
 
 function writeCookie(name: string, value: string) {
   document.cookie = `${name}=${value}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
@@ -38,7 +45,9 @@ export function useLanguage() {
 
 /** Applies a theme choice to <html>. "system" follows the device and its changes. */
 export function applyTheme(theme: Theme) {
-  const dark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark =
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   const root = document.documentElement;
   root.classList.toggle("dark", dark);
   root.classList.toggle("light", !dark);

@@ -32,7 +32,13 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
         {aside}
       </div>
       <div className="relative">
-        <Input ref={ref} id={inputId} aria-invalid={!!error} aria-describedby={describedBy} {...props} />
+        <Input
+          ref={ref}
+          id={inputId}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
+          {...props}
+        />
         {trailing && <div className="absolute top-1 right-1">{trailing}</div>}
       </div>
       {error ? (
@@ -48,32 +54,31 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
   );
 });
 
-export const PasswordField = forwardRef<HTMLInputElement, Omit<FieldProps, "type">>(function PasswordField(
-  { className, ...props },
-  ref
-) {
-  const t = useTranslations("common");
-  const [visible, setVisible] = useState(false);
-  return (
-    <Field
-      ref={ref}
-      type={visible ? "text" : "password"}
-      className={cn("pr-11", className)}
-      trailing={
-        <button
-          type="button"
-          onClick={() => setVisible((v) => !v)}
-          aria-label={visible ? t("hidePassword") : t("showPassword")}
-          aria-pressed={visible}
-          className="flex size-8 items-center justify-center rounded-md text-text-muted hover:text-text"
-        >
-          {visible ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
-        </button>
-      }
-      {...props}
-    />
-  );
-});
+export const PasswordField = forwardRef<HTMLInputElement, Omit<FieldProps, "type">>(
+  function PasswordField({ className, ...props }, ref) {
+    const t = useTranslations("common");
+    const [visible, setVisible] = useState(false);
+    return (
+      <Field
+        ref={ref}
+        type={visible ? "text" : "password"}
+        className={cn("pr-11", className)}
+        trailing={
+          <button
+            type="button"
+            onClick={() => setVisible((v) => !v)}
+            aria-label={visible ? t("hidePassword") : t("showPassword")}
+            aria-pressed={visible}
+            className="flex size-8 items-center justify-center rounded-md text-text-muted hover:text-text"
+          >
+            {visible ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
+          </button>
+        }
+        {...props}
+      />
+    );
+  }
+);
 
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null;
@@ -92,7 +97,13 @@ export function FormNotice({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SubmitButton({ pending, children }: { pending: boolean; children: React.ReactNode }) {
+export function SubmitButton({
+  pending,
+  children,
+}: {
+  pending: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="submit"
