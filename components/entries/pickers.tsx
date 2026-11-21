@@ -2,7 +2,7 @@
 /** Pickers used by the entry forms (ui-behavior §1.5, §6.1). */
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useId, useMemo, useState } from "react";
+import { cloneElement, isValidElement, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { MoneyInput } from "@/components/ui/money-input";
@@ -31,13 +31,21 @@ export function FieldShell({
   children: React.ReactNode;
   className?: string;
 }) {
+  // Link the label to the control: use the given id, or give the single child one.
+  const autoId = useId();
+  let control = children;
+  let labelFor = htmlFor;
+  if (!labelFor && isValidElement<{ id?: string }>(children)) {
+    labelFor = children.props.id ?? autoId;
+    if (!children.props.id) control = cloneElement(children, { id: autoId });
+  }
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
-      <label htmlFor={htmlFor} className={fieldLabel}>
+      <label htmlFor={labelFor} className={fieldLabel}>
         {label}
         {required && <span className="text-negative"> *</span>}
       </label>
-      {children}
+      {control}
       {error ? (
         <p className="text-[13px] text-negative">{error}</p>
       ) : hint ? (

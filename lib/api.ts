@@ -20,7 +20,9 @@ export class ApiError extends Error {
     readonly code: string,
     message: string,
     readonly fields: Record<string, string[]> = {},
-    readonly retryAfter: number | null = null
+    readonly retryAfter: number | null = null,
+    /** IN_USE responses say what uses the record (api.md §2). */
+    readonly usage: Record<string, number> | null = null
   ) {
     super(message);
   }
@@ -99,7 +101,8 @@ export async function request<T>(
     envelope.code ?? "UNKNOWN",
     envelope.message ?? response.statusText,
     envelope.fields ?? {},
-    retryAfter
+    retryAfter,
+    envelope.usage ?? data?.usage ?? null
   );
 }
 

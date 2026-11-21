@@ -4,7 +4,7 @@
  * they fill from the cents: "3", "30", "300", "3000" → "0,03", "0,30", "3,00", "30,00".
  * The value is the API's decimal string ("30.00"), or "" when empty.
  */
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { fromCents, toCents } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
@@ -65,3 +65,51 @@ export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(function
     </div>
   );
 });
+
+/** A money input that also accepts negative values, with a −/+ toggle (ui-behavior §4.2). */
+export function SignedMoneyInput({
+  value,
+  onChange,
+  symbol,
+  negativeLabel,
+  ...props
+}: Omit<MoneyInputProps, "value" | "onChange"> & {
+  value: string;
+  onChange: (value: string) => void;
+  /** Accessible name of the sign toggle. */
+  negativeLabel: string;
+}) {
+  // The sign is its own state: it must survive while the amount is still empty.
+  const [negative, setNegative] = useState(value.startsWith("-"));
+  const magnitude = value.startsWith("-") ? value.slice(1) : value;
+  const emit = (next: string, isNegative: boolean) => {
+    setNegative(isNegative);
+    onChange(next && isNegative ? `-${next}` : next);
+  };
+  return (
+    <div className="flex gap-2">
+      <button
+        type="button"
+        aria-pressed={negative}
+        aria-label={negativeLabel}
+        title={negativeLabel}
+        onClick={() => emit(magnitude, !negative)}
+        className={cn(
+          "h-10 w-10 shrink-0 rounded-lg border text-lg font-semibold",
+          negative
+            ? "border-negative text-negative"
+            : "border-line-strong text-text-muted hover:text-text"
+        )}
+      >
+        {negative ? "−" : "+"}
+      </button>
+      <MoneyInput
+        value={magnitude}
+        onChange={(next) => emit(next, negative)}
+        symbol={symbol}
+        className="flex-1"
+        {...props}
+      />
+    </div>
+  );
+}

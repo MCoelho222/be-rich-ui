@@ -48,12 +48,14 @@ import {
   type Card,
 } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { CardFormDialog } from "@/components/accounts/forms";
 import { CategoryPicker, FieldShell, NewAccountInline, Select } from "./pickers";
 
 const MAX_PARTS = 6;
 const DESCRIPTION_MAX = 200;
 const INTERVALS = [1, 2, 3, 6, 12];
 const NEW_ACCOUNT = "__new__";
+const NEW_CARD = "__new_card__";
 
 export type FormMode =
   | { type: "create"; repeats?: boolean }
@@ -182,6 +184,7 @@ export function EntryForm({
   const [day, setDay] = useState<number | "">("");
   const [until, setUntil] = useState("");
   const [creatingAccountFor, setCreatingAccountFor] = useState<number | null>(null);
+  const [creatingCardFor, setCreatingCardFor] = useState<number | null>(null);
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -444,7 +447,11 @@ export function EntryForm({
                 value={cardId}
                 disabled={paymentLocked}
                 invalid={!!errors[`${prefix}.card_id`]}
-                onChange={(e) => updatePart(part.key, { cardId: e.target.value })}
+                onChange={(e) =>
+                  e.target.value === NEW_CARD
+                    ? setCreatingCardFor(part.key)
+                    : updatePart(part.key, { cardId: e.target.value })
+                }
                 aria-label={t("card")}
               >
                 {cardList.length === 0 && <option value="">—</option>}
@@ -454,7 +461,15 @@ export function EntryForm({
                     {c.last_four ? ` •••• ${c.last_four}` : ""}
                   </option>
                 ))}
+                {!paymentLocked && <option value={NEW_CARD}>+ {t("newCard")}</option>}
               </Select>
+              {/* ui-behavior §1.5: the Card form opens in a nested dialog; the new card is selected. */}
+              {creatingCardFor === part.key && (
+                <CardFormDialog
+                  onClose={() => setCreatingCardFor(null)}
+                  onCreated={(id) => updatePart(part.key, { cardId: id })}
+                />
+              )}
             </FieldShell>
           ) : showAccount(part.method) ? (
             <FieldShell
