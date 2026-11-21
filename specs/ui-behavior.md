@@ -71,7 +71,7 @@ Text fields with a maximum length show a counter (`42/200`) once 80% of the limi
 | Email | Email input. Duplicates are rejected by the server with "Email already registered". **Locked** (read-only) when the user is signing up from an invitation. |
 | CPF | Mask `000.000.000-00`, accepting up to 11 digits. Check digits are validated on blur, with the error "Invalid CPF". Example: typing `12345678909` shows `123.456.789-09`. |
 | Birth date | Masked input `DD/MM/YYYY` with that placeholder, plus a date-picker button. Future dates are rejected. |
-| Phone | A country selector (flag + dialing code, default **Brazil +55**, searchable) next to the number input. The number is formatted as the user types, following the selected country's pattern (BR mobile: `(48) 99999-9999`). Submitted in E.164 format. |
+| Phone | A country selector (country code + dialing code, e.g. `BR +55`, default **Brazil**; flag emoji are avoided because Windows shows them as letters) next to the number input. The number is formatted as the user types, following the selected country's pattern (BR mobile: `(48) 99999-9999`). Submitted in E.164 format. |
 | CEP | Mask `00000-000`. Example: `88303575` shows `88303-575`. *Optional enhancement:* once 8 digits are entered, look up the CEP and fill in street, neighborhood, city and state, leaving all fields editable. |
 | Address | Separate inputs: street, number (with an "S/N" checkbox), complement, neighborhood, city, state (a select with the 27 UFs). |
 | Notes | Textarea with a character counter (500). Placeholder: "Anything you want to remember". |

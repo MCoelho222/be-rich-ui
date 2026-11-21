@@ -464,7 +464,7 @@ export function DeleteDialog({
   name,
   onClose,
 }: {
-  resource: "accounts" | "cards";
+  resource: "accounts" | "cards" | "categories";
   item: { id: string };
   name: string;
   onClose: () => void;
@@ -513,11 +513,18 @@ export function DeleteDialog({
     >
       <p className="text-sm text-text-2">
         {inUse
-          ? t(resource === "cards" ? "inUseCard" : "inUseAccount", {
-              expenses: inUse.expenses ?? 0,
-              incomes: inUse.incomes ?? 0,
-              fixed: inUse.recurrences ?? 0,
-            })
+          ? t(
+              resource === "cards"
+                ? "inUseCard"
+                : resource === "categories"
+                  ? "inUseCategory"
+                  : "inUseAccount",
+              {
+                expenses: inUse.expenses ?? 0,
+                incomes: inUse.incomes ?? 0,
+                fixed: inUse.recurrences ?? 0,
+              }
+            )
           : t("deleteBody")}
       </p>
     </FormDialog>

@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { ComingSoon, PageHeader } from "@/components/shell/PageHeader";
+import { Suspense } from "react";
+import { SettingsPage } from "@/components/settings/SettingsPage";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations("pages"))("settings") };
 }
 
-export default async function SettingsPage() {
-  const t = await getTranslations("pages");
+export default function Page() {
+  // The open section lives in the URL (?section=…), read on the client.
   return (
-    <>
-      <PageHeader title={t("settings")} />
-      <ComingSoon />
-    </>
+    <Suspense>
+      <SettingsPage />
+    </Suspense>
   );
 }

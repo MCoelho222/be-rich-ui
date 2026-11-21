@@ -18,7 +18,7 @@ function useInvalidate() {
     ]);
 }
 
-type Resource = "accounts" | "cards";
+type Resource = "accounts" | "cards" | "categories";
 
 /** Create, update, archive, unarchive, delete and (accounts) adjust. */
 export function useReferenceWrite<T = unknown>(resource: Resource) {
