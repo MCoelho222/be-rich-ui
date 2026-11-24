@@ -259,6 +259,7 @@ export function EndDialog({ rec, onClose }: { rec: Recurrence; onClose: () => vo
   const t = useTranslations("fixed");
   const { run, pending } = useRun();
   const [date, setDate] = useState(todayIso());
+  const [error, setError] = useState<string | null>(null);
   return (
     <FormDialog
       open
@@ -272,8 +273,8 @@ export function EndDialog({ rec, onClose }: { rec: Recurrence; onClose: () => vo
           disabled={!date}
           label={t("end")}
           onConfirm={() =>
-            void run({ kind: "end", id: rec.id, end_date: date }, t("ended"), onClose).catch(
-              () => undefined
+            void run({ kind: "end", id: rec.id, end_date: date }, t("ended"), onClose).catch((e) =>
+              setError(e instanceof ApiError ? (e.fields.end_date?.[0] ?? null) : null)
             )
           }
         />
@@ -281,12 +282,15 @@ export function EndDialog({ rec, onClose }: { rec: Recurrence; onClose: () => vo
     >
       <div className="flex flex-col gap-4">
         <p className="text-sm text-text-2">{t("endBody")}</p>
-        <FieldShell label={t("lastDay")} required>
+        <FieldShell label={t("lastDay")} required error={error ?? undefined}>
           <Input
             type="date"
             value={date}
-            min={rec.start_date}
-            onChange={(e) => setDate(e.target.value)}
+            aria-invalid={!!error}
+            onChange={(e) => {
+              setDate(e.target.value);
+              setError(null);
+            }}
           />
         </FieldShell>
       </div>
@@ -294,7 +298,10 @@ export function EndDialog({ rec, onClose }: { rec: Recurrence; onClose: () => vo
   );
 }
 
-/** Delete; when payments exist the API says IN_USE and the dialog offers End or Pause (ui-behavior §11.4). */
+/**
+ * Delete. When payments exist the API says IN_USE, and the dialog asks what happens to them:
+ * delete them too, or keep them as regular entries (ui-behavior §8.3). Ending is offered too.
+ */
 export function DeleteDialog({
   rec,
   onClose,
@@ -307,56 +314,70 @@ export function DeleteDialog({
   const t = useTranslations("fixed");
   const action = useRecurrenceAction();
   const errorMessage = useErrorMessage();
-  const [inUse, setInUse] = useState<string | null>(null);
+  const [count, setCount] = useState<number | null>(null);
+  const [payments, setPayments] = useState<"delete" | "keep">("keep");
 
   const remove = () =>
     action
-      .mutateAsync({ kind: "delete", id: rec.id })
+      .mutateAsync({ kind: "delete", id: rec.id, payments: count ? payments : undefined })
       .then(() => {
         toast.success(t("deleted"));
         onClose();
       })
       .catch((error) => {
-        if (error instanceof ApiError && error.code === "IN_USE") setInUse(error.message);
+        if (error instanceof ApiError && error.code === "IN_USE")
+          setCount(Object.values(error.usage ?? {}).reduce((a, b) => a + b, 0) || 1);
         else toast.error(errorMessage(error));
       });
 
-  const pause = () =>
-    action
-      .mutateAsync({ kind: "pause", id: rec.id })
-      .then(() => {
-        toast.success(t("paused"));
-        onClose();
-      })
-      .catch((error) => toast.error(errorMessage(error)));
+  const choice = (value: "delete" | "keep", label: string, hint: string) => (
+    <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3 has-[:checked]:border-brand">
+      <input
+        type="radio"
+        name="payments"
+        checked={payments === value}
+        onChange={() => setPayments(value)}
+        className="mt-0.5 size-4 accent-[var(--brand)]"
+      />
+      <span className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium">{label}</span>
+        <span className="text-[13px] text-text-muted">{hint}</span>
+      </span>
+    </label>
+  );
 
   return (
     <FormDialog
       open
       width="sm"
       onOpenChange={(open) => !open && onClose()}
-      title={inUse ? t("cantDeleteTitle") : t("deleteTitle")}
+      title={count ? t("deleteWithPaymentsTitle", { count }) : t("deleteTitle")}
       footer={
-        inUse ? (
-          <>
-            <SecondaryButton onClick={onClose}>{t("cancel")}</SecondaryButton>
-            {rec.is_active && <SecondaryButton onClick={pause}>{t("pause")}</SecondaryButton>}
-            <PrimaryButton onClick={onEnd}>{t("end")}</PrimaryButton>
-          </>
-        ) : (
-          <Footer
-            onCancel={onClose}
-            pending={action.isPending}
-            danger
-            label={t("delete")}
-            onConfirm={() => void remove()}
-          />
-        )
+        <>
+          <SecondaryButton onClick={onClose}>{t("cancel")}</SecondaryButton>
+          {count !== null && rec.status !== "ENDED" && (
+            <SecondaryButton onClick={onEnd}>{t("endInstead")}</SecondaryButton>
+          )}
+          <PrimaryButton danger disabled={action.isPending} onClick={() => void remove()}>
+            {action.isPending && <Loader2 size={16} className="animate-spin" aria-hidden />}
+            {t("delete")}
+          </PrimaryButton>
+        </>
       }
     >
-      <p className="text-sm text-text-2">
-        {inUse ? t("cantDeleteBody") : t("deleteBody", { name: rec.description || "—" })}
-      </p>
+      {count ? (
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-text-2">
+            {t("deleteWithPaymentsBody", { name: rec.description || "—" })}
+          </p>
+          <div role="radiogroup" className="flex flex-col gap-2">
+            {choice("keep", t("keepPayments"), t("keepPaymentsHint"))}
+            {choice("delete", t("deletePayments", { count }), t("deletePaymentsHint"))}
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-text-2">{t("deleteBody", { name: rec.description || "—" })}</p>
+      )}
     </FormDialog>
   );
 }

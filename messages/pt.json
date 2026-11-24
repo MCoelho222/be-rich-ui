@@ -444,9 +444,8 @@
     "lastDay": "Último dia",
     "ended": "Encerrado.",
     "deleteTitle": "Excluir este fixo?",
-    "deleteBody": "“{name}” será removido. Ele não tem pagamentos registrados.",
+    "deleteBody": "“{name}” será removido.",
     "deleted": "Excluído.",
-    "cantDeleteTitle": "Este fixo tem pagamentos",
     "paused": "Pausado.",
     "resumed": "Retomado.",
     "editExpenseTitle": "Editar despesa fixa",
@@ -454,9 +453,15 @@
     "futureOnly": "As mudanças valem só para as próximas ocorrências. Os pagamentos registrados não mudam.",
     "since": "Desde",
     "saved": "Alterações salvas.",
-    "cantDeleteBody": "Ele tem pagamentos registrados, então não pode ser excluído. Encerre ou pause em vez disso.",
     "purchasedOn": "Data da compra",
-    "purchasedOnHint": "Qualquer data dentro do período desta fatura."
+    "purchasedOnHint": "Qualquer data dentro do período desta fatura.",
+    "deleteWithPaymentsTitle": "Excluir um lançamento fixo com {count, plural, one {# pagamento} other {# pagamentos}}",
+    "deleteWithPaymentsBody": "O que deve acontecer com os pagamentos já registrados de “{name}”?",
+    "keepPayments": "Manter como lançamentos comuns",
+    "keepPaymentsHint": "Eles continuam nos lançamentos e saldos, sem vínculo com um lançamento fixo.",
+    "deletePayments": "Excluir {count, plural, one {o pagamento} other {os # pagamentos}} também",
+    "deletePaymentsHint": "Saldos, totais e projeções são atualizados sem eles. Não dá para desfazer.",
+    "endInstead": "Encerrar"
   },
   "accounts": {
     "title": "Contas e cartões",

@@ -247,7 +247,7 @@ This page lists every Recurrence, in two tabs: **Expenses** and **Incomes**.
 | **Edit** | Opens the Recurrence form. A notice reads "Changes apply to future occurrences only." |
 | **Change amount from…** | Asks for the date the new amount starts and the new amount. It ends the current Recurrence the day before that date and creates a copy with the new amount (schemas §12.3). |
 | **Pause / Resume** | Toggles `is_active`. |
-| **End** | Sets `end_date` (defaults to today). |
+| **End** | Sets `end_date` (defaults to today). The status becomes **Ended** once nothing is left to come (api.md §12.2). An error from the server shows under the date. |
 
 ### 8.4 Pending and overdue occurrences
 
@@ -302,4 +302,4 @@ When the user tries to delete one of these that existing records use, the UI off
 
 - For a card, account or category, it offers **Archive**, with the message: "This card is used by 14 expenses. Archive it to hide it from new entries."
 - For the last active Cash account, Archive is disabled (schemas §18).
-- For a Recurrence that has registered payments, it offers **End** or **Pause**.
+- For a Recurrence that has registered payments, the delete dialog asks what happens to them: **"Keep them as regular entries"** (the default) or **"Delete the N payments too"**. Balances, totals and projections follow either way. It also offers **End instead**.

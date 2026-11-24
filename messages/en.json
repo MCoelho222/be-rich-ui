@@ -444,9 +444,8 @@
     "lastDay": "Last day",
     "ended": "Ended.",
     "deleteTitle": "Delete this fixed entry?",
-    "deleteBody": "“{name}” will be removed. It has no registered payments.",
+    "deleteBody": "“{name}” will be removed.",
     "deleted": "Deleted.",
-    "cantDeleteTitle": "This fixed entry has payments",
     "paused": "Paused.",
     "resumed": "Resumed.",
     "editExpenseTitle": "Edit fixed expense",
@@ -454,9 +453,15 @@
     "futureOnly": "Changes apply to future occurrences only. Registered payments stay as they are.",
     "since": "Since",
     "saved": "Changes saved.",
-    "cantDeleteBody": "It has registered payments, so it can't be deleted. End it or pause it instead.",
     "purchasedOn": "Purchase date",
-    "purchasedOnHint": "Any date within this bill's period."
+    "purchasedOnHint": "Any date within this bill's period.",
+    "deleteWithPaymentsTitle": "Delete a fixed entry with {count, plural, one {# payment} other {# payments}}",
+    "deleteWithPaymentsBody": "What should happen to the payments already registered for “{name}”?",
+    "keepPayments": "Keep them as regular entries",
+    "keepPaymentsHint": "They stay in your entries and balances, no longer linked to a fixed entry.",
+    "deletePayments": "Delete {count, plural, one {the payment} other {the # payments}} too",
+    "deletePaymentsHint": "Balances, totals and projections are updated without them. This can't be undone.",
+    "endInstead": "End instead"
   },
   "accounts": {
     "title": "Accounts and cards",

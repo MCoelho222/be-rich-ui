@@ -33,7 +33,7 @@ type Action =
   | { kind: "pause" | "resume"; id: string }
   | { kind: "end"; id: string; end_date: string }
   | { kind: "change-amount"; id: string; effective_date: string; amount: string }
-  | { kind: "delete"; id: string }
+  | { kind: "delete"; id: string; payments?: "delete" | "keep" }
   | { kind: "update"; id: string; body: Record<string, unknown> }
   | { kind: "register"; id: string; occurrence: string; body: Record<string, unknown> }
   | { kind: "skip" | "unskip"; id: string; occurrence: string };
@@ -55,7 +55,7 @@ export function useRecurrenceAction() {
             amount: action.amount,
           });
         case "delete":
-          return api.delete(base);
+          return api.delete(action.payments ? `${base}?payments=${action.payments}` : base);
         case "update":
           return api.patch<Recurrence>(base, action.body);
         case "register":

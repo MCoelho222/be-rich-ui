@@ -191,7 +191,9 @@ function MonthlyTotals({ recurrences }: { recurrences: Recurrence[] }) {
     const active = recurrences.filter(
       (r) =>
         r.type === type &&
-        r.status === "ACTIVE" &&
+        r.is_active &&
+        // Ended ones still count in the month they end; an amount change shows once.
+        (r.status !== "ENDED" || (r.end_date ?? "") >= todayIso()) &&
         r.start_date <= monthEnd &&
         (!r.end_date || r.end_date >= monthStart)
     );
