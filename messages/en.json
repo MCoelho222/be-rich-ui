@@ -302,7 +302,11 @@
     "deletePaymentTitle": "Delete this payment?",
     "deleteBody": "“{description}”, {amount}, will be removed.",
     "deletePaymentBody": "The fixed entry stays active, and this occurrence will show as pending or overdue again.",
-    "newCard": "New card…"
+    "newCard": "New card…",
+    "firstBill": "First bill",
+    "firstBillHint": "Due on {date}. If that date has passed, this payment is registered now; otherwise it's the next one.",
+    "cardDueDay": "The card's due day",
+    "fixedCreatedFrom": "Fixed entry created. The first one is on {date}."
   },
   "entries": {
     "title": "Entries",
@@ -330,7 +334,9 @@
       "spender": "Spent by",
       "receiver": "Received by",
       "amount": "Amount",
-      "actions": "Actions"
+      "actions": "Actions",
+      "paymentDate": "Paid on",
+      "purchaseDate": "Purchased"
     },
     "split": "Split payment",
     "fixed": "Fixed",
@@ -341,7 +347,15 @@
     "emptyExpenses": "No expenses match this period and these filters.",
     "emptyIncomes": "No incomes match this period and these filters.",
     "addExpense": "New expense",
-    "addIncome": "New income"
+    "addIncome": "New income",
+    "dateBasis": "Date",
+    "byPurchase": "By purchase date",
+    "byTransaction": "By date",
+    "byPayment": "By payment date",
+    "boughtOn": "bought {date}",
+    "receivedOnDate": "dated {date}",
+    "paidOnDate": "paid {date}",
+    "expectedOnDate": "received {date}"
   },
   "fixed": {
     "title": "Fixed entries",
@@ -440,7 +454,9 @@
     "futureOnly": "Changes apply to future occurrences only. Registered payments stay as they are.",
     "since": "Since",
     "saved": "Changes saved.",
-    "cantDeleteBody": "It has registered payments, so it can't be deleted. End it or pause it instead."
+    "cantDeleteBody": "It has registered payments, so it can't be deleted. End it or pause it instead.",
+    "purchasedOn": "Purchase date",
+    "purchasedOnHint": "Any date within this bill's period."
   },
   "accounts": {
     "title": "Accounts and cards",

@@ -302,7 +302,11 @@
     "deletePaymentTitle": "Excluir este pagamento?",
     "deleteBody": "“{description}”, {amount}, será removido.",
     "deletePaymentBody": "O lançamento fixo continua ativo, e esta ocorrência volta a aparecer como pendente ou atrasada.",
-    "newCard": "Novo cartão…"
+    "newCard": "Novo cartão…",
+    "firstBill": "Primeira fatura",
+    "firstBillHint": "Vence em {date}. Se essa data já passou, este pagamento é registrado agora; senão, é o próximo.",
+    "cardDueDay": "O dia de vencimento do cartão",
+    "fixedCreatedFrom": "Lançamento fixo criado. O primeiro é em {date}."
   },
   "entries": {
     "title": "Lançamentos",
@@ -330,7 +334,9 @@
       "spender": "Gasto por",
       "receiver": "Recebido por",
       "amount": "Valor",
-      "actions": "Ações"
+      "actions": "Ações",
+      "paymentDate": "Pago em",
+      "purchaseDate": "Compra"
     },
     "split": "Pagamento dividido",
     "fixed": "Fixo",
@@ -341,7 +347,15 @@
     "emptyExpenses": "Nenhuma despesa neste período e com estes filtros.",
     "emptyIncomes": "Nenhuma receita neste período e com estes filtros.",
     "addExpense": "Nova despesa",
-    "addIncome": "Nova receita"
+    "addIncome": "Nova receita",
+    "dateBasis": "Data",
+    "byPurchase": "Pela data da compra",
+    "byTransaction": "Pela data",
+    "byPayment": "Pela data do pagamento",
+    "boughtOn": "comprado em {date}",
+    "receivedOnDate": "lançado em {date}",
+    "paidOnDate": "pago em {date}",
+    "expectedOnDate": "recebido em {date}"
   },
   "fixed": {
     "title": "Lançamentos fixos",
@@ -440,7 +454,9 @@
     "futureOnly": "As mudanças valem só para as próximas ocorrências. Os pagamentos registrados não mudam.",
     "since": "Desde",
     "saved": "Alterações salvas.",
-    "cantDeleteBody": "Ele tem pagamentos registrados, então não pode ser excluído. Encerre ou pause em vez disso."
+    "cantDeleteBody": "Ele tem pagamentos registrados, então não pode ser excluído. Encerre ou pause em vez disso.",
+    "purchasedOn": "Data da compra",
+    "purchasedOnHint": "Qualquer data dentro do período desta fatura."
   },
   "accounts": {
     "title": "Contas e cartões",

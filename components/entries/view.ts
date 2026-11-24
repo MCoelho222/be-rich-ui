@@ -1,7 +1,8 @@
 "use client";
 /**
  * The Entries page's view, kept in the URL (frontend.md §6.2): tab, period and filters.
- * Dashboard links arrive with from/to and a category or card (dashboard.md §4.6–§4.7).
+ * Dashboard links arrive with from/to and a category or card (dashboard.md §4.6–§4.7), and
+ * by=payment, since those ranges are payment dates.
  */
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
@@ -10,8 +11,12 @@ import { isIsoDate, presetRange, PRESETS, todayIso, type Preset, type Range } fr
 export const FILTER_KEYS = ["account", "card", "category", "person", "method"] as const;
 export type FilterKey = (typeof FILTER_KEYS)[number];
 
+/** Which date the period applies to: when it was bought, or when it is paid (cash flow). */
+export type DateBasis = "purchase" | "payment";
+
 export interface EntriesView {
   tab: "expenses" | "incomes";
+  by: DateBasis;
   preset: Preset;
   range: Range;
   q: string;
@@ -50,6 +55,7 @@ export function useEntriesView() {
     }
     return {
       tab: params.get("tab") === "incomes" ? "incomes" : "expenses",
+      by: params.get("by") === "payment" ? "payment" : "purchase",
       preset,
       range,
       q: params.get("q") ?? "",
@@ -62,6 +68,7 @@ export function useEntriesView() {
     (
       change: Partial<{
         tab: EntriesView["tab"];
+        by: DateBasis;
         preset: Preset;
         from: string;
         to: string;
@@ -89,6 +96,7 @@ export function useEntriesView() {
         set("from", change.from);
         set("to", change.to);
       }
+      if (change.by) set("by", change.by === "payment" ? "payment" : null);
       if (change.q !== undefined) set("q", change.q.trim() || null);
       if (change.fixed !== undefined) set("fixed", change.fixed ? "1" : null);
       if (change.filters) for (const key of FILTER_KEYS) set(key, change.filters[key]);

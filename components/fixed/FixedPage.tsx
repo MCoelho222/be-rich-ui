@@ -712,7 +712,7 @@ function OccurrencePanel({
                   )}
                   {o.status === "REGISTERED" && o.row_id && (
                     <Link
-                      href={`/entries?tab=${rec.type === "EXPENSE" ? "expenses" : "incomes"}&from=${o.payment_date}&to=${o.payment_date}`}
+                      href={`/entries?tab=${rec.type === "EXPENSE" ? "expenses" : "incomes"}&by=payment&from=${o.payment_date}&to=${o.payment_date}`}
                       className="h-7 px-2 text-xs leading-7 text-brand hover:underline"
                     >
                       {t("viewPayment")}

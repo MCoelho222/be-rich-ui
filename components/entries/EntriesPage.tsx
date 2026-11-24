@@ -19,7 +19,7 @@ import {
   type Entry,
   type EntryKind,
 } from "@/lib/entries";
-import { formatWeekdayDate, shortName } from "@/lib/format";
+import { formatDayMonth, formatWeekdayDate, shortName } from "@/lib/format";
 import { byId, useAccounts, useCards, useCategories, useMembers } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { Select } from "./pickers";
@@ -120,6 +120,17 @@ function Toolbar({ view, update, kind }: { view: EntriesView; update: Update; ki
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
         <PeriodPicker view={view} update={update} />
+        <Select
+          value={view.by}
+          onChange={(e) => update({ by: e.target.value as EntriesView["by"] })}
+          aria-label={t("dateBasis")}
+          className="h-9 w-auto"
+        >
+          <option value="purchase">
+            {kind === "expense" ? t("byPurchase") : t("byTransaction")}
+          </option>
+          <option value="payment">{t("byPayment")}</option>
+        </Select>
         <label className="relative min-w-48 flex-1 sm:max-w-72">
           <Search
             size={16}
@@ -221,6 +232,7 @@ function EntryTable({ kind, view }: { kind: EntryKind; view: EntriesView }) {
     category_id: view.filters.category,
     person_id: view.filters.person,
     payment_method: view.filters.method,
+    date_field: view.by === "payment" ? "payment_date" : "transaction_date",
   });
   const accounts = byId(useAccounts().data);
   const cards = byId(useCards().data);
@@ -262,6 +274,21 @@ function EntryTable({ kind, view }: { kind: EntryKind; view: EntriesView }) {
     const c = categories.get(entry.category_id);
     return c ? c.name + (c.is_active ? "" : ` (${t("archived")})`) : "—";
   };
+  const shownDate = (entry: Entry) =>
+    view.by === "payment" ? entry.payment_date : entry.transaction_date;
+  /** The other date, when it differs (a credit purchase is paid with a later bill). */
+  const otherDate = (entry: Entry) =>
+    entry.payment_date !== entry.transaction_date && (
+      <span className="block text-xs text-text-muted/80 max-sm:inline">
+        {view.by === "payment"
+          ? t(kind === "expense" ? "boughtOn" : "receivedOnDate", {
+              date: formatDayMonth(entry.transaction_date),
+            })
+          : t(kind === "expense" ? "paidOnDate" : "expectedOnDate", {
+              date: formatDayMonth(entry.payment_date),
+            })}
+      </span>
+    );
   const payment = (entry: Entry) => {
     const card = cardOf(entry);
     const where = card ? cards.get(card)?.alias : accounts.get(entry.account_id)?.name;
@@ -334,7 +361,13 @@ function EntryTable({ kind, view }: { kind: EntryKind; view: EntriesView }) {
           <table className="w-full min-w-[860px] border-collapse text-sm">
             <thead>
               <tr className="bg-surface-2 text-left text-xs tracking-wide text-text-muted uppercase">
-                <th className="px-5 py-2.5 font-semibold">{t("col.date")}</th>
+                <th className="px-5 py-2.5 font-semibold">
+                  {view.by === "payment"
+                    ? t("col.paymentDate")
+                    : kind === "expense"
+                      ? t("col.purchaseDate")
+                      : t("col.date")}
+                </th>
                 <th className="px-3 py-2.5 font-semibold">{t("col.description")}</th>
                 <th className="px-3 py-2.5 font-semibold">{t("col.category")}</th>
                 <th className="px-3 py-2.5 font-semibold">{t("col.payment")}</th>
@@ -352,7 +385,8 @@ function EntryTable({ kind, view }: { kind: EntryKind; view: EntriesView }) {
                   className="group border-t border-line transition-colors hover:bg-surface-2/60"
                 >
                   <td className="num px-5 py-3 whitespace-nowrap text-text-muted">
-                    {formatWeekdayDate(entry.payment_date, locale)}
+                    {formatWeekdayDate(shownDate(entry), locale)}
+                    {otherDate(entry)}
                   </td>
                   <td className="px-3 py-3">
                     <span className="flex flex-wrap items-center gap-2">
@@ -392,8 +426,9 @@ function EntryTable({ kind, view }: { kind: EntryKind; view: EntriesView }) {
               </span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
                 <span className="num">
-                  {formatWeekdayDate(entry.payment_date, locale)} · {category(entry)}
+                  {formatWeekdayDate(shownDate(entry), locale)} · {category(entry)}
                 </span>
+                {otherDate(entry)}
                 {badges(entry)}
               </span>
             </button>

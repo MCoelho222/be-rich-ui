@@ -2254,6 +2254,8 @@ export interface components {
        * Format: date
        */
       occurrence_date: string;
+      /** Transaction Date */
+      transaction_date?: string | null;
       /** Amount */
       amount?: number | string | null;
       /** Description */

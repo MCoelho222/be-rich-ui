@@ -19,6 +19,7 @@ import {
 import { useErrorMessage } from "@/lib/errors";
 import { formatDate, formatMoney, shortName } from "@/lib/format";
 import { toCents } from "@/lib/money";
+import { purchaseDateFor } from "@/lib/credit";
 import { firstOfMonth, todayIso } from "@/lib/period";
 import { useAccounts, useCards, useCategories, useMembers, type Recurrence } from "@/lib/queries";
 import { useRecurrenceAction } from "@/lib/recurrences";
@@ -94,8 +95,17 @@ export function RegisterDialog({
 }) {
   const t = useTranslations("fixed");
   const { run, pending } = useRun();
+  const cards = useCards().data ?? [];
+  // A credit card fixed expense's occurrence is a bill's due date (schemas §12.1): the payment
+  // gets a purchase date inside that bill.
+  const card =
+    rec.type === "EXPENSE" && rec.payment_method === "CREDIT"
+      ? cards.find((c) => c.id === rec.card_id)
+      : undefined;
+  const suggested = card ? purchaseDateFor(occurrence, card, todayIso()) : null;
   const [amount, setAmount] = useState(rec.amount);
-  const [date, setDate] = useState(occurrence);
+  const [picked, setDate] = useState<string | null>(null);
+  const date = picked ?? suggested ?? occurrence;
   const [description, setDescription] = useState(rec.description ?? "");
   const body = {
     ...(amount !== rec.amount ? { amount } : {}),
@@ -134,7 +144,11 @@ export function RegisterDialog({
             aria-label={t("amount")}
           />
         </FieldShell>
-        <FieldShell label={t("paidOn")} required>
+        <FieldShell
+          label={card ? t("purchasedOn") : t("paidOn")}
+          hint={card ? t("purchasedOnHint") : undefined}
+          required
+        >
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </FieldShell>
         <FieldShell label={t("description")}>
@@ -390,6 +404,12 @@ export function EditRecurrenceDialog({ rec, onClose }: { rec: Recurrence; onClos
     ? accountId
     : (accountOptions[0]?.id ?? "");
 
+  // Credit card fixed expenses follow the card's due day (schemas §12.1).
+  const cardDueDay =
+    isExpense && method === "CREDIT"
+      ? (cards.find((c) => c.id === effectiveCard)?.due_day ?? null)
+      : null;
+
   const body: Record<string, unknown> = {};
   if (amount !== rec.amount) body.amount = amount;
   if (currency !== rec.currency) body.currency = currency;
@@ -400,7 +420,7 @@ export function EditRecurrenceDialog({ rec, onClose }: { rec: Recurrence; onClos
   if (usesCard && effectiveCard !== rec.card_id) body.card_id = effectiveCard;
   if (!usesCard && effectiveAccount !== rec.account_id) body.account_id = effectiveAccount;
   if (interval !== rec.interval_months) body.interval_months = interval;
-  if (day !== rec.day_of_month) body.day_of_month = day;
+  if (!cardDueDay && day !== rec.day_of_month) body.day_of_month = day;
   if (start !== rec.start_date) body.start_date = start;
   if ((end || null) !== rec.end_date) body.end_date = end || null;
 
@@ -539,12 +559,17 @@ export function EditRecurrenceDialog({ rec, onClose }: { rec: Recurrence; onClos
               ))}
             </Select>
           </FieldShell>
-          <FieldShell label={tf("onDay")} error={errors.day_of_month}>
+          <FieldShell
+            label={tf("onDay")}
+            error={errors.day_of_month}
+            hint={cardDueDay ? tf("cardDueDay") : undefined}
+          >
             <Input
               type="number"
               min={1}
               max={31}
-              value={day}
+              value={cardDueDay ?? day}
+              disabled={!!cardDueDay}
               onChange={(e) => setDay(Math.min(31, Math.max(1, Number(e.target.value) || 1)))}
             />
           </FieldShell>

@@ -351,7 +351,7 @@ function CardList({
         )}
         {bill && (
           <Link
-            href={`/entries?card=${card.id}&from=${bill.due_date}&to=${bill.due_date}`}
+            href={`/entries?card=${card.id}&by=payment&from=${bill.due_date}&to=${bill.due_date}`}
             className="flex flex-col items-end text-right hover:underline"
           >
             <Money

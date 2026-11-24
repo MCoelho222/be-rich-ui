@@ -31,7 +31,7 @@ export function CardBills({ filters }: { filters: ReportFilters }) {
             return (
               <li key={bill.card_id}>
                 <Link
-                  href={`/entries?tab=expenses&card=${bill.card_id}&from=${bill.due_date}&to=${bill.due_date}`}
+                  href={`/entries?tab=expenses&card=${bill.card_id}&by=payment&from=${bill.due_date}&to=${bill.due_date}`}
                   className="flex items-center gap-3 rounded-lg bg-surface-2 p-3 transition-colors hover:bg-line"
                 >
                   <span

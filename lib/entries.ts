@@ -43,6 +43,7 @@ export interface EntryFilters {
   payment_method?: string;
   fixed_only?: boolean;
   q?: string;
+  date_field?: "transaction_date" | "payment_date";
 }
 
 interface Page<T> {

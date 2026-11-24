@@ -192,8 +192,13 @@ The form shows a summary below the fields that updates as the user types:
   - **Every:** `1` month (a select: monthly, every 2, 3 or 6 months, yearly).
   - **On day:** defaults to the purchase date's day.
   - **Until:** optional end date. "No end date" is selected by default.
-- Saving creates a **Recurrence** (schemas §12) and **registers today's occurrence** as the first Expense row, in a single action.
-- The success toast reads: "Fixed expense created. It will appear in your projections every month."
+- **Credit card:** the fixed expense runs on the card's bills (schemas §12.1).
+  - **On day** shows the card's due day and can't be changed.
+  - The date field becomes **"First bill"**. Its hint gives the due date of that month's bill: "Due on 16/12/2026. If that date has passed, this payment is registered now; otherwise it's the next one."
+  - The preview shows the bill's payment date (business-day adjusted).
+- Saving creates a **Recurrence** (schemas §12), in a single action with registering the first occurrence when its date has passed:
+  - **Date today or earlier:** the first occurrence is registered as an Expense row. The success toast reads: "Fixed expense created. It will appear in your projections every month."
+  - **Date in the future:** nothing is registered. The date is the first occurrence still to come, and it shows as the next one on the Fixed page. The toast reads: "Fixed entry created. The first one is on 16/12/2026."
 
 ---
 
@@ -237,7 +242,7 @@ This page lists every Recurrence, in two tabs: **Expenses** and **Incomes**.
 
 | Action | Effect |
 |---|---|
-| **Register** | Opens the Expense or Income form pre-filled for the next pending or overdue occurrence (schemas §12.2). |
+| **Register** | Opens the Expense or Income form pre-filled for the next pending or overdue occurrence (schemas §12.2). For a credit card fixed expense the date field is "Purchase date", pre-filled with a date inside that bill (schemas §12.1). |
 | **Skip this month** | Adds the occurrence to `skipped_dates`, after a confirmation. |
 | **Edit** | Opens the Recurrence form. A notice reads "Changes apply to future occurrences only." |
 | **Change amount from…** | Asks for the date the new amount starts and the new amount. It ends the current Recurrence the day before that date and creates a copy with the new amount (schemas §12.3). |

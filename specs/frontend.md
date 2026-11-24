@@ -191,8 +191,9 @@ Fully specified in [dashboard.md](dashboard.md). The visual rules are:
 ### 6.2 Entries (`/entries`)
 
 - **Tabs:** Expenses | Incomes, with the colored underline and a count. The tab is in the URL (`?tab=incomes`).
-- **Filter bar:** period (the same presets as the dashboard), search, and a "Filters" popover (account, card, category, person, method, fixed only). Active filters appear as removable chips.
-- **Table:** ui-behavior §10 columns, sorted by payment date. Pagination is "Load more" (api.md §3).
+- **Filter bar:** period (the same presets as the dashboard), a date basis, search, and a "Filters" popover (account, card, category, person, method, fixed only). Active filters appear as removable chips.
+- **Date basis:** "By purchase date" (the default) or "By payment date" (`?by=payment`). It picks the date the period applies to (`date_field`, api.md §10). A credit purchase made in November and paid with December's bill shows in November by purchase date, and in December by payment date. Links from the dashboard, card bills and fixed entries carry their own range of payment dates, so they open with `by=payment`.
+- **Table:** ui-behavior §10 columns, sorted by the chosen date. When the other date differs, it shows under the date in smaller text ("paid 16/12", or "bought 23/11"). Pagination is "Load more" (api.md §3).
 - **Row actions:** edit and delete; series rows ask for the scope (ui-behavior §11).
 - **Totals row:** the converted total of the loaded filter (from `/dashboard/summary` with the same filters).
 - **Forms:** the expense and income forms are dialogs (bottom sheets on phones), following ui-behavior §6–§7. The live preview (§6.2) shows the installment dates under the form.

@@ -38,6 +38,7 @@ import {
 import { useErrorMessage } from "@/lib/errors";
 import { formatDate, formatMoney, formatMonth, shortName } from "@/lib/format";
 import { fromCents, toCents } from "@/lib/money";
+import { purchaseDateFor } from "@/lib/credit";
 import { todayIso } from "@/lib/period";
 import {
   useAccounts,
@@ -209,6 +210,18 @@ export function EntryForm({
     return { cardId: "", accountId: part.accountId || options[0]?.id || "", card: undefined };
   };
 
+  // A credit card fixed expense runs on the card's bills (schemas §12.1): "On day" is the card's
+  // due day and the date field picks the first bill (its month), not a purchase date.
+  const billCard =
+    repeats && kind === "expense" && parts[0].method === "CREDIT"
+      ? resolve(parts[0]).card
+      : undefined;
+  const cardDueDay = billCard?.due_day ?? null;
+  const repeatDay = cardDueDay ?? effectiveDay;
+  const firstBill = cardDueDay ? firstOccurrence(date, cardDueDay) : null;
+  const billPurchase =
+    firstBill && billCard ? purchaseDateFor(firstBill, billCard, todayIso()) : null;
+
   const updatePart = (key: number, change: Partial<Part>) =>
     setParts((list) => list.map((p) => (p.key === key ? { ...p, ...change } : p)));
 
@@ -250,7 +263,11 @@ export function EntryForm({
   const previewBody = useDebounced(
     previewReady
       ? repeats
-        ? { ...createBody, parts: [{ ...partBodies[0], installments: 1 }] }
+        ? {
+            ...createBody,
+            transaction_date: billPurchase ?? date,
+            parts: [{ ...partBodies[0], installments: 1 }],
+          }
         : createBody
       : null,
     350
@@ -321,7 +338,9 @@ export function EntryForm({
         });
         toast.success(t("updated"));
       } else if (repeats) {
-        const occurrence = firstOccurrence(date, effectiveDay);
+        // A date in the future is the first occurrence still to come, so nothing is registered.
+        const occurrence = firstBill ?? firstOccurrence(date, repeatDay);
+        const happened = (firstBill ?? date) <= todayIso();
         const { cardId, accountId } = resolve(parts[0]);
         await createRecurrence.mutateAsync({
           type: entryType,
@@ -334,12 +353,21 @@ export function EntryForm({
           category_id: categoryId,
           description: description.trim() || null,
           interval_months: interval,
-          day_of_month: effectiveDay,
-          start_date: occurrence < date ? occurrence : date,
+          day_of_month: repeatDay,
+          start_date: firstBill ?? (happened && occurrence < date ? occurrence : date),
           end_date: until || null,
-          register_first: { occurrence_date: occurrence },
+          // A bill's payment gets a purchase date inside it from the server.
+          register_first: happened
+            ? { occurrence_date: occurrence, ...(firstBill ? {} : { transaction_date: date }) }
+            : undefined,
         });
-        toast.success(kind === "expense" ? t("fixedExpenseCreated") : t("fixedIncomeCreated"));
+        toast.success(
+          happened
+            ? kind === "expense"
+              ? t("fixedExpenseCreated")
+              : t("fixedIncomeCreated")
+            : t("fixedCreatedFrom", { date: formatDate(occurrence) })
+        );
       } else {
         await create.mutateAsync(createBody);
         toast.success(t("saved"));
@@ -620,11 +648,11 @@ export function EntryForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FieldShell
-          label={kind === "expense" ? t("purchaseDate") : t("date")}
+          label={firstBill ? t("firstBill") : kind === "expense" ? t("purchaseDate") : t("date")}
           required
           error={errors.transaction_date}
           htmlFor="entry-date"
-          hint={lockedHint}
+          hint={firstBill ? t("firstBillHint", { date: formatDate(firstBill) }) : lockedHint}
         >
           <Input
             id="entry-date"
@@ -819,12 +847,13 @@ export function EntryForm({
                   ))}
                 </Select>
               </FieldShell>
-              <FieldShell label={t("onDay")}>
+              <FieldShell label={t("onDay")} hint={cardDueDay ? t("cardDueDay") : undefined}>
                 <Input
                   type="number"
                   min={1}
                   max={31}
-                  value={effectiveDay}
+                  value={repeatDay}
+                  disabled={!!cardDueDay}
                   onChange={(e) => setDay(Math.min(31, Math.max(1, Number(e.target.value) || 1)))}
                 />
               </FieldShell>

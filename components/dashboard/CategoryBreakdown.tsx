@@ -92,7 +92,7 @@ export function CategoryBreakdown({
             const total = Number(item.total);
             const realized = Number(item.realized);
             const projectedPart = total - realized;
-            const href = `/entries?tab=${view.categories}&category=${item.category_id}&from=${view.range.from}&to=${view.range.to}`;
+            const href = `/entries?tab=${view.categories}&category=${item.category_id}&by=payment&from=${view.range.from}&to=${view.range.to}`;
             return (
               <li key={item.category_id}>
                 <Link href={href} className="group flex flex-col gap-1.5 rounded-md">
