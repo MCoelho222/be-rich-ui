@@ -57,3 +57,12 @@ export function purchaseDateFor(due: string, card: Cycle, today: string): string
   const last = dayBefore(closing);
   return today < first ? first : today > last ? last : today;
 }
+
+/** The first due date (day `dueDay`, clamped) on or after `date`: the bill a fixed expense starts on. */
+export function billOnOrAfter(date: string, dueDay: number): string {
+  const [y, m] = parts(date);
+  const thisMonth = clamp(y, m, dueDay);
+  if (thisMonth >= date) return thisMonth;
+  const [ny, nm] = shift(y, m, 1);
+  return clamp(ny, nm, dueDay);
+}

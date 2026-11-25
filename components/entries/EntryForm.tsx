@@ -38,7 +38,7 @@ import {
 import { useErrorMessage } from "@/lib/errors";
 import { formatDate, formatMoney, formatMonth, shortName } from "@/lib/format";
 import { fromCents, toCents } from "@/lib/money";
-import { purchaseDateFor } from "@/lib/credit";
+import { billOnOrAfter, purchaseDateFor } from "@/lib/credit";
 import { todayIso } from "@/lib/period";
 import {
   useAccounts,
@@ -218,7 +218,7 @@ export function EntryForm({
       : undefined;
   const cardDueDay = billCard?.due_day ?? null;
   const repeatDay = cardDueDay ?? effectiveDay;
-  const firstBill = cardDueDay ? firstOccurrence(date, cardDueDay) : null;
+  const firstBill = cardDueDay ? billOnOrAfter(date, cardDueDay) : null;
   const billPurchase =
     firstBill && billCard ? purchaseDateFor(firstBill, billCard, todayIso()) : null;
 

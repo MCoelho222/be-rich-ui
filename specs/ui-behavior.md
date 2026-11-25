@@ -194,7 +194,7 @@ The form shows a summary below the fields that updates as the user types:
   - **Until:** optional end date. "No end date" is selected by default.
 - **Credit card:** the fixed expense runs on the card's bills (schemas §12.1).
   - **On day** shows the card's due day and can't be changed.
-  - The date field becomes **"First bill"**. Its hint gives the due date of that month's bill: "Due on 16/12/2026. If that date has passed, this payment is registered now; otherwise it's the next one."
+  - The date field becomes **"First bill"**: the first due date on or after the chosen date. With the default (today, 25/11) and a card due on the 16th, that's 16/12, so nothing is registered yet. Its hint gives that due date: "Due on 16/12/2026. If that date has passed, this payment is registered now; otherwise it's the next one."
   - The preview shows the bill's payment date (business-day adjusted).
 - Saving creates a **Recurrence** (schemas §12), in a single action with registering the first occurrence when its date has passed:
   - **Date today or earlier:** the first occurrence is registered as an Expense row. The success toast reads: "Fixed expense created. It will appear in your projections every month."
