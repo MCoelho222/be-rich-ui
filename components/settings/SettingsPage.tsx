@@ -208,8 +208,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
     const found: Record<string, string> = {};
     if (!form.name.trim()) found.name = t("required");
     if (digits(form.cpf) && !isValidCpf(form.cpf)) found.cpf = t("invalidCpf");
-    if (form.birth_date && form.birth_date >= todayIso())
-      found.birth_date = t("birthPast");
+    if (form.birth_date && form.birth_date >= todayIso()) found.birth_date = t("birthPast");
     if (hasAddress) {
       if (digits(form.cep).length !== 8) found["address.cep"] = t("required");
       if (!form.street.trim()) found["address.street"] = t("required");
