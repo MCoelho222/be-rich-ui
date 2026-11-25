@@ -123,6 +123,10 @@ function CategoryColumn({
 
   const rename = async () => {
     if (!editing?.name.trim()) return;
+    // Unchanged: saving the shown (maybe translated) name would turn a built-in category into
+    // a custom one in this language.
+    if (editing.name.trim() === categories.find((c) => c.id === editing.id)?.name)
+      return setEditing(null);
     if (
       await run(
         { kind: "update", id: editing.id, body: { name: editing.name.trim() } },

@@ -626,5 +626,39 @@
     "revoked": "Convite cancelado.",
     "revokeTitle": "Cancelar este convite?",
     "revokeBody": "O link vai parar de funcionar."
+  },
+  "seedCategories": {
+    "EXPENSE": {
+      "food": "Alimentação",
+      "gasoline": "Combustível",
+      "car": "Carro",
+      "house": "Casa",
+      "rent": "Aluguel",
+      "courses": "Cursos",
+      "music": "Música",
+      "clothes": "Roupas",
+      "health": "Saúde",
+      "pharmacy": "Farmácia",
+      "gym": "Academia",
+      "kids": "Filhos",
+      "trips": "Viagens",
+      "transport": "Transporte",
+      "entertainment": "Lazer",
+      "birthdays": "Aniversários",
+      "gas": "Gás",
+      "electricity": "Energia",
+      "internet": "Internet",
+      "ai": "IA",
+      "storage": "Armazenamento",
+      "phone": "Telefone",
+      "business": "Negócios",
+      "tax": "Impostos",
+      "other": "Outros"
+    },
+    "INCOME": {
+      "salary": "Salário",
+      "investments": "Investimentos",
+      "other": "Outros"
+    }
   }
 }

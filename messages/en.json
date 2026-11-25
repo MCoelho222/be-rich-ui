@@ -626,5 +626,39 @@
     "revoked": "Invitation revoked.",
     "revokeTitle": "Revoke this invitation?",
     "revokeBody": "The link will stop working."
+  },
+  "seedCategories": {
+    "EXPENSE": {
+      "food": "Food",
+      "gasoline": "Gasoline",
+      "car": "Car",
+      "house": "House",
+      "rent": "Rent",
+      "courses": "Courses",
+      "music": "Music",
+      "clothes": "Clothes",
+      "health": "Health",
+      "pharmacy": "Pharmacy",
+      "gym": "Gym",
+      "kids": "Kids",
+      "trips": "Trips",
+      "transport": "Transport",
+      "entertainment": "Entertainment",
+      "birthdays": "Birthdays",
+      "gas": "Gas",
+      "electricity": "Electricity",
+      "internet": "Internet",
+      "ai": "AI",
+      "storage": "Storage",
+      "phone": "Phone",
+      "business": "Business",
+      "tax": "Tax",
+      "other": "Other"
+    },
+    "INCOME": {
+      "salary": "Salary",
+      "investments": "Investments",
+      "other": "Other"
+    }
   }
 }

@@ -1275,6 +1275,8 @@ export interface components {
       type: components["schemas"]["EntryType"];
       /** Name */
       name: string;
+      /** Seed Key */
+      seed_key: string | null;
       /** Is Active */
       is_active: boolean;
       /**
@@ -4281,7 +4283,9 @@ export interface operations {
   };
   delete_recurrence_api_v1_recurrences__recurrence_id__delete: {
     parameters: {
-      query?: never;
+      query?: {
+        payments?: ("delete" | "keep") | null;
+      };
       header?: never;
       path: {
         recurrence_id: string;

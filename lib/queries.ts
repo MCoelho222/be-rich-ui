@@ -5,6 +5,8 @@
  * "reports" prefix: one invalidation refreshes them all after a change (dashboard.md §4.9).
  */
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useCallback } from "react";
 import { api, type Schemas } from "./api";
 
 export type Account = Schemas["AccountOut"];
@@ -59,8 +61,22 @@ export function useCards() {
   });
 }
 
+/**
+ * Built-in categories carry a `seed_key` until renamed; they show in the language the user
+ * picked, whatever language they were created in (schemas §9).
+ */
 export function useCategories() {
+  const t = useTranslations("seedCategories");
+  const translate = useCallback(
+    (list: Category[]) =>
+      list.map((c) => {
+        const key = `${c.type}.${c.seed_key}` as "EXPENSE.food";
+        return c.seed_key && t.has(key) ? { ...c, name: t(key) } : c;
+      }),
+    [t]
+  );
   return useQuery({
+    select: translate,
     queryKey: [...keys.reference, "categories"],
     // The endpoint lists one type at a time (api.md §9).
     queryFn: () =>
