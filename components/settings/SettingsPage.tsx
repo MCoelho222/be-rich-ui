@@ -39,6 +39,7 @@ import {
   useUpdateProfile,
   type Profile,
 } from "@/lib/settings";
+import { todayIso } from "@/lib/period";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/i18n/config";
 
@@ -207,7 +208,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
     const found: Record<string, string> = {};
     if (!form.name.trim()) found.name = t("required");
     if (digits(form.cpf) && !isValidCpf(form.cpf)) found.cpf = t("invalidCpf");
-    if (form.birth_date && form.birth_date >= new Date().toISOString().slice(0, 10))
+    if (form.birth_date && form.birth_date >= todayIso())
       found.birth_date = t("birthPast");
     if (hasAddress) {
       if (digits(form.cep).length !== 8) found["address.cep"] = t("required");
@@ -288,7 +289,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
             <Input
               type="date"
               value={form.birth_date}
-              max={new Date().toISOString().slice(0, 10)}
+              max={todayIso()}
               onChange={(e) => set("birth_date")(e.target.value)}
             />
           </FieldShell>
