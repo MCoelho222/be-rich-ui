@@ -24,7 +24,6 @@ import { useMe } from "@/lib/auth";
 import { useErrorMessage } from "@/lib/errors";
 import { formatDate, formatDayMonth, formatMoney, formatMonth, shortName } from "@/lib/format";
 import { fromCents, toCents } from "@/lib/money";
-import { firstOfMonth, lastOfMonth, todayIso } from "@/lib/period";
 import {
   byId,
   useAccounts,
@@ -185,18 +184,9 @@ function MonthlyTotals({ recurrences }: { recurrences: Recurrence[] }) {
   const me = useMe();
   const currency = me.data?.household.default_currency ?? "BRL";
   const total = (type: "EXPENSE" | "INCOME") => {
-    // Active entries valid this month: an amount change shows once, not twice.
-    const monthStart = firstOfMonth(todayIso());
-    const monthEnd = lastOfMonth(todayIso());
-    const active = recurrences.filter(
-      (r) =>
-        r.type === type &&
-        r.is_active &&
-        // Ended ones still count in the month they end; an amount change shows once.
-        (r.status !== "ENDED" || (r.end_date ?? "") >= todayIso()) &&
-        r.start_date <= monthEnd &&
-        (!r.end_date || r.end_date >= monthStart)
-    );
+    // Running entries only: an ended one stops counting, and after an amount change the
+    // old version is ended, so it shows once.
+    const active = recurrences.filter((r) => r.type === type && r.status === "ACTIVE");
     // Exact cents per month; amounts in other currencies are noted, not converted here.
     const cents = active
       .filter((r) => r.currency === currency)

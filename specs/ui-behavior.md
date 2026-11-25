@@ -236,7 +236,7 @@ This page lists every Recurrence, in two tabs: **Expenses** and **Incomes**.
 ### 8.2 Filters and totals
 
 - Filters: Active (the default), Paused, Ended, All.
-- A header shows "Fixed expenses: ~R$ 4.200,00 / month" and "Fixed incomes: ~R$ 9.000,00 / month", counting the active recurrences valid in the current month, each divided by its interval (a yearly one counts 1/12). After a "Change amount", only the version valid this month counts. Amounts in other currencies are noted, not converted.
+- A header shows "Fixed expenses: ~R$ 4.200,00 / month" and "Fixed incomes: ~R$ 9.000,00 / month", counting the recurrences with status Active (still running, api.md §12.2), each divided by its interval (a yearly one counts 1/12). Ended and paused ones don't count. After a "Change amount" the old version is ended, so only the new one counts. Amounts in other currencies are noted, not converted.
 
 ### 8.3 Row actions
 
