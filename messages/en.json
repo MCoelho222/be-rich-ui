@@ -126,8 +126,8 @@
       "note": "Not included in projections until registered.",
       "register": "Register",
       "skip": "Skip",
-      "registered": "Registered.",
-      "skipped": "Skipped."
+      "daysLate": "{count, plural, one {# day late} other {# days late}}",
+      "loadError": "Couldn't check for overdue fixed entries."
     },
     "cards": {
       "total": "Total balance",
@@ -136,14 +136,20 @@
       "income": "Income",
       "expenses": "Expenses",
       "net": "Net",
-      "fixed": "Fixed",
-      "projected": "Projected",
-      "ofExpenses": "of expenses",
       "noOpening": "Set your accounts' opening balances to see real balances.",
       "account": "Account",
       "now": "Now",
       "endShort": "End",
-      "viewAccounts": "Go to accounts"
+      "viewAccounts": "Go to accounts",
+      "byAccount": "By account",
+      "outlookPositive": "Positive through {month} · lowest {amount} in {lowMonth}",
+      "outlookNegative": "Goes negative in {month} · lowest {amount} in {lowMonth}",
+      "overdrawnOne": "{name} is at {amount} today",
+      "overdrawnMany": "{count} accounts are below zero today",
+      "periodFlows": "Income and expenses in this period",
+      "realizedOf": "Realized so far · {amount} projected",
+      "allProjected": "Projected · nothing realized yet",
+      "fixedShare": "Fixed: {share} of expenses ({amount})"
     },
     "chart": {
       "title": "Projection",
@@ -152,13 +158,19 @@
       "expenses": "Expenses",
       "projected": "Projected",
       "balance": "Balance",
+      "flows": "Income and expenses",
       "realized": "Realized",
       "scheduled": "Scheduled",
       "projectedFixed": "Projected fixed",
       "endBalance": "End of month",
       "empty": "Add your first expense or income to see the projection.",
       "addFirst": "New expense",
-      "aria": "Monthly income, expenses and projected balance from {from} to {to}"
+      "aria": "Monthly income, expenses and projected balance from {from} to {to}",
+      "shortfall": "Lowest: {amount} in {month}",
+      "seeMonth": "See {month}",
+      "householdBalance": "Household balance",
+      "addIncome": "New income",
+      "monthCol": "Month"
     },
     "categories": {
       "title": "By category",
@@ -187,8 +199,8 @@
       "fixed": "Fixed",
       "projected": "Projected",
       "register": "Register",
-      "registered": "Registered.",
       "loadMore": "Load more",
+      "loadingMore": "Loading…",
       "empty": "No entries in this period."
     }
   },

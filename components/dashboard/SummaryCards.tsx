@@ -1,30 +1,35 @@
 "use client";
-/** Total balance, Income, Expenses, Net and Fixed (dashboard.md §4.1–§4.3). */
+/**
+ * The top of the dashboard (dashboard.md §4.1–§4.3). The balance leads as the one big figure,
+ * with the projection's verdict under it; the period's flows follow as one group.
+ */
+import { AlertTriangle, ChevronDown, CircleAlert, Repeat, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { BigMoney, Money } from "@/components/money/Money";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { formatShare } from "@/lib/format";
-import { byId, useAccounts, useBalances, useSummary, type ReportFilters } from "@/lib/queries";
+import { formatMoney, formatMonth, formatShare } from "@/lib/format";
+import { chartRange } from "@/lib/period";
+import {
+  byId,
+  useAccounts,
+  useBalances,
+  useProjection,
+  useSummary,
+  type ReportFilters,
+  type Summary,
+} from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { projectionOutlook } from "./outlook";
 import type { DashboardView } from "./view";
 import { Skeleton, WidgetError } from "./Widget";
 
 const cardClass =
-  "flex min-w-0 flex-col gap-2.5 rounded-xl border border-line bg-surface p-4 sm:p-5";
-// Phones: a horizontal row that snaps; larger screens: a grid.
-const rowClass =
-  "-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 [&>*]:shrink-0 [&>*]:basis-[78%] [&>*]:snap-start sm:[&>*]:basis-auto";
-
-function CardSkeleton() {
-  return (
-    <div className={cardClass}>
-      <Skeleton className="h-4 w-24" />
-      <Skeleton className="h-9 w-36" />
-      <Skeleton className="h-4 w-32" />
-    </div>
-  );
-}
+  "flex min-w-0 flex-col gap-3 rounded-xl border border-line bg-surface p-4 transition-opacity sm:p-5";
+const labelClass = "text-[13px] font-medium text-text-muted";
+const captionClass = "text-[13px] text-text-muted";
+/** Previous figures stay up, dimmed, while a new period or filter loads. */
+const updatingClass = "opacity-60";
 
 export function SummaryCards({
   view,
@@ -36,14 +41,24 @@ export function SummaryCards({
   today: string;
 }) {
   return (
-    <div className={rowClass}>
-      <TotalBalanceCard view={view} today={today} />
-      <FlowCards view={view} filters={filters} />
+    <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <BalanceCard view={view} filters={filters} today={today} />
+      <FlowsCard view={view} filters={filters} />
     </div>
   );
 }
 
-function TotalBalanceCard({ view, today }: { view: DashboardView; today: string }) {
+// --- Balance, its outlook, and accounts below zero ------------------------------------
+
+function BalanceCard({
+  view,
+  filters,
+  today,
+}: {
+  view: DashboardView;
+  filters: ReportFilters;
+  today: string;
+}) {
   const t = useTranslations("dashboard.cards");
   const accountFilter = { accountId: view.accountId };
   const now = useBalances(today, accountFilter);
@@ -51,7 +66,16 @@ function TotalBalanceCard({ view, today }: { view: DashboardView; today: string 
   const accounts = useAccounts();
   const names = byId(accounts.data);
 
-  if (now.isPending || end.isPending) return <CardSkeleton />;
+  if (now.isPending || end.isPending) {
+    return (
+      <div className={cardClass}>
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-9 w-44" />
+        <Skeleton className="h-4 w-56" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+    );
+  }
   if (now.isError || end.isError) {
     return (
       <div className={cardClass}>
@@ -63,131 +87,254 @@ function TotalBalanceCard({ view, today }: { view: DashboardView; today: string 
   const endProjected = end.data.projected;
   const noOpenings = (accounts.data ?? []).every((a) => Number(a.opening_balance) === 0);
   const endByAccount = new Map(end.data.accounts.map((a) => [a.account_id, a]));
+  // Sign check only, to warn about accounts below zero (dashboard.md §1, question 1).
+  const overdrawn = now.data.accounts.filter((a) => a.balance !== null && Number(a.balance) < 0);
 
   return (
-    <Popover>
-      <PopoverTrigger
-        className={cn(cardClass, "text-left transition-colors hover:border-line-strong")}
-      >
-        <span className="text-[13px] font-medium text-text-muted">
+    <section
+      aria-labelledby="balance-label"
+      aria-busy={now.isPlaceholderData || end.isPlaceholderData}
+      className={cn(cardClass, (now.isPlaceholderData || end.isPlaceholderData) && updatingClass)}
+    >
+      <div className="flex items-center gap-2">
+        <span id="balance-label" className={cn(labelClass, "flex-1")}>
           {view.member ? t("household") : t("total")}
         </span>
-        <BigMoney amount={now.data.total} currency={now.data.currency} />
-        <span className="text-[13px] text-text-muted">
-          {t("endOfPeriod")}{" "}
-          <Money amount={end.data.total} currency={end.data.currency} projected={endProjected} />
-        </span>
-        {noOpenings && <span className="text-xs text-text-muted">{t("noOpening")}</span>}
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs text-text-muted uppercase">
-              <th className="px-4 pt-3 pb-2 font-semibold">{t("account")}</th>
-              <th className="px-2 pt-3 pb-2 text-right font-semibold">{t("now")}</th>
-              <th className="px-4 pt-3 pb-2 text-right font-semibold">{t("endShort")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {now.data.accounts.map((row) => {
-              const later = endByAccount.get(row.account_id);
-              return (
-                <tr key={row.account_id} className="border-t border-line">
-                  <td className="max-w-28 truncate px-4 py-2">
-                    {names.get(row.account_id)?.name ?? "—"}
-                  </td>
-                  <td className="px-2 py-2 text-right">
-                    {row.balance === null ? (
-                      "—"
-                    ) : (
-                      <Money amount={row.balance} currency={row.account_currency} />
-                    )}
-                  </td>
-                  <td className="px-4 py-2 text-right">
-                    {later?.balance == null ? (
-                      "—"
-                    ) : (
-                      <Money
-                        amount={later.balance}
-                        currency={later.account_currency}
-                        projected={endProjected}
-                      />
-                    )}
-                  </td>
+        <Popover>
+          <PopoverTrigger className="-my-2 -mr-2 inline-flex h-10 items-center gap-1 rounded-md px-2 text-[13px] text-text-muted transition-colors hover:bg-surface-2 hover:text-text sm:h-8">
+            {t("byAccount")}
+            <ChevronDown size={14} aria-hidden />
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-0">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs tracking-wide text-text-muted uppercase">
+                  <th className="px-4 pt-3 pb-2 font-medium">{t("account")}</th>
+                  <th className="px-2 pt-3 pb-2 text-right font-medium">{t("now")}</th>
+                  <th className="px-4 pt-3 pb-2 text-right font-medium">{t("endShort")}</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <div className="border-t border-line px-4 py-2.5">
-          <Link
-            href="/accounts"
-            className="text-sm text-brand hover:text-brand-hover hover:underline"
-          >
-            {t("viewAccounts")}
-          </Link>
-        </div>
-      </PopoverContent>
-    </Popover>
+              </thead>
+              <tbody>
+                {now.data.accounts.map((row) => {
+                  const later = endByAccount.get(row.account_id);
+                  const name = names.get(row.account_id)?.name ?? "—";
+                  return (
+                    <tr key={row.account_id} className="border-t border-line">
+                      <td className="max-w-32 truncate px-4 py-2" title={name}>
+                        {name}
+                      </td>
+                      <td className="px-2 py-2 text-right">
+                        {row.balance === null ? (
+                          "—"
+                        ) : (
+                          <Money
+                            amount={row.balance}
+                            currency={row.account_currency}
+                            className={cn(Number(row.balance) < 0 && "text-negative")}
+                          />
+                        )}
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        {later?.balance == null ? (
+                          "—"
+                        ) : (
+                          <Money
+                            amount={later.balance}
+                            currency={later.account_currency}
+                            projected={endProjected}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <div className="border-t border-line px-4 py-2.5">
+              <Link
+                href="/accounts"
+                className="text-sm text-brand hover:text-brand-hover hover:underline"
+              >
+                {t("viewAccounts")}
+              </Link>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+      <BigMoney amount={now.data.total} currency={now.data.currency} />
+      <span className={captionClass}>
+        {t("endOfPeriod")}{" "}
+        <Money amount={end.data.total} currency={end.data.currency} projected={endProjected} />
+      </span>
+      <OutlookLine view={view} filters={filters} today={today} />
+      {overdrawn.length > 0 && (
+        <p className="flex items-start gap-2 rounded-lg bg-warning-soft px-3 py-2 text-[13px] text-warning">
+          <CircleAlert size={15} className="mt-px shrink-0" aria-hidden />
+          <span className="num">
+            {overdrawn.length === 1
+              ? t("overdrawnOne", {
+                  name: names.get(overdrawn[0].account_id)?.name ?? "—",
+                  amount: formatMoney(overdrawn[0].balance!, overdrawn[0].account_currency),
+                })
+              : t("overdrawnMany", { count: overdrawn.length })}
+          </span>
+        </p>
+      )}
+      {noOpenings && <span className="text-xs text-text-muted">{t("noOpening")}</span>}
+    </section>
   );
 }
 
-function FlowCards({ view, filters }: { view: DashboardView; filters: ReportFilters }) {
+/** The projection's verdict, read from the same query the chart uses (shared cache). */
+function OutlookLine({
+  view,
+  filters,
+  today,
+}: {
+  view: DashboardView;
+  filters: ReportFilters;
+  today: string;
+}) {
+  const t = useTranslations("dashboard.cards");
+  const locale = useLocale();
+  const range = chartRange(view.range, today);
+  const projection = useProjection(range.from, range.to, filters);
+  if (!projection.isSuccess) return null;
+  const outlook = projectionOutlook(projection.data, today);
+  if (!outlook) return null;
+
+  const values = {
+    amount: formatMoney(outlook.low.balance, projection.data.currency, {
+      projected: outlook.low.projected,
+    }),
+    lowMonth: formatMonth(outlook.low.month, locale),
+  };
+  const negative = outlook.negativeFrom !== null;
+  const Icon = negative ? AlertTriangle : TrendingUp;
+  return (
+    <p
+      className={cn(
+        "num flex items-start gap-2 text-[13px]",
+        negative ? "font-medium text-negative" : "text-text-2"
+      )}
+    >
+      <Icon
+        size={15}
+        className={cn("mt-px shrink-0", !negative && "text-text-muted")}
+        aria-hidden
+      />
+      {negative
+        ? t("outlookNegative", { month: formatMonth(outlook.negativeFrom!, locale), ...values })
+        : t("outlookPositive", { month: formatMonth(outlook.through, locale), ...values })}
+    </p>
+  );
+}
+
+// --- The period's flows: income, expenses, net, and the fixed share --------------------
+
+type Flow = Summary["income"];
+
+function FlowsCard({ view, filters }: { view: DashboardView; filters: ReportFilters }) {
   const t = useTranslations("dashboard.cards");
   const summary = useSummary(view.range.from, view.range.to, filters);
 
-  if (summary.isPending) return [0, 1, 2, 3].map((i) => <CardSkeleton key={i} />);
+  if (summary.isPending) {
+    return (
+      <div className={cardClass}>
+        <div className="grid gap-5 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex flex-col gap-2.5">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-7 w-32" />
+              <Skeleton className="h-4 w-36" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (summary.isError) {
     return (
-      <div className={cn(cardClass, "sm:col-span-4")}>
+      <div className={cardClass}>
         <WidgetError onRetry={() => void summary.refetch()} />
       </div>
     );
   }
 
   const s = summary.data;
-  const flows = [
-    { key: "income", label: t("income"), value: s.income, tone: "income" as const },
-    { key: "expenses", label: t("expenses"), value: s.expenses, tone: "expense" as const },
-    { key: "net", label: t("net"), value: s.net, tone: "default" as const },
-  ];
+  const share = s.fixed_expenses.share;
+  return (
+    <section
+      aria-label={t("periodFlows")}
+      aria-busy={summary.isPlaceholderData}
+      className={cn(cardClass, "gap-4", summary.isPlaceholderData && updatingClass)}
+    >
+      <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
+        <FlowFigure label={t("income")} flow={s.income} summary={s} tone="income" />
+        <FlowFigure label={t("expenses")} flow={s.expenses} summary={s} tone="expense" />
+        <FlowFigure label={t("net")} flow={s.net} summary={s} tone="default" />
+      </div>
+      {share !== null && (
+        <Link
+          href="/fixed"
+          className="group -mx-1 inline-flex min-h-10 items-center gap-2 self-start rounded-md px-1 text-[13px] text-text-muted sm:min-h-0 sm:py-1"
+        >
+          <Repeat size={14} className="shrink-0 text-fixed" aria-hidden />
+          <span className="num group-hover:text-text group-hover:underline">
+            {t("fixedShare", {
+              share: formatShare(share),
+              amount: formatMoney(s.fixed_expenses.total, s.currency, {
+                projected: s.includes_projection,
+              }),
+            })}
+          </span>
+        </Link>
+      )}
+    </section>
+  );
+}
+
+/**
+ * One flow. A period that is all past shows its total. One that reaches into the future
+ * shows what is realized so far, labelled, with the projected total beside it; when nothing
+ * is realized yet, the projected total itself is the figure (ui-behavior §1, dashboard §4.2).
+ */
+function FlowFigure({
+  label,
+  flow,
+  summary,
+  tone,
+}: {
+  label: string;
+  flow: Flow;
+  summary: Summary;
+  tone: "default" | "income" | "expense";
+}) {
+  const t = useTranslations("dashboard.cards");
+  const currency = summary.currency;
+  const mixed = summary.includes_projection;
+  // Zero check only: decides which figure leads, never arithmetic on money.
+  const nothingRealized = mixed && Number(flow.realized) === 0;
+  const lead = mixed && !nothingRealized ? flow.realized : flow.total;
+  const caption = !mixed
+    ? null
+    : nothingRealized
+      ? t("allProjected")
+      : flow.total === flow.realized
+        ? null
+        : t("realizedOf", { amount: formatMoney(flow.total, currency, { projected: true }) });
 
   return (
-    <>
-      {flows.map((flow) => (
-        <div key={flow.key} className={cardClass}>
-          <span className="text-[13px] font-medium text-text-muted">{flow.label}</span>
-          <BigMoney
-            amount={s.includes_projection ? flow.value.realized : flow.value.total}
-            currency={s.currency}
-            tone={flow.tone}
-          />
-          {s.includes_projection && (
-            <span className="text-[13px] text-text-muted">
-              {t("projected")} <Money amount={flow.value.total} currency={s.currency} projected />
-            </span>
-          )}
-        </div>
-      ))}
-      <Link href="/fixed" className={cn(cardClass, "transition-colors hover:border-line-strong")}>
-        <span className="text-[13px] font-medium text-text-muted">{t("fixed")}</span>
-        <span className="num inline-flex items-baseline text-fixed">
-          <span className="text-[32px] leading-none font-semibold tracking-tight sm:text-[36px]">
-            {s.fixed_expenses.share === null
-              ? "—"
-              : formatShare(s.fixed_expenses.share).replace("%", "")}
-          </span>
-          {s.fixed_expenses.share !== null && <span className="text-base">%</span>}
-        </span>
-        <span className="text-[13px] text-text-muted">
-          <Money
-            amount={s.fixed_expenses.total}
-            currency={s.currency}
-            projected={s.includes_projection}
-          />{" "}
-          {t("ofExpenses")}
-        </span>
-      </Link>
-    </>
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-1 sm:flex sm:flex-col sm:items-start sm:gap-2">
+      <span className={labelClass}>{label}</span>
+      <BigMoney
+        amount={lead}
+        currency={currency}
+        tone={tone}
+        size="md"
+        projected={nothingRealized}
+      />
+      {caption && <span className={cn(captionClass, "num col-span-2")}>{caption}</span>}
+    </div>
   );
 }

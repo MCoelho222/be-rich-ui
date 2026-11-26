@@ -9,24 +9,27 @@
 
 :root,
 .light {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --line: rgb(15 23 42 / 0.08);
-  --line-strong: rgb(15 23 42 / 0.14);
-  --text: #0f172a;
-  --text-2: #334155;
-  --text-muted: #475569;
-  --text-faint: #94a3b8;
+  /* Mist: no pure white; pale grey-green cards a clear step above a grey-green page,
+     the daylight twin of the Graphite dark theme. */
+  --bg: #dfe3e1;
+  --surface: #f3f5f4;
+  --surface-2: #e7eae8;
+  --line: rgb(20 30 25 / 0.1);
+  --line-strong: rgb(20 30 25 / 0.17);
+  --text: #1a1d1c;
+  --text-2: #3a403d;
+  --text-muted: #535a56;
+  --text-faint: #8a918d;
   --income: #047857;
   --income-bar: #10b981;
-  --expense: #e11d48;
-  --expense-bar: #f43f5e;
-  --fixed: #2563eb;
-  --fixed-soft: rgb(37 99 235 / 0.1);
-  --negative: #e11d48;
-  --negative-soft: rgb(225 29 72 / 0.08);
-  --warning: #b45309;
+  /* Text colors one shade deeper than on white, to keep 4.5:1 on the Mist cards and tints. */
+  --expense: #be123c;
+  --expense-bar: #e11d48;
+  --fixed: #1d4ed8;
+  --fixed-soft: rgb(29 78 216 / 0.1);
+  --negative: #be123c;
+  --negative-soft: rgb(190 18 60 / 0.08);
+  --warning: #92400e;
   --warning-soft: rgb(245 158 11 / 0.08);
   --warning-line: rgb(217 119 6 / 0.35);
   --brand: #047857;
@@ -38,19 +41,20 @@
 }
 
 .dark {
-  --bg: #0b1120;
-  --surface: #0f172a;
-  --surface-2: #1e293b;
+  /* Graphite: a charcoal with the faintest lean toward the brand emerald. */
+  --bg: #17191a;
+  --surface: #1f2223;
+  --surface-2: #2a2e2f;
   --line: rgb(255 255 255 / 0.08);
-  --line-strong: rgb(255 255 255 / 0.12);
-  --text: #f1f5f9;
-  --text-2: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-faint: #64748b;
+  --line-strong: rgb(255 255 255 / 0.13);
+  --text: #eef0ef;
+  --text-2: #c9cdcb;
+  --text-muted: #9ba19e;
+  --text-faint: #6d7370;
   --income: #34d399;
   --income-bar: #34d399;
   --expense: #fb7185;
-  --expense-bar: #fb7185;
+  --expense-bar: #f43f5e;
   --fixed: #60a5fa;
   --fixed-soft: rgb(96 165 250 / 0.14);
   --negative: #f43f5e;
@@ -177,11 +181,17 @@
   }
 }
 
-/* Scrollbars that only show on hover */
+/* Thin themed scrollbars. With a mouse they show on hover; on touch screens they stay
+   visible, since there is no hover to reveal that the area scrolls. */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-.custom-scrollbar:hover {
   scrollbar-color: var(--line-strong) transparent;
+}
+@media (hover: hover) {
+  .custom-scrollbar {
+    scrollbar-color: transparent transparent;
+  }
+  .custom-scrollbar:hover {
+    scrollbar-color: var(--line-strong) transparent;
+  }
 }

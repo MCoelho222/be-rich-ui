@@ -1,5 +1,6 @@
 "use client";
 /** Each credit card's next bill (dashboard.md §4.7). Hidden when there are no credit cards. */
+import { CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Money } from "@/components/money/Money";
@@ -17,7 +18,7 @@ export function CardBills({ filters }: { filters: ReportFilters }) {
   if (bills.isSuccess && bills.data.items.length === 0) return null;
 
   return (
-    <WidgetCard title={t("title")}>
+    <WidgetCard title={t("title")} updating={bills.isPlaceholderData}>
       {bills.isPending ? (
         <Skeleton className="h-16 w-full" />
       ) : bills.isError ? (
@@ -36,8 +37,10 @@ export function CardBills({ filters }: { filters: ReportFilters }) {
                 >
                   <span
                     aria-hidden
-                    className="h-7 w-10 shrink-0 rounded-md bg-gradient-to-br from-violet-600 to-violet-900"
-                  />
+                    className="flex h-7 w-10 shrink-0 items-center justify-center rounded-md border border-line bg-surface text-text-muted"
+                  >
+                    <CreditCard size={16} />
+                  </span>
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-sm font-medium">
                       {card?.alias ?? "—"}{" "}
@@ -59,7 +62,7 @@ export function CardBills({ filters }: { filters: ReportFilters }) {
                       amount={bill.total}
                       currency={bills.data.currency}
                       projected={projected}
-                      className="text-[15px] font-semibold not-italic"
+                      className="text-[15px] font-semibold"
                     />
                     <span className="num text-xs text-text-muted">
                       {t("due", { date: formatWeekdayDate(bill.due_date, locale) })}

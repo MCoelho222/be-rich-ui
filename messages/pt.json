@@ -126,8 +126,8 @@
       "note": "Fora das projeções até serem registrados.",
       "register": "Registrar",
       "skip": "Pular",
-      "registered": "Registrado.",
-      "skipped": "Pulado."
+      "daysLate": "{count, plural, one {# dia de atraso} other {# dias de atraso}}",
+      "loadError": "Não foi possível verificar os fixos atrasados."
     },
     "cards": {
       "total": "Saldo total",
@@ -136,14 +136,20 @@
       "income": "Receitas",
       "expenses": "Despesas",
       "net": "Resultado",
-      "fixed": "Fixos",
-      "projected": "Previsto",
-      "ofExpenses": "das despesas",
       "noOpening": "Informe o saldo inicial das contas para ver os saldos reais.",
       "account": "Conta",
       "now": "Agora",
       "endShort": "Fim",
-      "viewAccounts": "Ir para contas"
+      "viewAccounts": "Ir para contas",
+      "byAccount": "Por conta",
+      "outlookPositive": "Positivo até {month} · menor saldo {amount} em {lowMonth}",
+      "outlookNegative": "Fica negativo em {month} · menor saldo {amount} em {lowMonth}",
+      "overdrawnOne": "{name} está em {amount} hoje",
+      "overdrawnMany": "{count} contas estão abaixo de zero hoje",
+      "periodFlows": "Receitas e despesas no período",
+      "realizedOf": "Realizado até agora · {amount} previsto",
+      "allProjected": "Previsto · nada realizado ainda",
+      "fixedShare": "Fixos: {share} das despesas ({amount})"
     },
     "chart": {
       "title": "Projeção",
@@ -152,13 +158,19 @@
       "expenses": "Despesas",
       "projected": "Previsto",
       "balance": "Saldo",
+      "flows": "Receitas e despesas",
       "realized": "Realizado",
       "scheduled": "Agendado",
       "projectedFixed": "Fixos previstos",
       "endBalance": "Fim do mês",
       "empty": "Adicione sua primeira despesa ou receita para ver a projeção.",
       "addFirst": "Nova despesa",
-      "aria": "Receitas, despesas e saldo previsto por mês, de {from} a {to}"
+      "aria": "Receitas, despesas e saldo previsto por mês, de {from} a {to}",
+      "shortfall": "Menor saldo: {amount} em {month}",
+      "seeMonth": "Ver {month}",
+      "householdBalance": "Saldo da casa",
+      "addIncome": "Nova receita",
+      "monthCol": "Mês"
     },
     "categories": {
       "title": "Por categoria",
@@ -187,8 +199,8 @@
       "fixed": "Fixo",
       "projected": "Previsto",
       "register": "Registrar",
-      "registered": "Registrado.",
       "loadMore": "Carregar mais",
+      "loadingMore": "Carregando…",
       "empty": "Nenhum lançamento neste período."
     }
   },

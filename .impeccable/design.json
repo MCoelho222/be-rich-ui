@@ -1,0 +1,675 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26T20:36:25.342398+00:00",
+  "title": "Design System: Be Rich",
+  "extensions": {
+    "colorMeta": {
+      "night-canvas": {
+        "role": "neutral",
+        "displayName": "Night Canvas",
+        "canonical": "#17191a",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242526",
+          "#404243",
+          "#5f6263",
+          "#808384",
+          "#a3a5a6",
+          "#c8c9ca",
+          "#edefef"
+        ]
+      },
+      "night-panel": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "canonical": "#1f2223",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242526",
+          "#404243",
+          "#5f6263",
+          "#7f8384",
+          "#a3a5a6",
+          "#c7c9ca",
+          "#edefef"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Night Raised",
+        "canonical": "#2a2e2f",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#232526",
+          "#3f4343",
+          "#5e6263",
+          "#7f8384",
+          "#a2a6a7",
+          "#c7caca",
+          "#ecefef"
+        ]
+      },
+      "night-hairline": {
+        "role": "neutral",
+        "displayName": "Hairline (dark)",
+        "canonical": "rgb(255 255 255 / 0.08)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "night-hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline (dark)",
+        "canonical": "rgb(255 255 255 / 0.13)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "moonlit-text": {
+        "role": "neutral",
+        "displayName": "Moonlit Text",
+        "canonical": "#eef0ef",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242525",
+          "#414242",
+          "#606261",
+          "#818382",
+          "#a4a5a5",
+          "#c8c9c9",
+          "#eeefee"
+        ]
+      },
+      "soft-text": {
+        "role": "neutral",
+        "displayName": "Soft Text",
+        "canonical": "#c9cdcb",
+        "tonalRamp": [
+          "#0a0b0b",
+          "#242525",
+          "#404341",
+          "#5f6260",
+          "#808381",
+          "#a3a6a4",
+          "#c7cac8",
+          "#edefee"
+        ]
+      },
+      "muted-text": {
+        "role": "neutral",
+        "displayName": "Muted Text",
+        "canonical": "#9ba19e",
+        "tonalRamp": [
+          "#0a0c0b",
+          "#232624",
+          "#3f4341",
+          "#5d6360",
+          "#7e8481",
+          "#a2a6a4",
+          "#c6cac8",
+          "#ecefee"
+        ]
+      },
+      "faint-text": {
+        "role": "neutral",
+        "displayName": "Faint Text",
+        "canonical": "#6d7370",
+        "tonalRamp": [
+          "#0a0c0b",
+          "#232624",
+          "#3f4341",
+          "#5d6360",
+          "#7e8481",
+          "#a1a6a4",
+          "#c6cac8",
+          "#ecefee"
+        ]
+      },
+      "signal-emerald": {
+        "role": "primary",
+        "displayName": "Signal Emerald",
+        "canonical": "#34d399",
+        "tonalRamp": [
+          "#001006",
+          "#002d1d",
+          "#084f36",
+          "#107351",
+          "#039a6c",
+          "#54bc90",
+          "#8eddb8",
+          "#c4fee1"
+        ]
+      },
+      "emerald-ink-deep": {
+        "role": "primary",
+        "displayName": "Deep Emerald Ink",
+        "canonical": "#052e1c",
+        "tonalRamp": [
+          "#030e07",
+          "#152a1f",
+          "#2d493a",
+          "#476a57",
+          "#688c78",
+          "#8fae9c",
+          "#b7d0c1",
+          "#e1f4e9"
+        ]
+      },
+      "spent-rose": {
+        "role": "secondary",
+        "displayName": "Spent Rose",
+        "canonical": "#fb7185",
+        "tonalRamp": [
+          "#210004",
+          "#4b0216",
+          "#77172d",
+          "#a72e47",
+          "#ce5367",
+          "#ea818d",
+          "#fdb2b8",
+          "#fee8ea"
+        ]
+      },
+      "alarm-rose": {
+        "role": "secondary",
+        "displayName": "Alarm Rose",
+        "canonical": "#f43f5e",
+        "tonalRamp": [
+          "#210003",
+          "#4b0213",
+          "#7f0024",
+          "#b70037",
+          "#e03c57",
+          "#fb7480",
+          "#fdb3b5",
+          "#fee8e9"
+        ]
+      },
+      "recurring-blue": {
+        "role": "tertiary",
+        "displayName": "Recurring Blue",
+        "canonical": "#60a5fa",
+        "tonalRamp": [
+          "#000925",
+          "#00244e",
+          "#0e427a",
+          "#2361aa",
+          "#4684cf",
+          "#74a8e9",
+          "#a6ccfd",
+          "#e4f0ff"
+        ]
+      },
+      "caution-amber": {
+        "role": "tertiary",
+        "displayName": "Caution Amber",
+        "canonical": "#fbbf24",
+        "tonalRamp": [
+          "#140900",
+          "#322200",
+          "#553e02",
+          "#7b5b03",
+          "#a37b17",
+          "#ca9e39",
+          "#e8c47b",
+          "#feedca"
+        ]
+      },
+      "day-canvas": {
+        "role": "neutral",
+        "displayName": "Day Canvas",
+        "canonical": "#dfe3e1",
+        "tonalRamp": [
+          "#0a0b0b",
+          "#242525",
+          "#404341",
+          "#5f6260",
+          "#808381",
+          "#a3a6a4",
+          "#c7cac8",
+          "#edefee"
+        ]
+      },
+      "day-panel": {
+        "role": "neutral",
+        "displayName": "Day Panel",
+        "canonical": "#f3f5f4",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242525",
+          "#414242",
+          "#606261",
+          "#818382",
+          "#a4a5a5",
+          "#c8c9c9",
+          "#eeefee"
+        ]
+      },
+      "day-raised": {
+        "role": "neutral",
+        "displayName": "Day Raised",
+        "canonical": "#e7eae8",
+        "tonalRamp": [
+          "#0a0b0b",
+          "#242524",
+          "#414241",
+          "#5f6260",
+          "#808381",
+          "#a3a6a4",
+          "#c8cac8",
+          "#edefee"
+        ]
+      },
+      "day-hairline": {
+        "role": "neutral",
+        "displayName": "Hairline (light)",
+        "canonical": "rgb(20 30 25 / 0.1)",
+        "tonalRamp": [
+          "#080c0a",
+          "#212724",
+          "#3c4440",
+          "#59645f",
+          "#7a857f",
+          "#9ea8a3",
+          "#c3cbc7",
+          "#eaf0ed"
+        ]
+      },
+      "day-hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline (light)",
+        "canonical": "rgb(20 30 25 / 0.17)",
+        "tonalRamp": [
+          "#080c0a",
+          "#212724",
+          "#3c4440",
+          "#59645f",
+          "#7a857f",
+          "#9ea8a3",
+          "#c3cbc7",
+          "#eaf0ed"
+        ]
+      },
+      "day-text": {
+        "role": "neutral",
+        "displayName": "Day Text",
+        "canonical": "#1a1d1c",
+        "tonalRamp": [
+          "#0a0b0b",
+          "#242525",
+          "#404342",
+          "#5f6261",
+          "#808382",
+          "#a3a6a5",
+          "#c7cac9",
+          "#edefee"
+        ]
+      },
+      "day-muted-text": {
+        "role": "neutral",
+        "displayName": "Day Muted Text",
+        "canonical": "#535a56",
+        "tonalRamp": [
+          "#090c0a",
+          "#222624",
+          "#3e4340",
+          "#5c635f",
+          "#7d8480",
+          "#a1a7a3",
+          "#c6cac8",
+          "#ecefed"
+        ]
+      },
+      "on-forest-emerald": {
+        "role": "neutral",
+        "displayName": "On Forest Emerald",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "forest-emerald": {
+        "role": "primary",
+        "displayName": "Forest Emerald",
+        "canonical": "#047857",
+        "tonalRamp": [
+          "#001007",
+          "#012d1f",
+          "#004f38",
+          "#137254",
+          "#409574",
+          "#72b599",
+          "#a2d7bf",
+          "#d2f9e7"
+        ]
+      },
+      "forest-emerald-hover": {
+        "role": "primary",
+        "displayName": "Forest Emerald Hover",
+        "canonical": "#065f46",
+        "tonalRamp": [
+          "#001008",
+          "#022d1f",
+          "#154d3a",
+          "#2b7057",
+          "#4f9278",
+          "#7cb39c",
+          "#a9d5c2",
+          "#d7f7e9"
+        ]
+      },
+      "meadow-emerald-bar": {
+        "role": "primary",
+        "displayName": "Meadow Emerald (bars)",
+        "canonical": "#10b981",
+        "tonalRamp": [
+          "#001006",
+          "#002e1c",
+          "#014f35",
+          "#01744f",
+          "#18996b",
+          "#58bb90",
+          "#91dcb8",
+          "#c6fde1"
+        ]
+      },
+      "crimson-rose": {
+        "role": "secondary",
+        "displayName": "Crimson Rose",
+        "canonical": "#be123c",
+        "tonalRamp": [
+          "#210003",
+          "#4b0212",
+          "#7f0023",
+          "#b11a3a",
+          "#d9465a",
+          "#f57983",
+          "#fcb3b5",
+          "#fee9e9"
+        ]
+      },
+      "crimson-rose-bar": {
+        "role": "secondary",
+        "displayName": "Crimson Rose Bar",
+        "canonical": "#e11d48",
+        "tonalRamp": [
+          "#220002",
+          "#4c0011",
+          "#7d0a24",
+          "#b31237",
+          "#e23853",
+          "#fd727d",
+          "#feb2b4",
+          "#ffe8e8"
+        ]
+      },
+      "ink-blue": {
+        "role": "tertiary",
+        "displayName": "Ink Blue",
+        "canonical": "#1d4ed8",
+        "tonalRamp": [
+          "#000134",
+          "#031964",
+          "#123598",
+          "#2453d0",
+          "#4378f8",
+          "#78a2fd",
+          "#afc9fe",
+          "#e7effe"
+        ]
+      },
+      "burnt-amber": {
+        "role": "tertiary",
+        "displayName": "Burnt Amber",
+        "canonical": "#92400e",
+        "tonalRamp": [
+          "#1d0200",
+          "#411600",
+          "#6a2e0c",
+          "#954920",
+          "#ba6a43",
+          "#d79271",
+          "#f4baa0",
+          "#ffeae0"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Big money figure",
+        "purpose": "Hero amounts only: integer at display size, cents 16px, symbol 15px muted. 32px on phones."
+      },
+      "headline": {
+        "displayName": "Page title",
+        "purpose": "Page header titles; 24px on phones."
+      },
+      "title": {
+        "displayName": "Widget title",
+        "purpose": "Widget and section titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Tables, lists, menus, copy."
+      },
+      "input": {
+        "displayName": "Input",
+        "purpose": "Text inside form fields."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Card captions, field labels, secondary lines."
+      },
+      "table-header": {
+        "displayName": "Table header",
+        "purpose": "Uppercase sticky column labels on Raised."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Pills: Fixed, \"2/5\", Projected, Overdue."
+      },
+      "display-phone": {
+        "displayName": "Big money figure (phone)",
+        "purpose": "The display figure below 640px."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Secondary amounts in a group: the period's income, expenses and net."
+      }
+    },
+    "shadows": [
+      {
+        "name": "floating",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Popovers, menus, chart tooltips, dialogs. Never on resting surfaces."
+      },
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 3px var(--ring-color)",
+        "purpose": "Every focusable control."
+      },
+      {
+        "name": "nav-active",
+        "value": "inset 3px 0 0 var(--brand)",
+        "purpose": "Emerald bar on the current sidebar item."
+      },
+      {
+        "name": "auth-halo",
+        "value": "radial-gradient(circle, var(--glow) 0%, transparent 70%)",
+        "purpose": "Soft 560px emerald halo behind public pages only (a background, not a shadow)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-standard",
+        "value": "150ms",
+        "purpose": "Fades and slides for dialogs, sheets, toasts; color transitions on hover."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "All animation and transition durations under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled emerald action per view; split variant for New expense.",
+      "html": "<div class=\"ds-split\"><button class=\"ds-btn-primary ds-split-main\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>New expense</button><button class=\"ds-btn-primary ds-split-arrow\" aria-label=\"More ways to add\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg></button></div>",
+      "css": ".ds-split { display: inline-flex; } .ds-btn-primary { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: none; background: var(--brand); color: var(--on-brand); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 150ms; } .ds-btn-primary:hover { background: var(--brand-hover); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring-color); } .ds-split-main { border-radius: 10px 0 0 10px; } .ds-split-arrow { width: 32px; padding: 0; justify-content: center; border-radius: 0 10px 10px 0; border-left: 1px solid color-mix(in srgb, var(--on-brand) 25%, transparent); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "nav-item",
+      "description": "Quiet secondary action: muted text, Raised background on hover.",
+      "html": "<button class=\"ds-btn-ghost\">Cancel</button>",
+      "css": ".ds-btn-ghost { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; height: 36px; padding: 0 14px; border: none; border-radius: 10px; background: transparent; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; transition: background 150ms, color 150ms; } .ds-btn-ghost:hover { background: var(--surface-2); color: var(--text); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring-color); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Raised field, strong hairline, emerald border and ring on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Description</span><input class=\"ds-input\" placeholder=\"Groceries\"></label>",
+      "css": ".ds-field { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 6px; width: 280px; } .ds-field-label { font-size: 13px; font-weight: 500; color: var(--text-muted); } .ds-input { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text); font-size: 15px; outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: var(--text-faint); } .ds-input:hover { border-color: var(--text-faint); } .ds-input:focus-visible { border-color: var(--brand); box-shadow: 0 0 0 3px var(--ring-color); }"
+    },
+    {
+      "name": "Summary Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat panel with the big money figure: large integer, small cents, muted symbol.",
+      "html": "<div class=\"ds-card\"><span class=\"ds-card-label\">Total balance</span><span class=\"ds-big\"><span class=\"ds-big-sym\">R$</span><span class=\"ds-big-int\">5.800</span><span class=\"ds-big-cents\">,00</span></span><span class=\"ds-card-sub\">End of period <i>~R$ 4.215,30</i></span></div>",
+      "css": ".ds-card { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 10px; width: 240px; padding: 20px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); transition: border-color 150ms; } .ds-card:hover { border-color: var(--line-strong); } .ds-card-label, .ds-card-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; } .ds-card-sub i { color: var(--text-2); font-variant-numeric: tabular-nums; } .ds-big { display: inline-flex; align-items: baseline; font-variant-numeric: tabular-nums; } .ds-big-sym { margin-right: 4px; font-size: 15px; color: var(--text-muted); opacity: .8; } .ds-big-int { font-size: 36px; font-weight: 600; line-height: 1; letter-spacing: -0.025em; } .ds-big-cents { font-size: 16px; color: var(--text-2); }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "40px items; active item on Raised with a 3px inset emerald bar.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-active\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" rx=\"1\"/><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" rx=\"1\"/><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" rx=\"1\"/></svg>Dashboard</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m17 2 4 4-4 4\"/><path d=\"M3 11v-1a4 4 0 0 1 4-4h14\"/><path d=\"m7 22-4-4 4-4\"/><path d=\"M21 13v1a4 4 0 0 1-4 4H3\"/></svg>Fixed</a></nav>",
+      "css": ".ds-nav { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; gap: 4px; width: 216px; padding: 8px; background: var(--surface); border-radius: 12px; border: 1px solid var(--line); } .ds-nav-item { display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 10px; border-radius: 10px; color: var(--text-muted); font-size: 14px; font-weight: 500; text-decoration: none; transition: background 150ms, color 150ms; } .ds-nav-item svg { width: 20px; height: 20px; } .ds-nav-item:hover { background: var(--surface-2); color: var(--text); } .ds-nav-item:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring-color); } .ds-active { background: var(--surface-2); color: var(--text); box-shadow: inset 3px 0 0 var(--brand); }"
+    },
+    {
+      "name": "Entry Badges",
+      "kind": "chip",
+      "refersTo": "badge-fixed",
+      "description": "11px semibold pills: Fixed (blue tint), installment (muted), Projected (dashed), Overdue (amber).",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge ds-badge-fixed\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m17 2 4 4-4 4\"/><path d=\"M3 11v-1a4 4 0 0 1 4-4h14\"/><path d=\"m7 22-4-4 4-4\"/><path d=\"M21 13v1a4 4 0 0 1-4 4H3\"/></svg>Fixed</span><span class=\"ds-badge ds-badge-inst\">2/5</span><span class=\"ds-badge ds-badge-proj\">Projected</span><span class=\"ds-badge ds-badge-over\">Overdue</span></div>",
+      "css": ".ds-badges { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; display: flex; gap: 8px; } .ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-badge-fixed { background: var(--fixed-soft); color: var(--fixed); } .ds-badge-inst { background: var(--surface-2); color: var(--text-muted); } .ds-badge-proj { border: 1px dashed var(--text-faint); color: var(--text-muted); } .ds-badge-over { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-line); }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "custom",
+      "refersTo": "segmented",
+      "description": "Language and theme toggles: hairline track, Raised selected segment.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\" aria-label=\"Language\"><button class=\"ds-seg-opt ds-seg-on\" role=\"radio\" aria-checked=\"true\">EN</button><button class=\"ds-seg-opt\" role=\"radio\" aria-checked=\"false\">PT</button></div>",
+      "css": ".ds-seg { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); } .ds-seg-opt { font-family: var(--font-geist-sans), Geist, ui-sans-serif, system-ui, sans-serif; height: 28px; min-width: 36px; padding: 0 8px; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: color 150ms, background 150ms; } .ds-seg-opt:hover { color: var(--text); } .ds-seg-opt:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring-color); } .ds-seg-on { background: var(--surface-2); color: var(--text); }"
+    },
+    {
+      "name": "Projected Bar",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Projection chart bars: square at the baseline, 4px rounded tops on the top segment only; the projected part hatched in the bar's own colour over a faint wash.",
+      "html": "<div class=\"ds-bars\"><div class=\"ds-bar ds-in\"><span class=\"ds-solid\" style=\"height:60%\"></span><span class=\"ds-hatch\" style=\"height:25%\"></span></div><div class=\"ds-bar ds-out\"><span class=\"ds-solid\" style=\"height:45%\"></span><span class=\"ds-hatch\" style=\"height:30%\"></span></div><div class=\"ds-bar ds-in\"><span class=\"ds-solid ds-top\" style=\"height:70%\"></span></div><div class=\"ds-bar ds-out\"><span class=\"ds-solid ds-top\" style=\"height:52%\"></span></div></div>",
+      "css": ".ds-bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; } .ds-bar { display: flex; flex-direction: column-reverse; width: 18px; height: 100%; } .ds-in { color: var(--income-bar); } .ds-out { color: var(--expense-bar); } .ds-solid { background: currentColor; } .ds-top { border-radius: 4px 4px 0 0; } .ds-hatch { background-color: color-mix(in srgb, currentColor 12%, transparent); background-image: repeating-linear-gradient(135deg, currentColor 0 3px, transparent 3px 6px); box-shadow: inset 0 0 0 1px currentColor; border-radius: 4px 4px 0 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Instrument Panel",
+    "overview": "Be Rich reads like a calm instrument panel at night. The household's money sits on graphite: a soft charcoal with the faintest lean toward the brand emerald, so the greys read as chosen rather than default. Most of the screen stays quiet so that the few colored readings carry the meaning: emerald for money coming in, rose for money going out, blue for what repeats, amber for what needs attention. The big money figure is the main readout. Everything else (labels, borders, chrome) steps back so it can be read at a glance.\n\nIt is an instrument, but it lives at home rather than in a bank. Warmth comes from friendly 12px corners, the green brand mark, initials in round avatars, a soft halo behind the public pages, and plain, direct words. Precision comes from tabular figures, hairline borders, an exact type scale and honest projections. Expression is spent on details like these, never on decoration. The light theme is a full equal: the same instrument in daylight, on mist (no pure white, cards a clear step above the page), with darker ink shades so the readings keep their contrast.\n\nThe system rejects three looks outright: stiff corporate banking UI, gamified fintech (confetti, streaks, mascots, loud gradients), and the default shadcn SaaS dashboard with no identity of its own.",
+    "keyCharacteristics": [
+      "Dark graphite first, with an equal light theme. Every color is a token with a value per theme.",
+      "Color is reserved for signals (income, expense, fixed, negative, warning). Chrome stays neutral.",
+      "The big money figure: a large integer, small cents, a muted currency symbol, tabular figures.",
+      "Flat panels separated by hairline borders, not shadows.",
+      "Projected values are always marked: a `~` prefix, italics, muted text, hatched bars.",
+      "Warm details within precise structure: 12px cards, round avatars and badges, a soft emerald halo on auth pages."
+    ],
+    "rules": [
+      {
+        "name": "The One Meaning Rule",
+        "body": "Each signal color means one thing. Emerald is in or brand, rose is out or below zero, blue repeats, amber needs attention. Never use a signal color as decoration or for an unrelated status.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tokens Only Rule",
+        "body": "Components use token utilities (`text-income`, `bg-surface`, `border-line`), never raw Tailwind palette classes or hex values. The SVG chart colors (read through `useThemeColors`) are the only exception.",
+        "section": "colors"
+      },
+      {
+        "name": "The Never Color Alone Rule",
+        "body": "Every colored amount also carries a sign, a label or a `~`. Color reinforces the meaning and never carries it alone.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every number uses tabular figures so columns line up and totals don't jitter as they update. A number without `.num` is a bug.",
+        "section": "typography"
+      },
+      {
+        "name": "The Big Figure Rule",
+        "body": "Only the hero amounts of a view get the big money figure. Everywhere else, amounts are inline at body size. Several big figures competing in one panel is wrong.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Panel Rule",
+        "body": "Cards and widgets are flat. To make something stand out, raise its tone (Raised) or strengthen its border (`line-strong` on hover). Never add a shadow to a surface at rest.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use the theme tokens (`bg-surface`, `text-income`, `border-line`) for every color, and give each new token a dark and a light value.",
+      "**Do** put `.num` (tabular figures) on every number, and use a true minus sign (−) for negatives.",
+      "**Do** mark every projected value with `~`, italics and muted text, and hatch the projected part of a bar.",
+      "**Do** keep cards flat: 12px corners, a 1px hairline and 20px padding (16px on phones).",
+      "**Do** keep controls at 10px corners and 36px tall (40px on phones), with the 3px emerald focus ring.",
+      "**Do** show the first load as skeletons shaped like the final content, keep previous content dimmed while filters reload, and show errors inline with a Retry.",
+      "**Do** keep warmth in the details: round avatars and badges, friendly corners, the emerald mark, plain words."
+    ],
+    "donts": [
+      "**Don't** look like a corporate bank: no stiff navy-and-gray layouts, no heavy chrome, no formal stock imagery.",
+      "**Don't** gamify: no confetti, streaks, mascots, celebratory animation or loud gradients.",
+      "**Don't** ship the default shadcn look. Primitives still on shadcn defaults (`rounded-md`, `h-9`, `shadow-xs`, `bg-transparent` in `button.tsx`, `select.tsx`, `textarea.tsx` and `dialog.tsx`) should be brought in line with the custom components (10px corners, Raised fill, strong hairline, 40px fields).",
+      "**Don't** use a signal color for anything outside its meaning (The One Meaning Rule).",
+      "**Don't** let color carry meaning alone. Every amount also has a sign, a label or a `~`.",
+      "**Don't** put shadows on surfaces at rest. Shadows are only for floating layers.",
+      "**Don't** put two value scales on one chart. Measures of different size get their own panels on a shared axis.",
+      "**Don't** use raw palette classes (`text-emerald-400`) or hex values in components.",
+      "**Don't** use a spinner over a whole page."
+    ]
+  }
+}
