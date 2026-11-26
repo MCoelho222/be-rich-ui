@@ -45,7 +45,7 @@ export function Dashboard() {
         {ready ? (
           <>
             <SummaryCards view={view} filters={filters} today={today} />
-            <ProjectionChart view={view} filters={filters} />
+            <ProjectionChart view={view} update={update} filters={filters} />
             <div className="grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
               <CategoryBreakdown view={view} update={update} filters={filters} />
               <CardBills filters={filters} />

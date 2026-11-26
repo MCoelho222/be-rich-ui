@@ -4,7 +4,7 @@
  * so it loads, fails and retries on its own (dashboard.md §5). Every read model shares the
  * "reports" prefix: one invalidation refreshes them all after a change (dashboard.md §4.9).
  */
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { api, type Schemas } from "./api";
@@ -185,31 +185,5 @@ export function useOverdue() {
   return useQuery({
     queryKey: [...keys.reports, "overdue"],
     queryFn: () => api.get<Items<Overdue>>("occurrences/overdue").then((r) => r.items),
-  });
-}
-
-// --- Occurrence actions (api.md §12.3) ------------------------------------------------
-
-/** Register or skip an occurrence, then refresh everything that depends on it. */
-export function useOccurrenceAction() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      action,
-      recurrenceId,
-      occurrenceDate,
-    }: {
-      action: "register" | "skip";
-      recurrenceId: string;
-      occurrenceDate: string;
-    }) =>
-      api.post(
-        `recurrences/${recurrenceId}/occurrences/${occurrenceDate}/${action}`,
-        action === "register" ? {} : undefined
-      ),
-    onSuccess: () => {
-      void client.invalidateQueries({ queryKey: keys.reports });
-      void client.invalidateQueries({ queryKey: [...keys.reference, "recurrences"] });
-    },
   });
 }

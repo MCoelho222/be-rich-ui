@@ -37,6 +37,82 @@ export function WidgetCard({
   );
 }
 
+export interface TypeTab<T extends string> {
+  value: T;
+  label: string;
+  /** The underline follows the meaning: rose for expenses, emerald for incomes (DESIGN.md, Tabs). */
+  tone: "brand" | "income" | "expense";
+}
+
+const TONE = { brand: "text-brand", income: "text-income", expense: "text-expense" };
+
+/**
+ * The Expenses / Incomes switch every widget shares: tabs with a colored underline, arrow-key
+ * navigation, and a panel (`panelId`) the caller renders with `role="tabpanel"`.
+ */
+export function TypeTabs<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  panelId,
+}: {
+  label: string;
+  value: T;
+  options: TypeTab<T>[];
+  onChange: (value: T) => void;
+  panelId: string;
+}) {
+  const move = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const index = options.findIndex((o) => o.value === value);
+    const next =
+      event.key === "ArrowRight"
+        ? (index + 1) % options.length
+        : event.key === "ArrowLeft"
+          ? (index - 1 + options.length) % options.length
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? options.length - 1
+              : null;
+    if (next === null) return;
+    event.preventDefault();
+    onChange(options[next].value);
+    document.getElementById(tabId(panelId, options[next].value))?.focus();
+  };
+  return (
+    <div role="tablist" aria-label={label} className="flex gap-1" onKeyDown={move}>
+      {options.map((option) => {
+        const active = option.value === value;
+        return (
+          <button
+            key={option.value}
+            id={tabId(panelId, option.value)}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            aria-controls={panelId}
+            tabIndex={active ? 0 : -1}
+            onClick={() => onChange(option.value)}
+            className={cn(
+              "h-10 rounded-sm px-2 text-[13px] font-medium transition-colors sm:h-8",
+              active
+                ? cn(TONE[option.tone], "shadow-[inset_0_-2px_0_currentColor]")
+                : "text-text-muted hover:text-text"
+            )}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function tabId(panelId: string, value: string) {
+  return `${panelId}-tab-${value}`;
+}
+
 export function Skeleton({ className }: { className?: string }) {
   return <div aria-hidden className={cn("animate-pulse rounded-md bg-surface-2", className)} />;
 }

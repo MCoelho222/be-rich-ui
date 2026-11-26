@@ -18,35 +18,43 @@ export function Money({
   );
 }
 
-/** The big number: a large integer part with small cents. */
+/**
+ * The big number: a large integer part with small cents. Projected amounts keep the
+ * projected treatment at any size: "~", italic, muted (DESIGN.md, Big money figure).
+ */
 export function BigMoney({
   amount,
   currency = "BRL",
   tone = "default",
   size = "lg",
+  projected = false,
 }: {
   amount: string | number;
   currency?: string;
   tone?: "default" | "income" | "expense";
   size?: "md" | "lg";
+  projected?: boolean;
 }) {
   const { negative, symbol, integer, cents } = moneyParts(amount, currency);
-  const color = negative
-    ? "text-negative"
-    : tone === "income"
-      ? "text-income"
-      : tone === "expense"
-        ? "text-expense"
-        : "text-text";
+  const color = projected
+    ? "text-text-2 italic"
+    : negative
+      ? "text-negative"
+      : tone === "income"
+        ? "text-income"
+        : tone === "expense"
+          ? "text-expense"
+          : "text-text";
   return (
     <span className={cn("num inline-flex items-baseline", color)}>
       <span
         className={cn(
           "mr-1 opacity-80",
           size === "lg" ? "text-[15px]" : "text-sm",
-          tone === "default" && !negative && "text-text-muted"
+          tone === "default" && !negative && !projected && "text-text-muted"
         )}
       >
+        {projected ? "~ " : ""}
         {negative ? "−" : ""}
         {symbol}
       </span>

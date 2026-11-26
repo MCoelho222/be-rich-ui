@@ -177,11 +177,17 @@
   }
 }
 
-/* Scrollbars that only show on hover */
+/* Thin themed scrollbars. With a mouse they show on hover; on touch screens they stay
+   visible, since there is no hover to reveal that the area scrolls. */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-.custom-scrollbar:hover {
   scrollbar-color: var(--line-strong) transparent;
+}
+@media (hover: hover) {
+  .custom-scrollbar {
+    scrollbar-color: transparent transparent;
+  }
+  .custom-scrollbar:hover {
+    scrollbar-color: var(--line-strong) transparent;
+  }
 }

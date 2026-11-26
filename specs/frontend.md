@@ -45,8 +45,8 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 ### 1.3 Typography
 
 - **Font:** Geist for text, with `tabular-nums` on every number so columns line up.
-- **Big money number** (from today's `DisplayValue`): the integer part is large and the cents are small and raised to the baseline: `R$ 5.800`<sub>`,00`</sub>. It's used on the dashboard cards, the account balances and the totals.
-- **Scale:** 12 (labels, uppercase table headers), 14 (body, tables), 16 (inputs), 20 (section titles), 28 (page titles), 40 (card numbers on desktop; 32 on phones).
+- **Big money number** (from today's `DisplayValue`): the integer part is large and the cents are small and raised to the baseline: `R$ 5.800`<sub>`,00`</sub>. It's used for the dashboard's total balance, the account balances and the totals. Grouped figures (the dashboard's income, expenses and net) use its smaller 26px size. A projected big number keeps the projected treatment: `~`, italic, muted.
+- **Scale:** 12 (labels, uppercase table headers), 14 (body, tables), 16 (inputs), 20 (section titles), 28 (page titles), 36 (the big number on desktop; 32 on phones), 26 (grouped figures).
 
 ### 1.4 Shape and spacing
 
@@ -57,7 +57,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 ### 1.5 Patterns
 
 - **Projected values:** `~` prefix, italic, in `--text-muted`. Projected parts of bars are hatched (diagonal stripes in the bar's color).
-- **Tabs:** the current colored underline (rose for expenses, emerald for incomes, `--brand` elsewhere). Tabs switch on click, not hover.
+- **Tabs:** the current colored underline (rose for expenses, emerald for incomes, `--brand` elsewhere). Tabs switch on click, not hover, and the arrow keys move between them. The same Expenses / Incomes choice is always tabs, never a segmented control.
 - **Tables:** the current style, kept: sticky `--surface-2` header, uppercase 12px column labels, row hover, actions at the row's end. On phones each row becomes a two-line item (description and amount; date, category and badges).
 - **Badges:** small rounded pills: `Fixed` (blue), `2/5` installments (muted), `Projected` (dashed border), `Overdue` (amber).
 - **Feedback:** toasts at the bottom right (top on phones) for saved, deleted and failed actions, each with "Undo" where the API allows it.
@@ -185,9 +185,9 @@ The sidebar is collapsed to icons by default.
 
 ### 6.1 Dashboard
 Fully specified in [dashboard.md](dashboard.md). The visual rules are:
-- the cards use the big number;
-- the chart uses `--income` and `--expense` bars with hatched projected parts, and a `--text` balance line that turns `--negative` below zero, with a dashed zero line;
-- the category bars use the category's position in a fixed 8-color palette, because categories have no color of their own.
+- only the total balance uses the big number; income, expenses and net use the 26px figure;
+- the chart uses `--income` and `--expense` bars with hatched projected parts on the left axis, and a `--text` balance line on its own right axis that turns `--negative` below zero, with a dashed zero line and shaded negative months;
+- the category bars take a color from a fixed 8-color palette, picked from the category's id so it never changes between periods, because categories have no color of their own.
 
 ### 6.2 Entries (`/entries`)
 

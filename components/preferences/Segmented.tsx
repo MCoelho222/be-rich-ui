@@ -48,7 +48,9 @@ export function Segmented<T extends string>({
             onClick={() => onChange(option.value)}
             className={cn(
               "inline-flex items-center justify-center rounded-md font-semibold transition-colors",
-              size === "sm" ? "h-6 min-w-7 px-1.5 text-[11px]" : "h-7 min-w-9 px-2 text-xs",
+              size === "sm"
+                ? "h-6 min-w-7 px-1.5 text-[11px]"
+                : "h-9 min-w-10 px-2 text-xs sm:h-7 sm:min-w-9",
               active ? "bg-surface-2 text-text" : "text-text-muted hover:text-text"
             )}
           >

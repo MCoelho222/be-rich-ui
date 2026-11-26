@@ -67,6 +67,24 @@ export function formatCompact(value: number, locale: string): string {
   }).format(value);
 }
 
+/** "R$ 22,9 mil"-style compact money for chart axes and labels. */
+export function formatCompactMoney(value: number, currency: string, locale: string): string {
+  const body = new Intl.NumberFormat(locale === "pt" ? "pt-BR" : "en", {
+    style: "currency",
+    currency,
+    notation: "compact",
+    maximumFractionDigits: 1,
+  })
+    .format(Math.abs(value))
+    .replace(/ /g, " ");
+  return value < 0 ? `${MINUS}${body}` : body;
+}
+
+/** Whole days from one "YYYY-MM-DD" date to another (positive when `to` is later). */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((toUtcDate(to).getTime() - toUtcDate(from).getTime()) / 86_400_000);
+}
+
 // --- Dates (always "YYYY-MM-DD" strings from the API; no time zones) ---------------
 
 function toUtcDate(iso: string): Date {

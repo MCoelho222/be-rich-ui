@@ -15,11 +15,12 @@ import {
   YAxis,
 } from "recharts";
 import { useNewEntry } from "@/components/shell/NewEntry";
-import { formatCompact, formatMoney, formatMonth, formatMonthShort } from "@/lib/format";
-import { chartRange, todayIso } from "@/lib/period";
+import { formatCompactMoney, formatMoney, formatMonth, formatMonthShort } from "@/lib/format";
+import { chartRange, firstOfMonth, lastOfMonth, todayIso } from "@/lib/period";
 import { useProjection, type Projection, type ReportFilters } from "@/lib/queries";
 import { useThemeColors } from "@/lib/theme-colors";
-import type { DashboardView } from "./view";
+import { projectionOutlook } from "./outlook";
+import type { DashboardView, useDashboardView } from "./view";
 import { CurrencyNote, Skeleton, WidgetCard, WidgetError } from "./Widget";
 
 type Month = Projection["months"][number];
@@ -67,32 +68,30 @@ function toPoints(months: Month[]): Point[] {
   }));
 }
 
+type Update = ReturnType<typeof useDashboardView>["update"];
+
 export function ProjectionChart({
   view,
+  update,
   filters,
 }: {
   view: DashboardView;
+  update: Update;
   filters: ReportFilters;
 }) {
   const t = useTranslations("dashboard.chart");
-  const locale = useLocale();
   const range = chartRange(view.range, todayIso());
   const projection = useProjection(range.from, range.to, filters);
 
   return (
-    <WidgetCard title={t("title")} actions={<Legend />}>
+    <WidgetCard title={t("title")} actions={<Legend household={view.member === "me"} />}>
       {projection.isPending ? (
         <Skeleton className="h-[280px] w-full" />
       ) : projection.isError ? (
         <WidgetError onRetry={() => void projection.refetch()} />
       ) : (
         <>
-          {projection.data.first_negative_month && (
-            <p className="inline-flex items-center gap-2 self-start rounded-full bg-negative-soft px-3 py-1.5 text-[13px] font-medium text-negative">
-              <AlertTriangle size={14} aria-hidden />
-              {t("negative", { month: formatMonth(projection.data.first_negative_month, locale) })}
-            </p>
-          )}
+          <NegativeWarning data={projection.data} update={update} />
           <ChartBody data={projection.data} view={view} />
           <CurrencyNote data={projection.data} />
         </>
@@ -101,7 +100,48 @@ export function ProjectionChart({
   );
 }
 
-function Legend() {
+/** When the balance would go below zero: when, how low, and a way to open that month. */
+function NegativeWarning({ data, update }: { data: Projection; update: Update }) {
+  const t = useTranslations("dashboard.chart");
+  const locale = useLocale();
+  const outlook = projectionOutlook(data, todayIso());
+  const month = data.first_negative_month;
+  if (!month) return null;
+  return (
+    <div
+      role="status"
+      className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-negative-soft px-3 py-2 text-[13px] text-negative"
+    >
+      <AlertTriangle size={15} className="shrink-0" aria-hidden />
+      <span className="font-medium">{t("negative", { month: formatMonth(month, locale) })}</span>
+      {outlook && (
+        <span className="num">
+          {t("shortfall", {
+            amount: formatMoney(outlook.low.balance, data.currency, {
+              projected: outlook.low.projected,
+            }),
+            month: formatMonth(outlook.low.month, locale),
+          })}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() =>
+          update({
+            preset: "custom",
+            from: firstOfMonth(`${month}-01`),
+            to: lastOfMonth(`${month}-01`),
+          })
+        }
+        className="-my-1 ml-auto inline-flex h-10 items-center rounded-md px-2 font-medium underline-offset-2 hover:underline sm:h-7"
+      >
+        {t("seeMonth", { month: formatMonth(month, locale) })}
+      </button>
+    </div>
+  );
+}
+
+function Legend({ household }: { household: boolean }) {
   const t = useTranslations("dashboard.chart");
   const item = (swatch: React.ReactNode, label: string) => (
     <span className="inline-flex items-center gap-1.5">
@@ -114,10 +154,13 @@ function Legend() {
       {item(<span className="size-2.5 rounded-sm bg-income-bar" />, t("income"))}
       {item(<span className="size-2.5 rounded-sm bg-expense-bar" />, t("expenses"))}
       {item(
-        <span className="hatch size-2.5 rounded-sm border border-expense-bar text-expense-bar" />,
+        <span className="hatch size-2.5 rounded-sm border border-text-muted text-text-muted" />,
         t("projected")
       )}
-      {item(<span className="h-0.5 w-3.5 bg-text" />, t("balance"))}
+      {item(
+        <span className="h-0.5 w-3.5 bg-text" />,
+        household ? t("householdBalance") : t("balance")
+      )}
     </div>
   );
 }
@@ -134,16 +177,26 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
   const empty = data.months.every((m) => n(m.income.total) === 0 && n(m.expenses.total) === 0);
   if (empty) {
     return (
-      <div className="flex h-[220px] flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-line-strong text-sm text-text-muted">
+      <div className="flex h-[220px] flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-line-strong px-4 text-center text-sm text-text-muted">
         {t("empty")}
-        <button
-          type="button"
-          onClick={() => open("expense")}
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brand px-3.5 font-semibold text-on-brand hover:bg-brand-hover"
-        >
-          <Plus size={16} aria-hidden />
-          {t("addFirst")}
-        </button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => open("expense")}
+            className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-brand px-3.5 font-semibold text-on-brand hover:bg-brand-hover sm:h-9"
+          >
+            <Plus size={16} aria-hidden />
+            {t("addFirst")}
+          </button>
+          <button
+            type="button"
+            onClick={() => open("income")}
+            className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line-strong px-3.5 font-medium text-text hover:bg-surface-2 sm:h-9"
+          >
+            <Plus size={16} aria-hidden />
+            {t("addIncome")}
+          </button>
+        </div>
       </div>
     );
   }
@@ -175,6 +228,15 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
         : `url(#bal-${uid})`;
   const first = data.months[0]?.month;
   const last = data.months[data.months.length - 1]?.month;
+  // Balance labelled on the line where it matters: the start, the lowest point, the end.
+  const withBalance = points.flatMap((p, i) => (p.balance === null ? [] : [i]));
+  const lowest = withBalance.reduce(
+    (a, b) => (points[b].balance! < points[a].balance! ? b : a),
+    withBalance[0] ?? -1
+  );
+  const labelled = new Set([withBalance[0], lowest, withBalance[withBalance.length - 1]]);
+  const negativeMonths = points.filter((p) => p.balance !== null && p.balance < 0);
+  const money = (value: number) => formatCompactMoney(value, data.currency, locale);
 
   return (
     <div
@@ -182,12 +244,13 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
       className="custom-scrollbar overflow-x-auto"
       style={{ minHeight: CHART_HEIGHT }}
     >
+      <MonthTable data={data} />
       <ComposedChart
         width={width}
         height={CHART_HEIGHT}
         data={points}
         barGap={3}
-        margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+        margin={{ top: 24, right: 4, bottom: 0, left: 0 }}
         accessibilityLayer
         title={t("aria", { from: formatMonth(first, locale), to: formatMonth(last, locale) })}
       >
@@ -213,9 +276,21 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
             <stop offset={zeroAt} stopColor={colors["--negative"]} />
           </linearGradient>
         </defs>
-        <CartesianGrid vertical={false} stroke={colors["--line"]} />
+        <CartesianGrid yAxisId="flow" vertical={false} stroke={colors["--line"]} />
+        {negativeMonths.map((p) => (
+          <ReferenceArea
+            key={p.key}
+            yAxisId="flow"
+            x1={p.key}
+            x2={p.key}
+            fill={colors["--negative"]}
+            fillOpacity={0.08}
+            ifOverflow="extendDomain"
+          />
+        ))}
         {inPeriod.length > 0 && (
           <ReferenceArea
+            yAxisId="flow"
             x1={inPeriod[0].key}
             x2={inPeriod[inPeriod.length - 1].key}
             fill={colors["--text"]}
@@ -230,16 +305,36 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
           axisLine={false}
           tick={{ fill: colors["--text-muted"], fontSize: 12 }}
         />
+        {/* Flows and the balance differ by an order of magnitude: each gets its own axis. */}
         <YAxis
-          tickFormatter={(value: number) => formatCompact(value, locale)}
+          yAxisId="flow"
+          tickFormatter={money}
           tickLine={false}
           axisLine={false}
-          width={44}
+          width={60}
           tick={{ fill: colors["--text-muted"], fontSize: 11 }}
         />
-        <ReferenceLine y={0} stroke={colors["--line-strong"]} strokeDasharray="4 4" />
+        <YAxis
+          yAxisId="balance"
+          orientation="right"
+          tickFormatter={money}
+          tickLine={false}
+          axisLine={false}
+          width={60}
+          tick={{ fill: colors["--text-muted"], fontSize: 11 }}
+        />
+        {min < 0 && (
+          <ReferenceLine
+            yAxisId="balance"
+            y={0}
+            stroke={colors["--negative"]}
+            strokeOpacity={0.5}
+            strokeDasharray="4 4"
+          />
+        )}
         <Bar
           dataKey="incomeSolid"
+          yAxisId="flow"
           stackId="income"
           fill={colors["--income-bar"]}
           maxBarSize={22}
@@ -247,6 +342,7 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
         />
         <Bar
           dataKey="incomeProjected"
+          yAxisId="flow"
           stackId="income"
           fill={`url(#income-${uid})`}
           stroke={colors["--income-bar"]}
@@ -256,6 +352,7 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
         />
         <Bar
           dataKey="expenseSolid"
+          yAxisId="flow"
           stackId="expense"
           fill={colors["--expense-bar"]}
           maxBarSize={22}
@@ -263,6 +360,7 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
         />
         <Bar
           dataKey="expenseProjected"
+          yAxisId="flow"
           stackId="expense"
           fill={`url(#expense-${uid})`}
           stroke={colors["--expense-bar"]}
@@ -272,6 +370,7 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
         />
         <Line
           dataKey="balance"
+          yAxisId="balance"
           type="linear"
           stroke={lineStroke}
           strokeWidth={2.5}
@@ -294,6 +393,25 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
             );
           }}
           activeDot={{ r: 5 }}
+          label={(props: { x?: number | string; y?: number | string; index?: number }) => {
+            const point = props.index === undefined ? undefined : points[props.index];
+            if (!point || point.balance === null || !labelled.has(props.index!))
+              return <g key={`label-${props.index}`} />;
+            return (
+              <text
+                key={`label-${props.index}`}
+                x={Number(props.x)}
+                y={Number(props.y) - 12}
+                textAnchor="middle"
+                fontSize={11}
+                fontWeight={600}
+                className="num"
+                fill={point.balance < 0 ? colors["--negative"] : colors["--text"]}
+              >
+                {money(point.balance)}
+              </text>
+            );
+          }}
         />
         <Tooltip
           content={(props) => (
@@ -303,6 +421,37 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
         />
       </ComposedChart>
     </div>
+  );
+}
+
+/** The chart's numbers as a table, for screen readers (the tooltip is pointer-only). */
+function MonthTable({ data }: { data: Projection }) {
+  const t = useTranslations("dashboard.chart");
+  const locale = useLocale();
+  const money = (value: string, projected = false) =>
+    formatMoney(value, data.currency, { projected });
+  return (
+    <table className="sr-only">
+      <caption>{t("title")}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{t("monthCol")}</th>
+          <th scope="col">{t("income")}</th>
+          <th scope="col">{t("expenses")}</th>
+          <th scope="col">{t("endBalance")}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.months.map((m) => (
+          <tr key={m.month}>
+            <th scope="row">{formatMonth(m.month, locale)}</th>
+            <td>{money(m.income.total, n(m.income.projected_fixed) > 0)}</td>
+            <td>{money(m.expenses.total, n(m.expenses.projected_fixed) > 0)}</td>
+            <td>{m.end_balance === null ? "—" : money(m.end_balance, m.end_balance_projected)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
