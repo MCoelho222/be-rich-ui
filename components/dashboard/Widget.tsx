@@ -11,18 +11,23 @@ export function WidgetCard({
   children,
   className,
   padded = true,
+  updating = false,
 }: {
   title?: React.ReactNode;
   actions?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   padded?: boolean;
+  /** Showing the previous result while new filters load: dimmed, never a skeleton flash. */
+  updating?: boolean;
 }) {
   return (
     <section
+      aria-busy={updating}
       className={cn(
-        "flex min-w-0 flex-col gap-4 rounded-xl border border-line bg-surface",
+        "flex min-w-0 flex-col gap-4 rounded-xl border border-line bg-surface transition-opacity",
         padded && "p-4 sm:p-5",
+        updating && "opacity-60",
         className
       )}
     >
@@ -129,7 +134,7 @@ export function WidgetError({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="inline-flex items-center gap-1.5 font-medium hover:underline"
+        className="-my-2 inline-flex h-10 items-center gap-1.5 font-medium hover:underline sm:h-8"
       >
         <RotateCw size={14} aria-hidden />
         {t("retry")}

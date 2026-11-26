@@ -158,6 +158,7 @@
       "expenses": "Despesas",
       "projected": "Previsto",
       "balance": "Saldo",
+      "flows": "Receitas e despesas",
       "realized": "Realizado",
       "scheduled": "Agendado",
       "projectedFixed": "Fixos previstos",
@@ -199,6 +200,7 @@
       "projected": "Previsto",
       "register": "Registrar",
       "loadMore": "Carregar mais",
+      "loadingMore": "Carregando…",
       "empty": "Nenhum lançamento neste período."
     }
   },

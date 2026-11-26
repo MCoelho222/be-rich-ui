@@ -158,6 +158,7 @@
       "expenses": "Expenses",
       "projected": "Projected",
       "balance": "Balance",
+      "flows": "Income and expenses",
       "realized": "Realized",
       "scheduled": "Scheduled",
       "projectedFixed": "Projected fixed",
@@ -199,6 +200,7 @@
       "projected": "Projected",
       "register": "Register",
       "loadMore": "Load more",
+      "loadingMore": "Loading…",
       "empty": "No entries in this period."
     }
   },

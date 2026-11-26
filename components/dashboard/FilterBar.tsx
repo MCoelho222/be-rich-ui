@@ -205,7 +205,7 @@ function MemberToggle({ view, update }: { view: DashboardView; update: Update })
         { value: "all", label: t("everyone") },
         { value: "me", label: t("me") },
       ]}
-      className="[&_button]:h-8 [&_button]:px-3 [&_button]:text-[13px] [&_button]:font-medium"
+      className="[&_button]:h-9 [&_button]:px-3 [&_button]:text-[13px] [&_button]:font-medium sm:[&_button]:h-8"
     />
   );
 }

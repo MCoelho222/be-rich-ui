@@ -24,9 +24,12 @@ import { projectionOutlook } from "./outlook";
 import type { DashboardView } from "./view";
 import { Skeleton, WidgetError } from "./Widget";
 
-const cardClass = "flex min-w-0 flex-col gap-3 rounded-xl border border-line bg-surface p-4 sm:p-5";
+const cardClass =
+  "flex min-w-0 flex-col gap-3 rounded-xl border border-line bg-surface p-4 transition-opacity sm:p-5";
 const labelClass = "text-[13px] font-medium text-text-muted";
 const captionClass = "text-[13px] text-text-muted";
+/** Previous figures stay up, dimmed, while a new period or filter loads. */
+const updatingClass = "opacity-60";
 
 export function SummaryCards({
   view,
@@ -88,7 +91,11 @@ function BalanceCard({
   const overdrawn = now.data.accounts.filter((a) => a.balance !== null && Number(a.balance) < 0);
 
   return (
-    <section aria-labelledby="balance-label" className={cardClass}>
+    <section
+      aria-labelledby="balance-label"
+      aria-busy={now.isPlaceholderData || end.isPlaceholderData}
+      className={cn(cardClass, (now.isPlaceholderData || end.isPlaceholderData) && updatingClass)}
+    >
       <div className="flex items-center gap-2">
         <span id="balance-label" className={cn(labelClass, "flex-1")}>
           {view.member ? t("household") : t("total")}
@@ -257,7 +264,11 @@ function FlowsCard({ view, filters }: { view: DashboardView; filters: ReportFilt
   const s = summary.data;
   const share = s.fixed_expenses.share;
   return (
-    <section aria-label={t("periodFlows")} className={cn(cardClass, "gap-4")}>
+    <section
+      aria-label={t("periodFlows")}
+      aria-busy={summary.isPlaceholderData}
+      className={cn(cardClass, "gap-4", summary.isPlaceholderData && updatingClass)}
+    >
       <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
         <FlowFigure label={t("income")} flow={s.income} summary={s} tone="income" />
         <FlowFigure label={t("expenses")} flow={s.expenses} summary={s} tone="expense" />

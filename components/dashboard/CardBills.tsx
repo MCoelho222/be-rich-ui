@@ -18,7 +18,7 @@ export function CardBills({ filters }: { filters: ReportFilters }) {
   if (bills.isSuccess && bills.data.items.length === 0) return null;
 
   return (
-    <WidgetCard title={t("title")}>
+    <WidgetCard title={t("title")} updating={bills.isPlaceholderData}>
       {bills.isPending ? (
         <Skeleton className="h-16 w-full" />
       ) : bills.isError ? (

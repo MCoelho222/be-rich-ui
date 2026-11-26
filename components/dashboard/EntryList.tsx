@@ -149,6 +149,7 @@ export function EntryList({ view, filters }: { view: DashboardView; filters: Rep
     <WidgetCard
       padded={false}
       title={t("title")}
+      updating={query.isPlaceholderData}
       actions={
         <TypeTabs<TypeFilter>
           label={t("title")}
@@ -253,9 +254,10 @@ export function EntryList({ view, filters }: { view: DashboardView; filters: Rep
               type="button"
               onClick={() => void query.fetchNextPage()}
               disabled={query.isFetchingNextPage}
+              aria-busy={query.isFetchingNextPage}
               className="h-10 rounded-lg border border-line-strong px-4 text-sm hover:bg-surface-2 disabled:opacity-50 sm:h-9"
             >
-              {t("loadMore")}
+              {query.isFetchingNextPage ? t("loadingMore") : t("loadMore")}
             </button>
           </div>
         )}

@@ -6,28 +6,18 @@ import { useId, useState } from "react";
 import { Money } from "@/components/money/Money";
 import { formatShare } from "@/lib/format";
 import { byId, useCategories, useCategoryBreakdown, type ReportFilters } from "@/lib/queries";
+import { cn } from "@/lib/utils";
 import type { DashboardView, useDashboardView } from "./view";
 import { CurrencyNote, Skeleton, TypeTabs, WidgetCard, WidgetError, tabId } from "./Widget";
 
-/** Categories have no color of their own: a fixed palette (frontend.md §6.1). */
-export const CATEGORY_PALETTE = [
-  "#0ea5e9",
-  "#8b5cf6",
-  "#f59e0b",
-  "#ec4899",
-  "#14b8a6",
-  "#f97316",
-  "#6366f1",
-  "#84cc16",
-];
 const VISIBLE = 8;
 
-/** A category keeps the same color whatever its rank in the period, so it stays recognizable. */
-export function categoryColor(categoryId: string): string {
-  let hash = 0;
-  for (const char of categoryId) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return CATEGORY_PALETTE[hash % CATEGORY_PALETTE.length];
-}
+/**
+ * One series, one colour: every bar takes the tab's colour (rose for expenses, emerald for
+ * incomes). Each row names its category, so a colour per category would add nothing.
+ */
+const BAR = { EXPENSE: "bg-expense-bar", INCOME: "bg-income-bar" };
+const HATCH = { EXPENSE: "text-expense-bar", INCOME: "text-income-bar" };
 
 type Update = ReturnType<typeof useDashboardView>["update"];
 
@@ -54,6 +44,7 @@ export function CategoryBreakdown({
   return (
     <WidgetCard
       title={t("title")}
+      updating={breakdown.isPlaceholderData}
       actions={
         <TypeTabs
           label={t("title")}
@@ -88,7 +79,6 @@ export function CategoryBreakdown({
         ) : (
           <ul className="flex flex-col gap-3.5">
             {visible.map((item) => {
-              const color = categoryColor(item.category_id);
               const total = Number(item.total);
               const realized = Number(item.realized);
               const projectedPart = total - realized;
@@ -97,11 +87,6 @@ export function CategoryBreakdown({
                 <li key={item.category_id}>
                   <Link href={href} className="group flex flex-col gap-1.5 rounded-md">
                     <span className="flex items-baseline gap-2 text-sm">
-                      <span
-                        aria-hidden
-                        className="size-2 self-center rounded-sm"
-                        style={{ background: color }}
-                      />
                       <span className="flex-1 truncate font-medium group-hover:underline">
                         {names.get(item.category_id)?.name ?? "—"}
                       </span>
@@ -116,11 +101,12 @@ export function CategoryBreakdown({
                     </span>
                     <span className="flex h-2 overflow-hidden rounded bg-surface-2" aria-hidden>
                       <span
-                        style={{ width: `${max ? (realized / max) * 100 : 0}%`, background: color }}
+                        className={BAR[type]}
+                        style={{ width: `${max ? (realized / max) * 100 : 0}%` }}
                       />
                       <span
-                        className="hatch"
-                        style={{ width: `${max ? (projectedPart / max) * 100 : 0}%`, color }}
+                        className={cn("hatch", HATCH[type])}
+                        style={{ width: `${max ? (projectedPart / max) * 100 : 0}%` }}
                       />
                     </span>
                   </Link>
@@ -133,7 +119,7 @@ export function CategoryBreakdown({
           <button
             type="button"
             onClick={() => setShowAll((v) => !v)}
-            className="-my-2 self-start py-2 text-sm text-brand hover:text-brand-hover hover:underline"
+            className="-my-2 inline-flex min-h-10 items-center self-start text-sm sm:min-h-9 text-brand hover:text-brand-hover hover:underline"
           >
             {showAll ? t("showLess") : t("showAll", { count: items.length })}
           </button>

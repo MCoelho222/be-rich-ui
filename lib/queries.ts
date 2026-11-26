@@ -113,9 +113,16 @@ export function byId<T extends { id: string }>(items: T[] | undefined): Map<stri
 
 // --- Read models (api.md §13) ------------------------------------------------------
 
+/**
+ * Dashboard reports keep showing the previous result while a new period or filter loads,
+ * dimmed by the widget, instead of flashing back to a skeleton (dashboard.md §4.9).
+ */
+const keepPrevious = <T>(previous: T | undefined) => previous;
+
 export function useBalances(date: string, filters: ReportFilters) {
   return useQuery({
     queryKey: [...keys.reports, "balances", date, filters.accountId],
+    placeholderData: keepPrevious,
     queryFn: () => api.get<Balances>("balances", { date, account_id: filters.accountId }),
   });
 }
@@ -123,6 +130,7 @@ export function useBalances(date: string, filters: ReportFilters) {
 export function useSummary(from: string, to: string, filters: ReportFilters) {
   return useQuery({
     queryKey: [...keys.reports, "summary", from, to, filters],
+    placeholderData: keepPrevious,
     queryFn: () => api.get<Summary>("dashboard/summary", { from, to, ...filterQuery(filters) }),
   });
 }
@@ -130,6 +138,7 @@ export function useSummary(from: string, to: string, filters: ReportFilters) {
 export function useProjection(from: string, to: string, filters: ReportFilters) {
   return useQuery({
     queryKey: [...keys.reports, "projection", from, to, filters],
+    placeholderData: keepPrevious,
     queryFn: () => api.get<Projection>("projection", { from, to, ...filterQuery(filters) }),
   });
 }
@@ -142,6 +151,7 @@ export function useCategoryBreakdown(
 ) {
   return useQuery({
     queryKey: [...keys.reports, "categories", from, to, type, filters],
+    placeholderData: keepPrevious,
     queryFn: () =>
       api.get<CategoryBreakdown>("dashboard/categories", {
         from,
@@ -155,6 +165,7 @@ export function useCategoryBreakdown(
 export function useCardBills(filters: ReportFilters) {
   return useQuery({
     queryKey: [...keys.reports, "bills", filters],
+    placeholderData: keepPrevious,
     queryFn: () => api.get<CardBills>("cards/bills", filterQuery(filters)),
   });
 }
@@ -167,6 +178,7 @@ export function useProjectionItems(
 ) {
   return useInfiniteQuery({
     queryKey: [...keys.reports, "items", from, to, type, filters],
+    placeholderData: keepPrevious,
     queryFn: ({ pageParam }) =>
       api.get<ProjectionItems>("projection/items", {
         from,

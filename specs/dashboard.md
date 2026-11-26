@@ -116,12 +116,13 @@ The dashboard is the home screen. It answers, at a glance:
 ### 4.4 Projection chart
 
 - Monthly bars for income and expenses, plus a line for the **cumulative projected balance**, which starts from the current total balance (§14.2).
-- **Two axes:** the bars use the left axis and the balance line its own right axis, because balances are usually an order of magnitude larger than a month's flows. Both axes show compact currency ("R$ 22,9 mil").
+- **Two panels, one month axis:** the balance line on top and the income and expense bars below, each panel with its own scale, because balances are usually an order of magnitude larger than a month's flows. Never two scales on one plot: the crossing of the line and the bars would mean nothing. Both axes show compact currency ("R$ 22,9 mil"). Hovering a month highlights it in both panels.
+- Bars have 4px rounded tops (only the top segment of a stack) and square bases.
 - The balance is labelled on the line at the first month, the lowest month and the last month.
 - Projected parts of each bar are hatched.
 - Months where the projected balance is negative are shaded in `--negative`, the line and its dots turn `--negative`, and a dashed zero line appears.
 - **Negative warning:** above the chart, "Balance projected to go negative in Mar/2027 · Lowest: −R$ 1.240,00 in Apr/2027", with a "See Mar/2027" button that switches the period to that month (custom range).
-- While "Me" is on, the legend labels the line "Household balance" (§3.2).
+- While "Me" is on, the legend and the top panel's label say "Household balance" (§3.2).
 - Hovering a month shows a breakdown: realized, scheduled future rows (such as installments), projected fixed entries, and the end-of-month balance. The same numbers are available to screen readers as a visually hidden table.
 - **Range:** the chart always covers at least the current month and the next 5 months, and stretches to cover the selected period. In months: from = the earlier of the period's first month and the current month; to = the later of the period's last month and the current month + 5. The months inside the selected period are highlighted.
 - **Data:** `GET /projection` with that range.
@@ -141,7 +142,7 @@ The dashboard is the home screen. It answers, at a glance:
 - A horizontal bar chart of the period's totals per category, largest first.
 - Tabs switch between **Expenses** (the default) and **Incomes**, with the colored underline (frontend.md §1.5). The choice is kept with the view (§3.3) as `&categories=incomes`.
 - Only categories with entries in the period appear, including projected fixed occurrences; unused categories are never shown.
-- Each category's colour comes from its id, so it stays the same whatever its rank in the period. Each bar shows the category's colour (no icon), its name, the amount and its share of the total. The projected part of a bar is hatched, as in the chart.
+- Every bar takes the tab's colour (rose for Expenses, emerald for Incomes); categories have no colour of their own. Each row shows the category's name, the amount and its share of the total. The projected part of a bar is hatched, as in the chart.
 - At most 8 bars are shown; when there are more, a "Show all (12)" link expands the list.
 - **Interaction:** clicking a bar opens the Expenses (or Incomes) list filtered by that category and the period.
 - **Empty state:** "No expenses in this period" (or incomes).

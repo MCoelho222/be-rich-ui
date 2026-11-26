@@ -1,41 +1,29 @@
 "use client";
 /** Monthly income and expense bars with the cumulative projected balance line (dashboard.md §4.4). */
 import { AlertTriangle, Plus } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useId, useState } from "react";
-import {
-  Bar,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ReferenceArea,
-  ReferenceLine,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { useEffect, useState } from "react";
 import { useNewEntry } from "@/components/shell/NewEntry";
-import { formatCompactMoney, formatMoney, formatMonth, formatMonthShort } from "@/lib/format";
+import { formatMoney, formatMonth } from "@/lib/format";
 import { chartRange, firstOfMonth, lastOfMonth, todayIso } from "@/lib/period";
 import { useProjection, type Projection, type ReportFilters } from "@/lib/queries";
-import { useThemeColors } from "@/lib/theme-colors";
 import { projectionOutlook } from "./outlook";
 import type { DashboardView, useDashboardView } from "./view";
 import { CurrencyNote, Skeleton, WidgetCard, WidgetError } from "./Widget";
 
-type Month = Projection["months"][number];
+/** Both panels with their labels: the balance on top, income and expenses below. */
+const CHART_HEIGHT = 340;
 
-interface Point {
-  key: string;
-  month: Month;
-  incomeSolid: number;
-  incomeProjected: number;
-  expenseSolid: number;
-  expenseProjected: number;
-  balance: number | null;
+function ChartSkeleton() {
+  return <Skeleton className="h-[340px] w-full" />;
 }
 
-const CHART_HEIGHT = 280;
+// recharts is the dashboard's largest dependency: it loads on its own, behind the skeleton.
+const ProjectionPlot = dynamic(() => import("./ProjectionPlot"), {
+  ssr: false,
+  loading: ChartSkeleton,
+});
 
 /**
  * The element's width, kept current. Recharts gets explicit sizes, measured here.
@@ -53,20 +41,8 @@ function useWidth<T extends HTMLElement>() {
   return [setNode, width] as const;
 }
 
-// Chart geometry only: amounts are converted to numbers to be drawn, never to be summed.
+// Amounts are converted to numbers only to test for zero, never to be summed.
 const n = (value: string) => Number(value);
-
-function toPoints(months: Month[]): Point[] {
-  return months.map((m) => ({
-    key: m.month,
-    month: m,
-    incomeSolid: n(m.income.realized) + n(m.income.scheduled),
-    incomeProjected: n(m.income.projected_fixed),
-    expenseSolid: n(m.expenses.realized) + n(m.expenses.scheduled),
-    expenseProjected: n(m.expenses.projected_fixed),
-    balance: m.end_balance === null ? null : n(m.end_balance),
-  }));
-}
 
 type Update = ReturnType<typeof useDashboardView>["update"];
 
@@ -84,9 +60,13 @@ export function ProjectionChart({
   const projection = useProjection(range.from, range.to, filters);
 
   return (
-    <WidgetCard title={t("title")} actions={<Legend household={view.member === "me"} />}>
+    <WidgetCard
+      title={t("title")}
+      actions={<Legend household={view.member === "me"} />}
+      updating={projection.isPlaceholderData}
+    >
       {projection.isPending ? (
-        <Skeleton className="h-[280px] w-full" />
+        <Skeleton className="h-[340px] w-full" />
       ) : projection.isError ? (
         <WidgetError onRetry={() => void projection.refetch()} />
       ) : (
@@ -167,12 +147,8 @@ function Legend({ household }: { household: boolean }) {
 
 function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
   const t = useTranslations("dashboard.chart");
-  const locale = useLocale();
-  const colors = useThemeColors();
   const { open } = useNewEntry();
-  const uid = useId().replace(/:/g, "");
   const [boxRef, boxWidth] = useWidth<HTMLDivElement>();
-  const points = toPoints(data.months);
 
   const empty = data.months.every((m) => n(m.income.total) === 0 && n(m.expenses.total) === 0);
   if (empty) {
@@ -200,44 +176,6 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
       </div>
     );
   }
-  // On phones the chart keeps ~56px per month and scrolls sideways (dashboard.md §2.2).
-  const width = Math.max(boxWidth, Math.max(points.length, 6) * 56);
-  if (!colors || boxWidth === 0) {
-    // Keep the measured box mounted while the width and theme colors are read.
-    return (
-      <div ref={boxRef} style={{ minHeight: CHART_HEIGHT }}>
-        <Skeleton className="h-[280px] w-full" />
-      </div>
-    );
-  }
-
-  // The selected period's months are highlighted.
-  const inPeriod = points.filter(
-    (p) => p.key >= view.range.from.slice(0, 7) && p.key <= view.range.to.slice(0, 7)
-  );
-  // The balance line turns red below zero: a vertical gradient split at the zero line.
-  const balances = points.map((p) => p.balance).filter((b): b is number => b !== null);
-  const max = Math.max(...balances, 0);
-  const min = Math.min(...balances, 0);
-  const zeroAt = max === min ? 1 : max / (max - min);
-  const lineStroke =
-    max === min || min >= 0
-      ? colors["--text"]
-      : max <= 0
-        ? colors["--negative"]
-        : `url(#bal-${uid})`;
-  const first = data.months[0]?.month;
-  const last = data.months[data.months.length - 1]?.month;
-  // Balance labelled on the line where it matters: the start, the lowest point, the end.
-  const withBalance = points.flatMap((p, i) => (p.balance === null ? [] : [i]));
-  const lowest = withBalance.reduce(
-    (a, b) => (points[b].balance! < points[a].balance! ? b : a),
-    withBalance[0] ?? -1
-  );
-  const labelled = new Set([withBalance[0], lowest, withBalance[withBalance.length - 1]]);
-  const negativeMonths = points.filter((p) => p.balance !== null && p.balance < 0);
-  const money = (value: number) => formatCompactMoney(value, data.currency, locale);
-
   return (
     <div
       ref={boxRef}
@@ -245,181 +183,11 @@ function ChartBody({ data, view }: { data: Projection; view: DashboardView }) {
       style={{ minHeight: CHART_HEIGHT }}
     >
       <MonthTable data={data} />
-      <ComposedChart
-        width={width}
-        height={CHART_HEIGHT}
-        data={points}
-        barGap={3}
-        margin={{ top: 24, right: 4, bottom: 0, left: 0 }}
-        accessibilityLayer
-        title={t("aria", { from: formatMonth(first, locale), to: formatMonth(last, locale) })}
-      >
-        <defs>
-          {(["income", "expense"] as const).map((kind) => {
-            const color = colors[kind === "income" ? "--income-bar" : "--expense-bar"];
-            return (
-              <pattern
-                key={kind}
-                id={`${kind}-${uid}`}
-                width="6"
-                height="6"
-                patternUnits="userSpaceOnUse"
-                patternTransform="rotate(45)"
-              >
-                <rect width="6" height="6" fill={color} fillOpacity={0.12} />
-                <line x1="0" y1="0" x2="0" y2="6" stroke={color} strokeWidth="2.2" />
-              </pattern>
-            );
-          })}
-          <linearGradient id={`bal-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset={zeroAt} stopColor={colors["--text"]} />
-            <stop offset={zeroAt} stopColor={colors["--negative"]} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid yAxisId="flow" vertical={false} stroke={colors["--line"]} />
-        {negativeMonths.map((p) => (
-          <ReferenceArea
-            key={p.key}
-            yAxisId="flow"
-            x1={p.key}
-            x2={p.key}
-            fill={colors["--negative"]}
-            fillOpacity={0.08}
-            ifOverflow="extendDomain"
-          />
-        ))}
-        {inPeriod.length > 0 && (
-          <ReferenceArea
-            yAxisId="flow"
-            x1={inPeriod[0].key}
-            x2={inPeriod[inPeriod.length - 1].key}
-            fill={colors["--text"]}
-            fillOpacity={0.04}
-            ifOverflow="extendDomain"
-          />
-        )}
-        <XAxis
-          dataKey="key"
-          tickFormatter={(key: string) => formatMonthShort(key, locale)}
-          tickLine={false}
-          axisLine={false}
-          tick={{ fill: colors["--text-muted"], fontSize: 12 }}
-        />
-        {/* Flows and the balance differ by an order of magnitude: each gets its own axis. */}
-        <YAxis
-          yAxisId="flow"
-          tickFormatter={money}
-          tickLine={false}
-          axisLine={false}
-          width={60}
-          tick={{ fill: colors["--text-muted"], fontSize: 11 }}
-        />
-        <YAxis
-          yAxisId="balance"
-          orientation="right"
-          tickFormatter={money}
-          tickLine={false}
-          axisLine={false}
-          width={60}
-          tick={{ fill: colors["--text-muted"], fontSize: 11 }}
-        />
-        {min < 0 && (
-          <ReferenceLine
-            yAxisId="balance"
-            y={0}
-            stroke={colors["--negative"]}
-            strokeOpacity={0.5}
-            strokeDasharray="4 4"
-          />
-        )}
-        <Bar
-          dataKey="incomeSolid"
-          yAxisId="flow"
-          stackId="income"
-          fill={colors["--income-bar"]}
-          maxBarSize={22}
-          isAnimationActive={false}
-        />
-        <Bar
-          dataKey="incomeProjected"
-          yAxisId="flow"
-          stackId="income"
-          fill={`url(#income-${uid})`}
-          stroke={colors["--income-bar"]}
-          strokeWidth={1}
-          maxBarSize={22}
-          isAnimationActive={false}
-        />
-        <Bar
-          dataKey="expenseSolid"
-          yAxisId="flow"
-          stackId="expense"
-          fill={colors["--expense-bar"]}
-          maxBarSize={22}
-          isAnimationActive={false}
-        />
-        <Bar
-          dataKey="expenseProjected"
-          yAxisId="flow"
-          stackId="expense"
-          fill={`url(#expense-${uid})`}
-          stroke={colors["--expense-bar"]}
-          strokeWidth={1}
-          maxBarSize={22}
-          isAnimationActive={false}
-        />
-        <Line
-          dataKey="balance"
-          yAxisId="balance"
-          type="linear"
-          stroke={lineStroke}
-          strokeWidth={2.5}
-          connectNulls
-          isAnimationActive={false}
-          dot={(props: { cx?: number; cy?: number; payload?: Point; index?: number }) => {
-            const negative = (props.payload?.balance ?? 0) < 0;
-            if (props.cx === undefined || props.cy === undefined || props.payload?.balance === null)
-              return <g key={props.index} />;
-            return (
-              <circle
-                key={props.index}
-                cx={props.cx}
-                cy={props.cy}
-                r={4}
-                fill={colors["--surface"]}
-                stroke={negative ? colors["--negative"] : colors["--text"]}
-                strokeWidth={2.5}
-              />
-            );
-          }}
-          activeDot={{ r: 5 }}
-          label={(props: { x?: number | string; y?: number | string; index?: number }) => {
-            const point = props.index === undefined ? undefined : points[props.index];
-            if (!point || point.balance === null || !labelled.has(props.index!))
-              return <g key={`label-${props.index}`} />;
-            return (
-              <text
-                key={`label-${props.index}`}
-                x={Number(props.x)}
-                y={Number(props.y) - 12}
-                textAnchor="middle"
-                fontSize={11}
-                fontWeight={600}
-                className="num"
-                fill={point.balance < 0 ? colors["--negative"] : colors["--text"]}
-              >
-                {money(point.balance)}
-              </text>
-            );
-          }}
-        />
-        <Tooltip
-          content={(props) => (
-            <MonthTooltip active={props.active} payload={props.payload} currency={data.currency} />
-          )}
-          cursor={{ fill: colors["--text"], fillOpacity: 0.05 }}
-        />
-      </ComposedChart>
+      {boxWidth > 0 ? (
+        <ProjectionPlot data={data} view={view} width={boxWidth} height={CHART_HEIGHT - 44} />
+      ) : (
+        <ChartSkeleton />
+      )}
     </div>
   );
 }
@@ -452,63 +220,5 @@ function MonthTable({ data }: { data: Projection }) {
         ))}
       </tbody>
     </table>
-  );
-}
-
-function MonthTooltip({
-  active,
-  payload,
-  currency,
-}: {
-  active?: boolean;
-  payload?: ReadonlyArray<{ payload?: unknown }>;
-  currency: string;
-}) {
-  const t = useTranslations("dashboard.chart");
-  const locale = useLocale();
-  const point = payload?.[0]?.payload as Point | undefined;
-  if (!active || !point) return null;
-  const m = point.month;
-  const rows = (label: string, part: Month["income"]) => (
-    <>
-      <tr>
-        <td colSpan={2} className="pt-2 pb-0.5 text-xs font-semibold text-text">
-          {label}
-        </td>
-      </tr>
-      {(
-        [
-          [t("realized"), part.realized],
-          [t("scheduled"), part.scheduled],
-          [t("projectedFixed"), part.projected_fixed],
-        ] as const
-      ).map(([name, value]) => (
-        <tr key={name}>
-          <td className="pr-4 text-text-muted">{name}</td>
-          <td className="num text-right">{formatMoney(value, currency)}</td>
-        </tr>
-      ))}
-    </>
-  );
-  return (
-    <div className="rounded-lg border border-line bg-surface px-3 py-2.5 text-[13px] shadow-lg shadow-black/10">
-      <p className="font-semibold">{formatMonth(m.month, locale)}</p>
-      <table>
-        <tbody>
-          {rows(t("income"), m.income)}
-          {rows(t("expenses"), m.expenses)}
-          <tr>
-            <td className="pt-2 pr-4 font-semibold">{t("endBalance")}</td>
-            <td
-              className={`num pt-2 text-right font-semibold ${m.end_balance !== null && Number(m.end_balance) < 0 ? "text-negative" : ""}`}
-            >
-              {m.end_balance === null
-                ? "—"
-                : formatMoney(m.end_balance, currency, { projected: m.end_balance_projected })}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   );
 }

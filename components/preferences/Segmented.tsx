@@ -26,10 +26,28 @@ export function Segmented<T extends string>({
   size = "md",
   className,
 }: SegmentedProps<T>) {
+  // A radio group is one Tab stop; the arrow keys move the choice (WAI-ARIA radio group).
+  const move = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const step =
+      event.key === "ArrowRight" || event.key === "ArrowDown"
+        ? 1
+        : event.key === "ArrowLeft" || event.key === "ArrowUp"
+          ? -1
+          : 0;
+    if (!step) return;
+    event.preventDefault();
+    const index = options.findIndex((o) => o.value === value);
+    const next = (index + step + options.length) % options.length;
+    onChange(options[next].value);
+    const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>("[role=radio]");
+    buttons[next]?.focus();
+  };
+
   return (
     <div
       role="radiogroup"
       aria-label={label}
+      onKeyDown={move}
       className={cn(
         "inline-flex gap-0.5 rounded-lg border border-line bg-surface p-0.5",
         className
@@ -43,6 +61,7 @@ export function Segmented<T extends string>({
             type="button"
             role="radio"
             aria-checked={active}
+            tabIndex={active || !options.some((o) => o.value === value) ? 0 : -1}
             aria-label={option.title}
             title={option.title}
             onClick={() => onChange(option.value)}
