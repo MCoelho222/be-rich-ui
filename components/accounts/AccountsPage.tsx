@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useReferenceWrite } from "@/lib/accounts";
 import { useErrorMessage } from "@/lib/errors";
-import { formatDayMonth, formatWeekdayDate, shortName } from "@/lib/format";
+import { formatDayMonth, formatMoney, formatWeekdayDate, shortName } from "@/lib/format";
 import { lastOfMonth, todayIso } from "@/lib/period";
 import {
   byId,
@@ -126,6 +126,7 @@ export function AccountsPage() {
 /** Sum of every account, archived ones included (ui-behavior §4.1). */
 function TotalBalance() {
   const t = useTranslations("accounts");
+  const td = useTranslations("dashboard.cards");
   const now = useBalances(todayIso(), {});
   const end = useBalances(lastOfMonth(todayIso()), {});
   if (now.isPending || end.isPending) return <Skeleton className="h-24 w-full rounded-xl" />;
@@ -137,8 +138,15 @@ function TotalBalance() {
         <span className="text-[13px] font-medium text-text-muted">{t("totalBalance")}</span>
         <BigMoney amount={now.data.total} currency={now.data.currency} />
       </div>
-      <span className="text-[13px] text-text-muted">
-        {t("endOfMonth")} <Money amount={end.data.total} currency={end.data.currency} projected />
+      <span className="flex flex-col items-end gap-1 text-[13px] text-text-muted">
+        <span>
+          {t("endOfMonth")} <Money amount={end.data.total} currency={end.data.currency} projected />
+        </span>
+        {Number(now.data.investments) > 0 && (
+          <Link href="/investments" className="hover:text-text hover:underline">
+            {td("inInvestments", { amount: formatMoney(now.data.investments, now.data.currency) })}
+          </Link>
+        )}
       </span>
     </div>
   );

@@ -148,6 +148,25 @@ function BalanceCard({
                     </tr>
                   );
                 })}
+                {(Number(now.data.investments) > 0 || Number(end.data.investments) > 0) && (
+                  <tr className="border-t border-line">
+                    <td className="px-4 py-2">
+                      <Link href="/investments" className="hover:underline">
+                        {t("investmentsRow")}
+                      </Link>
+                    </td>
+                    <td className="px-2 py-2 text-right">
+                      <Money amount={now.data.investments} currency={now.data.currency} />
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <Money
+                        amount={end.data.investments}
+                        currency={end.data.currency}
+                        projected={endProjected}
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
             <div className="border-t border-line px-4 py-2.5">
@@ -165,6 +184,16 @@ function BalanceCard({
       <span className={captionClass}>
         {t("endOfPeriod")}{" "}
         <Money amount={end.data.total} currency={end.data.currency} projected={endProjected} />
+        {Number(now.data.investments) > 0 && (
+          <>
+            {" · "}
+            <Link href="/investments" className="hover:text-text hover:underline">
+              {t("inInvestments", {
+                amount: formatMoney(now.data.investments, now.data.currency),
+              })}
+            </Link>
+          </>
+        )}
       </span>
       <OutlookLine view={view} filters={filters} today={today} />
       {overdrawn.length > 0 && (
