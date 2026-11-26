@@ -8,6 +8,8 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 const API_ORIGIN = process.env.API_ORIGIN ?? "http://localhost:8000";
 
 const nextConfig: NextConfig = {
+  // The dev-tools badge defaults to bottom-left, on top of the sidebar's user menu.
+  devIndicators: { position: "bottom-right" },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API_ORIGIN}/api/:path*` }];
   },

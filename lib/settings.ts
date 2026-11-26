@@ -2,7 +2,7 @@
 /** Profile, household, members and invitations (api.md §4–§6, auth.md §4.5). */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type Schemas } from "./api";
-import { meKey } from "./auth";
+import { meKey, type Me } from "./auth";
 import { keys } from "./queries";
 
 export type Profile = Schemas["ProfileOut"];
@@ -25,6 +25,25 @@ export function useUpdateProfile() {
       client.setQueryData(profileKey, profile);
       void client.invalidateQueries({ queryKey: meKey });
       void client.invalidateQueries({ queryKey: [...keys.reference, "members"] });
+    },
+  });
+}
+
+/** Uploading or removing the photo saves at once, apart from the profile form. */
+export function useSetAvatar() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (image: string | null) =>
+      image === null
+        ? api.delete("me/avatar").then(() => null)
+        : api.put<Profile>("me/avatar", { image }),
+    onSuccess: (profile, image) => {
+      if (profile) client.setQueryData(profileKey, profile);
+      else
+        client.setQueryData<Profile>(profileKey, (old) => (old ? { ...old, avatar: null } : old));
+      client.setQueryData<Me>(meKey, (old) =>
+        old ? { ...old, user: { ...old.user, avatar: image } } : old
+      );
     },
   });
 }
