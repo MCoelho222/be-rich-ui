@@ -267,6 +267,24 @@ export interface paths {
     patch: operations["patch_profile_api_v1_me_patch"];
     trace?: never;
   };
+  "/api/v1/me/avatar": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Put Avatar */
+    put: operations["put_avatar_api_v1_me_avatar_put"];
+    post?: never;
+    /** Delete Avatar */
+    delete: operations["delete_avatar_api_v1_me_avatar_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/invitations": {
     parameters: {
       query?: never;
@@ -1079,6 +1097,11 @@ export interface components {
       ended: components["schemas"]["RecurrenceOut"];
       created: components["schemas"]["RecurrenceOut"];
     };
+    /** AvatarIn */
+    AvatarIn: {
+      /** Image */
+      image: string;
+    };
     /** BalancesOut */
     BalancesOut: {
       currency: components["schemas"]["Currency"];
@@ -1797,6 +1820,8 @@ export interface components {
        */
       household_id: string;
       language: components["schemas"]["Language"];
+      /** Avatar */
+      avatar: string | null;
     };
     /** MemberOut */
     MemberOut: {
@@ -1992,6 +2017,8 @@ export interface components {
       /** Notes */
       notes: string | null;
       language: components["schemas"]["Language"];
+      /** Avatar */
+      avatar: string | null;
       /**
        * Created At
        * Format: date-time
@@ -2803,6 +2830,57 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
         };
+      };
+    };
+  };
+  put_avatar_api_v1_me_avatar_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AvatarIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProfileOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_avatar_api_v1_me_avatar_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

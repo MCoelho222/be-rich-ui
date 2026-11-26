@@ -1,17 +1,19 @@
 "use client";
 /** Settings (frontend.md §6.6, ui-behavior §2–§3): profile, password, household, members, invitations. */
-import { Loader2, Mail, RotateCw, UserMinus, X } from "lucide-react";
+import { Camera, Loader2, Mail, RotateCw, UserMinus, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { FormError, PasswordField } from "@/components/auth/fields";
 import { Skeleton, WidgetError } from "@/components/dashboard/Widget";
 import { FieldShell, Select } from "@/components/entries/pickers";
+import { Avatar } from "@/components/shell/Avatar";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { FormDialog, PrimaryButton, SecondaryButton } from "@/components/ui/form-dialog";
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api";
+import { AvatarFileError, avatarDataUrl } from "@/lib/avatar";
 import {
   COUNTRIES,
   digits,
@@ -35,6 +37,7 @@ import {
   useLeaveHousehold,
   useProfile,
   useRemoveMember,
+  useSetAvatar,
   useUpdateHousehold,
   useUpdateProfile,
   type Profile,
@@ -152,6 +155,91 @@ export function SettingsPage() {
 
 // --- Profile (ui-behavior §2) --------------------------------------------------------
 
+/** Saves on its own as soon as a file is picked; the profile form's Save doesn't touch it. */
+function PhotoField({ name, avatar }: { name: string; avatar: string | null }) {
+  const t = useTranslations("settings");
+  const setAvatar = useSetAvatar();
+  const errorMessage = useErrorMessage();
+  const input = useRef<HTMLInputElement>(null);
+  const [pending, setPending] = useState<"upload" | "remove" | null>(null);
+
+  const save = (image: string | null) =>
+    setAvatar
+      .mutateAsync(image)
+      .then(() => toast.success(t(image ? "photoSaved" : "photoRemoved")))
+      .catch((error) => toast.error(errorMessage(error)));
+
+  const pick = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = ""; // picking the same file again still fires onChange
+    if (!file) return;
+    setPending("upload");
+    try {
+      await save(await avatarDataUrl(file));
+    } catch (error) {
+      if (!(error instanceof AvatarFileError)) throw error;
+      toast.error(
+        t(
+          error.reason === "type"
+            ? "photoNotImage"
+            : error.reason === "size"
+              ? "photoTooBig"
+              : "photoUnreadable"
+        )
+      );
+    } finally {
+      setPending(null);
+    }
+  };
+
+  const remove = () => {
+    setPending("remove");
+    void save(null).finally(() => setPending(null));
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      <Avatar name={name} src={avatar} size={64} />
+      <div className="flex min-w-0 flex-col gap-2">
+        <div className="flex flex-wrap gap-2">
+          <SecondaryButton
+            onClick={() => input.current?.click()}
+            disabled={pending !== null}
+            className="inline-flex items-center gap-2"
+          >
+            {pending === "upload" ? (
+              <Loader2 size={16} className="animate-spin" aria-hidden />
+            ) : (
+              <Camera size={16} aria-hidden />
+            )}
+            {avatar ? t("changePhoto") : t("uploadPhoto")}
+          </SecondaryButton>
+          {avatar && (
+            <SecondaryButton
+              onClick={remove}
+              disabled={pending !== null}
+              className="inline-flex items-center gap-2"
+            >
+              {pending === "remove" && <Loader2 size={16} className="animate-spin" aria-hidden />}
+              {t("removePhoto")}
+            </SecondaryButton>
+          )}
+        </div>
+        <p className="text-xs text-text-muted">{t("photoHint")}</p>
+      </div>
+      <input
+        ref={input}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/*"
+        className="sr-only"
+        tabIndex={-1}
+        aria-label={t("photo")}
+        onChange={(e) => void pick(e)}
+      />
+    </div>
+  );
+}
+
 function ProfileSection() {
   const profile = useProfile();
   if (profile.isPending) return <Skeleton className="h-[640px] w-full rounded-xl" />;
@@ -257,6 +345,7 @@ function ProfileForm({ profile }: { profile: Profile }) {
   return (
     <form noValidate onSubmit={submit} className="flex flex-col gap-6">
       <Card title={t("section.profile")} description={t("profileIntro")}>
+        <PhotoField name={profile.name} avatar={profile.avatar} />
         <div className="grid gap-4 sm:grid-cols-2">
           <FieldShell label={t("name")} required error={errors.name}>
             <Input

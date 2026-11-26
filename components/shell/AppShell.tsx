@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLogout, useMe } from "@/lib/auth";
-import { initial, shortName } from "@/lib/format";
+import { shortName } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { Avatar } from "./Avatar";
 import { NewEntryProvider, useNewEntry } from "./NewEntry";
 import { isActive, MAIN_NAV, SETTINGS_NAV, type NavItem } from "./nav";
 
@@ -137,12 +138,7 @@ function UserMenu({ wide }: { wide: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex h-10 w-full items-center gap-2.5 rounded-lg px-1.5 text-left hover:bg-surface-2">
-        <span
-          aria-hidden
-          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[13px] font-semibold text-brand"
-        >
-          {name ? initial(name) : ""}
-        </span>
+        <Avatar name={name} src={me.data?.user.avatar} size={32} />
         <span
           className={cn("hidden min-w-0 flex-1 truncate text-sm font-medium", wide && "lg:block")}
         >
