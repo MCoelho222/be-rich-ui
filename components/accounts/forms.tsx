@@ -21,7 +21,7 @@ import { useAccounts, useBalances, useMembers, type Account, type Card } from "@
 
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
-function symbolOf(currency: string) {
+export function symbolOf(currency: string) {
   return (
     new Intl.NumberFormat("pt-BR", { style: "currency", currency })
       .formatToParts(0)

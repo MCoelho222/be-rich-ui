@@ -2,6 +2,7 @@ import {
   ArrowDownUp,
   CreditCard,
   LayoutDashboard,
+  PiggyBank,
   Repeat,
   Settings,
   Tag,
@@ -10,7 +11,7 @@ import {
 
 export interface NavItem {
   href: string;
-  key: "dashboard" | "entries" | "fixed" | "accounts" | "categories" | "settings";
+  key: "dashboard" | "entries" | "fixed" | "accounts" | "investments" | "categories" | "settings";
   icon: LucideIcon;
 }
 
@@ -20,6 +21,7 @@ export const MAIN_NAV: NavItem[] = [
   { href: "/entries", key: "entries", icon: ArrowDownUp },
   { href: "/fixed", key: "fixed", icon: Repeat },
   { href: "/accounts", key: "accounts", icon: CreditCard },
+  { href: "/investments", key: "investments", icon: PiggyBank },
   { href: "/categories", key: "categories", icon: Tag },
 ];
 

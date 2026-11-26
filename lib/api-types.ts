@@ -975,6 +975,42 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/investments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Investments */
+    get: operations["list_investments_api_v1_investments_get"];
+    put?: never;
+    /** Create Investment */
+    post: operations["create_investment_api_v1_investments_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/investments/{investment_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Investment */
+    delete: operations["delete_investment_api_v1_investments__investment_id__delete"];
+    options?: never;
+    head?: never;
+    /** Update Investment */
+    patch: operations["update_investment_api_v1_investments__investment_id__patch"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1120,6 +1156,8 @@ export interface components {
       total: string;
       /** Accounts */
       accounts: components["schemas"]["AccountBalanceOut"][];
+      /** Investments */
+      investments: string;
     };
     /** CardBillOut */
     CardBillOut: {
@@ -1686,6 +1724,81 @@ export interface components {
       /** Receiver Id */
       receiver_id?: string | null;
     };
+    /** InvestmentCreate */
+    InvestmentCreate: {
+      /** Name */
+      name?: string | null;
+      /** Bank */
+      bank: string;
+      /** Amount */
+      amount: number | string;
+      currency?: components["schemas"]["Currency"] | null;
+      /** Invested On */
+      invested_on?: string | null;
+      liquidity: components["schemas"]["Liquidity"];
+      /** Maturity Date */
+      maturity_date?: string | null;
+      /**
+       * Include In Balance
+       * @default true
+       */
+      include_in_balance: boolean;
+    };
+    /** InvestmentOut */
+    InvestmentOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string | null;
+      /** Bank */
+      bank: string;
+      /** Amount */
+      amount: string;
+      currency: components["schemas"]["Currency"];
+      /**
+       * Invested On
+       * Format: date
+       */
+      invested_on: string;
+      liquidity: components["schemas"]["Liquidity"];
+      /** Maturity Date */
+      maturity_date: string | null;
+      /** Include In Balance */
+      include_in_balance: boolean;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string;
+    };
+    /**
+     * InvestmentPatch
+     * @description PATCH semantics: omitted fields are unchanged; null clears `name` and `maturity_date`.
+     */
+    InvestmentPatch: {
+      /** Name */
+      name?: string | null;
+      /** Bank */
+      bank?: string | null;
+      /** Amount */
+      amount?: number | string | null;
+      currency?: components["schemas"]["Currency"] | null;
+      /** Invested On */
+      invested_on?: string | null;
+      liquidity?: components["schemas"]["Liquidity"] | null;
+      /** Maturity Date */
+      maturity_date?: string | null;
+      /** Include In Balance */
+      include_in_balance?: boolean | null;
+    };
     /** InvitationCreate */
     InvitationCreate: {
       /**
@@ -1749,6 +1862,11 @@ export interface components {
       /** Items */
       items: components["schemas"]["CategoryOut"][];
     };
+    /** Items[InvestmentOut] */
+    Items_InvestmentOut_: {
+      /** Items */
+      items: components["schemas"]["InvestmentOut"][];
+    };
     /** Items[InvitationOut] */
     Items_InvitationOut_: {
       /** Items */
@@ -1780,6 +1898,12 @@ export interface components {
      * @enum {string}
      */
     Language: "en" | "pt";
+    /**
+     * Liquidity
+     * @description When an investment can be redeemed (schemas §20).
+     * @enum {string}
+     */
+    Liquidity: "DAILY" | "MATURITY";
     /** LoginIn */
     LoginIn: {
       /** Email */
@@ -1861,6 +1985,8 @@ export interface components {
       end_balance: string | null;
       /** End Balance Projected */
       end_balance_projected: boolean;
+      /** End Investments */
+      end_investments: string;
     };
     /** MonthPart */
     MonthPart: {
@@ -4705,6 +4831,123 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Items_OverdueOut_"];
+        };
+      };
+    };
+  };
+  list_investments_api_v1_investments_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Items_InvestmentOut_"];
+        };
+      };
+    };
+  };
+  create_investment_api_v1_investments_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InvestmentCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvestmentOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_investment_api_v1_investments__investment_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        investment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_investment_api_v1_investments__investment_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        investment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InvestmentPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvestmentOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

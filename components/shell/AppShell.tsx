@@ -196,7 +196,7 @@ function BottomBar() {
   const { open } = useNewEntry();
   const logout = useLogout();
   const [dashboard, entries, fixed] = MAIN_NAV;
-  const moreItems = [MAIN_NAV[3], MAIN_NAV[4], SETTINGS_NAV];
+  const moreItems = [...MAIN_NAV.slice(3), SETTINGS_NAV];
   const moreActive = moreItems.some((item) => isActive(pathname, item.href));
 
   const tab = (item: NavItem) => {
