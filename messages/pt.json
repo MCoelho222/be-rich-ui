@@ -589,7 +589,7 @@
     "liquidityMaturity": "No vencimento",
     "maturityDate": "Vencimento",
     "maturityAfter": "Deve ser depois da data do investimento.",
-    "includeHint": "Soma ao saldo da casa e às projeções. Não tira dinheiro de nenhuma conta; para isso, registre uma despesa.",
+    "includeHint": "Soma no saldo da casa e nas projeções. Criar o investimento não tira dinheiro de uma conta; para isso, use Transferir na conta.",
     "save": "Salvar",
     "cancel": "Cancelar",
     "created": "Investimento adicionado.",

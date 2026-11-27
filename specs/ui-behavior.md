@@ -75,6 +75,7 @@ Text fields with a maximum length show a counter (`42/200`) once 80% of the limi
 | CEP | Mask `00000-000`. Example: `88303575` shows `88303-575`. *Optional enhancement:* once 8 digits are entered, look up the CEP and fill in street, neighborhood, city and state, leaving all fields editable. |
 | Address | Separate inputs: street, number (with an "S/N" checkbox), complement, neighborhood, city, state (a select with the 27 UFs). |
 | Notes | Textarea with a character counter (500). Placeholder: "Anything you want to remember". |
+| Photo | Optional, shown in the sidebar's user menu (or the member's initial without one). JPEG, PNG or WebP. The browser crops it to a square and shrinks it to a 256×256 JPEG before upload (api.md §5, `PUT /me/avatar`). "Remove" goes back to the initial. Errors: "Choose an image file.", "This image is too large." (over 20 MB), "Couldn't read this image." |
 
 ---
 
@@ -115,8 +116,9 @@ Text fields with a maximum length show a counter (`42/200`) once 80% of the limi
 
 ### 4.1 Accounts page
 
-- Each account is shown as a card with its name, type icon (bank or cash), **current balance**, and **projected balance at the end of the month**.
-- The header shows **Total balance**, the sum of all accounts in the default currency (schemas §14.2).
+- Each account is shown as a card with its name, type icon (bank or cash), **current balance**, **projected balance at the end of the month**, and "Opening balance on 01/11", so it's clear which entries are already inside the opening balance.
+- The header shows **Total balance**, the sum of all accounts in the default currency plus the investments counted in the balance (schemas §14.2, §20.1). When there are investments, a line below splits it: "Accounts R$ 5.800,00 · Investments R$ 10.000,00", with Investments linking to `/investments`.
+- An active account's **⋯** menu has **Transfer** (§13).
 - Archived accounts are grouped in a collapsed "Archived" section, and their balances still count in the total.
 
 ### 4.2 Account form
@@ -177,6 +179,7 @@ The form shows a summary below the fields that updates as the user types:
 - **Payment date:** "Charged on **07/12/2026**" for Credit, calculated with the card's cycle and the business-day adjustment (§10.3). For other methods it is not shown, because it equals the purchase date.
 - **Series range** when there are installments: "Dec/2026 → Feb/2027".
 - **Conversion** when the currency is not the default: "≈ R$ 545,10 at today's rate".
+- **Before the opening balance:** when a part's payment date is on or before its account's opening balance date, a muted note reads "Before Itaú's opening balance (01/11/2026): it won't change the balance." (schemas §14.1). This also shows when registering an old fixed occurrence.
 
 ### 6.3 Split payment
 
@@ -242,7 +245,7 @@ This page lists every Recurrence, in two tabs: **Expenses** and **Incomes**.
 
 | Action | Effect |
 |---|---|
-| **Register** | Opens the Expense or Income form pre-filled for the next pending or overdue occurrence (schemas §12.2). For a credit card fixed expense the date field is "Purchase date", pre-filled with a date inside that bill (schemas §12.1). |
+| **Register** | Opens a small dialog for the next pending or overdue occurrence (schemas §12.2). Under the title it names what is being registered: "Internet · expected R$ 119,90 · occurrence of 15/12/2026." (the description, or the category when there is none), so two fixed entries on the same day can't be confused. Fields: amount (pre-filled with the expected amount), paid on date (pre-filled with the occurrence date) and description. For a credit card fixed expense the date field is "Purchase date", pre-filled with a date inside that bill (schemas §12.1). The same dialog opens from the dashboard's entry list and the overdue panel. |
 | **Skip this month** | Adds the occurrence to `skipped_dates`, after a confirmation. |
 | **Edit** | Opens the Recurrence form. A notice reads "Changes apply to future occurrences only." |
 | **Change amount from…** | Asks for the date the new amount starts and the new amount. It ends the current Recurrence the day before that date and creates a copy with the new amount (schemas §12.3). |
@@ -266,6 +269,7 @@ The dashboard has its own spec: [dashboard.md](dashboard.md). It covers the peri
 ## 10. Lists and tables
 
 - Rows in an installment series show an `n/N` badge. Rows in a split payment show a "split" icon. Hovering the icon lists the sibling parts.
+- Rows paid on or before their account's opening balance date show a muted "Before opening balance" pill. Its tooltip reads "Paid on or before Itaú's opening balance (01/11/2026). It's already included in that balance, so it doesn't change it." (schemas §14.1).
 - Rows registered from a Recurrence show a "fixed" icon. They can be filtered with a "Fixed only" toggle, and clicking the icon opens the Recurrence.
 - An Account column and an Account filter are available.
 - Amounts in a non-default currency use the converted format (§1.1).
@@ -303,3 +307,39 @@ When the user tries to delete one of these that existing records use, the UI off
 - For a card, account or category, it offers **Archive**, with the message: "This card is used by 14 expenses. Archive it to hide it from new entries."
 - For the last active Cash account, Archive is disabled (schemas §18).
 - For a Recurrence that has registered payments, the delete dialog asks what happens to them: **"Keep them as regular entries"** (the default) or **"Delete the N payments too"**. Balances, totals and projections follow either way. It also offers **End instead**.
+
+---
+
+## 12. Investments (`/investments`)
+
+- **Page:** a header with the amount **counted in your balance** (converted to the household currency) and the number of investments, noting how many are left out. Then a card per investment: label (name, or bank), bank and currency, amount as a big number, "Daily liquidity" or "Due 01/11/2028" ("Matured on …" in a warning color once the date passed), "Invested 01/11/2026", and a **Count in balance** switch. Investments left out of the balance have a dimmer card.
+- A fully redeemed investment (amount 0, schemas §21) shows a **Redeemed** badge.
+- **⋯ menu:** Edit, Transfer (§13), Delete.
+
+| Field | Behavior |
+|---|---|
+| Bank | Required text, up to 40 characters. Hint: "The bank or broker holding it." |
+| Name | Optional, up to 40. Hint: "Optional, e.g. "CDB 110% CDI"." |
+| Amount | Currency input, required and greater than 0 for a new investment (0 is allowed when editing a redeemed one). Hint: "Update it when your bank shows a new value." |
+| Currency | A select, default the household's currency. |
+| Invested on | Date, default today. |
+| Liquidity | Segmented control: Daily liquidity, Due date. Due date shows a required date field after the invested date. |
+| Count in balance | Switch, on by default. Hint: "Add it to the household balance and projections. Creating it doesn't take money out of an account; use Transfer on the account for that." |
+
+- Delete asks for confirmation: "It will no longer count in your balance or projections, including past months." Its transfers stay, labeled with the investment's name.
+
+## 13. Transfers
+
+- **Starting one:** **Transfer** in the **⋯** menu of an active account card (§4.1) or an investment card (§12). That card is the source, named under the title ("From Itaú.").
+
+| Field | Behavior |
+|---|---|
+| To | Required select, grouped into Accounts (active ones) and Investments, without the source. |
+| Amount | Required, greater than 0, in the source's currency. For an investment source the hint shows "Available: R$ 10.000,00", and more than that is rejected. Labeled "Amount sent" when the currencies differ. |
+| Amount received | Shown only when the two ends use different currencies. Required. Hint: "How much arrived, in USD." |
+| Date | Default today. Future dates are not allowed, because investment amounts change right away (schemas §21.1). |
+| Description | Optional, up to 200 characters. |
+
+- **Entries → Transfers tab** (`/entries?tab=transfers`): a period picker and an account filter. A note reads "Transfers move money between your accounts and investments. They don't count as income or expense." Each row shows the date, "Source → Target", the description and the amount sent (with "received US$ 100,00" under it when the currency differs). A deleted investment shows as "XP (deleted)".
+- **Delete:** a trash button asks "Delete this transfer?", explaining that it will be undone. The server refuses (409) when the money already left the target investment; the error shows as a toast.
+
