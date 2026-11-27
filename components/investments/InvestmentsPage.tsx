@@ -26,11 +26,13 @@ import {
 import { todayIso } from "@/lib/period";
 import { useBalances } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { TransferDialog } from "@/components/transfers/TransferDialog";
 import { DeleteInvestmentDialog, InvestmentFormDialog } from "./forms";
 
 type Dialog =
   | { type: "form"; investment?: Investment }
-  | { type: "delete"; investment: Investment };
+  | { type: "delete"; investment: Investment }
+  | { type: "transfer"; investment: Investment };
 
 export function InvestmentsPage() {
   const t = useTranslations("investments");
@@ -79,6 +81,9 @@ export function InvestmentsPage() {
 
       {dialog?.type === "form" && (
         <InvestmentFormDialog investment={dialog.investment} onClose={close} />
+      )}
+      {dialog?.type === "transfer" && (
+        <TransferDialog source={{ kind: "INVESTMENT", id: dialog.investment.id }} onClose={close} />
       )}
       {dialog?.type === "delete" && (
         <DeleteInvestmentDialog investment={dialog.investment} onClose={close} />
@@ -147,6 +152,7 @@ function InvestmentTile({
   const label = investmentLabel(investment);
   const due = investment.maturity_date;
   const matured = due !== null && due <= todayIso();
+  const redeemed = Number(investment.amount) === 0;
 
   const toggle = (on: boolean) =>
     write
@@ -162,8 +168,13 @@ function InvestmentTile({
     >
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate font-medium" title={label}>
-            {label}
+          <h3 className="flex items-center gap-2 font-medium" title={label}>
+            <span className="truncate">{label}</span>
+            {redeemed && (
+              <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-text-muted">
+                {t("redeemed")}
+              </span>
+            )}
           </h3>
           <p className="truncate text-xs text-text-muted">
             {investment.name ? `${investment.bank} · ` : ""}
@@ -180,6 +191,9 @@ function InvestmentTile({
           <DropdownMenuContent align="end" className="min-w-40">
             <DropdownMenuItem onSelect={() => onAction({ type: "form", investment })}>
               {t("edit")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => onAction({ type: "transfer", investment })}>
+              {t("transfer")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -9,6 +9,7 @@ import { Skeleton, WidgetError } from "@/components/dashboard/Widget";
 import { Money } from "@/components/money/Money";
 import { useNewEntry } from "@/components/shell/NewEntry";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { TransferList } from "@/components/transfers/TransferList";
 import { BeforeOpeningPill } from "./BeforeOpeningPill";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -57,9 +58,16 @@ export function EntriesPage() {
         <div role="tablist" className="flex border-b border-line">
           {tab("expenses", t("expenses"), "text-expense")}
           {tab("incomes", t("incomes"), "text-income")}
+          {tab("transfers", t("transfers"), "text-text")}
         </div>
-        <Toolbar view={view} update={update} kind={kind} />
-        <EntryTable kind={kind} view={view} />
+        {view.tab === "transfers" ? (
+          <TransferList view={view} update={update} />
+        ) : (
+          <>
+            <Toolbar view={view} update={update} kind={kind} />
+            <EntryTable kind={kind} view={view} />
+          </>
+        )}
       </div>
     </>
   );

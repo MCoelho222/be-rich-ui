@@ -15,7 +15,7 @@ export type FilterKey = (typeof FILTER_KEYS)[number];
 export type DateBasis = "purchase" | "payment";
 
 export interface EntriesView {
-  tab: "expenses" | "incomes";
+  tab: "expenses" | "incomes" | "transfers";
   by: DateBasis;
   preset: Preset;
   range: Range;
@@ -54,7 +54,8 @@ export function useEntriesView() {
       if (value) filters[key] = value;
     }
     return {
-      tab: params.get("tab") === "incomes" ? "incomes" : "expenses",
+      tab:
+        (["incomes", "transfers"] as const).find((tab) => tab === params.get("tab")) ?? "expenses",
       by: params.get("by") === "payment" ? "payment" : "purchase",
       preset,
       range,
@@ -80,7 +81,7 @@ export function useEntriesView() {
       const set = (key: string, value: string | null | undefined) =>
         value ? params.set(key, value) : params.delete(key);
       if (change.tab) {
-        set("tab", change.tab === "incomes" ? "incomes" : null);
+        set("tab", change.tab === "expenses" ? null : change.tab);
         // Card and method filters differ between expenses and incomes.
         params.delete("card");
         params.delete("category");

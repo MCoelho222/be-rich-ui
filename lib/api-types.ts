@@ -1011,6 +1011,41 @@ export interface paths {
     patch: operations["update_investment_api_v1_investments__investment_id__patch"];
     trace?: never;
   };
+  "/api/v1/transfers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Transfers */
+    get: operations["list_transfers_api_v1_transfers_get"];
+    put?: never;
+    /** Create Transfer */
+    post: operations["create_transfer_api_v1_transfers_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/transfers/{transfer_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Transfer */
+    delete: operations["delete_transfer_api_v1_transfers__transfer_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1892,6 +1927,11 @@ export interface components {
       /** Items */
       items: components["schemas"]["RecurrenceOut"][];
     };
+    /** Items[TransferOut] */
+    Items_TransferOut_: {
+      /** Items */
+      items: components["schemas"]["TransferOut"][];
+    };
     /**
      * Language
      * @description UI language, also used for seed data such as default category names.
@@ -2470,6 +2510,72 @@ export interface components {
       expenses: components["schemas"]["RealizedTotal"];
       net: components["schemas"]["RealizedTotal"];
       fixed_expenses: components["schemas"]["FixedExpenses"];
+    };
+    /** TransferCreate */
+    TransferCreate: {
+      source: components["schemas"]["TransferEndIn"];
+      target: components["schemas"]["TransferEndIn"];
+      /** Amount */
+      amount: number | string;
+      /** Amount Received */
+      amount_received?: number | string | null;
+      /** Date */
+      date?: string | null;
+      /** Description */
+      description?: string | null;
+    };
+    /**
+     * TransferEnd
+     * @description What a transfer moves money from or to (schemas §21).
+     * @enum {string}
+     */
+    TransferEnd: "ACCOUNT" | "INVESTMENT";
+    /** TransferEndIn */
+    TransferEndIn: {
+      kind: components["schemas"]["TransferEnd"];
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+    };
+    /** TransferEndOut */
+    TransferEndOut: {
+      kind: components["schemas"]["TransferEnd"];
+      /** Account Id */
+      account_id: string | null;
+      /** Investment Id */
+      investment_id: string | null;
+      /** Label */
+      label: string | null;
+    };
+    /** TransferOut */
+    TransferOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Date
+       * Format: date
+       */
+      date: string;
+      /** Description */
+      description: string | null;
+      source: components["schemas"]["TransferEndOut"];
+      target: components["schemas"]["TransferEndOut"];
+      /** Amount Sent */
+      amount_sent: string;
+      currency_sent: components["schemas"]["Currency"];
+      /** Amount Received */
+      amount_received: string;
+      currency_received: components["schemas"]["Currency"];
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
     };
     /** UserRefOut */
     UserRefOut: {
@@ -4940,6 +5046,102 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["InvestmentOut"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_transfers_api_v1_transfers_get: {
+    parameters: {
+      query?: {
+        from?: string | null;
+        to?: string | null;
+        account_id?: string | null;
+        investment_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Items_TransferOut_"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_transfer_api_v1_transfers_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TransferCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TransferOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_transfer_api_v1_transfers__transfer_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        transfer_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

@@ -86,7 +86,8 @@ export function InvestmentFormDialog({
   const maturity = form.liquidity === "MATURITY";
   const ready =
     form.bank.trim() &&
-    Number(form.amount) > 0 &&
+    // Transfers can redeem an investment down to 0; only a new one needs more.
+    (investment ? form.amount !== "" && Number(form.amount) >= 0 : Number(form.amount) > 0) &&
     form.invested_on &&
     (!maturity || form.maturity_date);
 

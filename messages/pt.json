@@ -375,7 +375,8 @@
     "paidOnDate": "pago em {date}",
     "expectedOnDate": "recebido em {date}",
     "beforeOpening": "Antes do saldo inicial",
-    "beforeOpeningHint": "Pago até a data do saldo inicial de {account} ({date}). Já está incluído nesse saldo, então não o altera."
+    "beforeOpeningHint": "Pago até a data do saldo inicial de {account} ({date}). Já está incluído nesse saldo, então não o altera.",
+    "transfers": "Transferências"
   },
   "fixed": {
     "title": "Lançamentos fixos",
@@ -553,7 +554,8 @@
     "inUseCard": "Este cartão é usado por {expenses, plural, one {# despesa} other {# despesas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-lo dos novos lançamentos.",
     "inUseAccount": "Esta conta é usada por {expenses, plural, one {# despesa} other {# despesas}}, {incomes, plural, one {# receita} other {# receitas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-la dos novos lançamentos; o saldo continua contando.",
     "inUseCategory": "Esta categoria é usada por {expenses, plural, one {# despesa} other {# despesas}}, {incomes, plural, one {# receita} other {# receitas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-la dos novos lançamentos.",
-    "openingOn": "Saldo inicial em {date}"
+    "openingOn": "Saldo inicial em {date}",
+    "transfer": "Transferir"
   },
   "investments": {
     "title": "Investimentos",
@@ -594,7 +596,9 @@
     "saved": "Alterações salvas.",
     "deleted": "Investimento excluído.",
     "deleteTitle": "Excluir {name}?",
-    "deleteBody": "Ele deixará de contar no saldo e nas projeções, inclusive nos meses passados."
+    "deleteBody": "Ele deixará de contar no saldo e nas projeções, inclusive nos meses passados.",
+    "transfer": "Transferir",
+    "redeemed": "Resgatado"
   },
   "categories": {
     "title": "Categorias",
@@ -732,5 +736,33 @@
       "investments": "Investimentos",
       "other": "Outros"
     }
+  },
+  "transfers": {
+    "title": "Transferir",
+    "from": "De {name}.",
+    "to": "Para",
+    "pick": "Escolha para onde enviar",
+    "accounts": "Contas",
+    "investments": "Investimentos",
+    "amount": "Valor",
+    "amountSent": "Valor enviado",
+    "amountReceived": "Valor recebido",
+    "receivedHint": "Quanto chegou, em {currency}.",
+    "available": "Disponível: {amount}",
+    "date": "Data",
+    "description": "Descrição",
+    "submit": "Transferir",
+    "cancel": "Cancelar",
+    "created": "Transferência feita",
+    "deletedInvestment": "excluído",
+    "receivedAs": "recebido",
+    "delete": "Excluir transferência",
+    "route": "De → para",
+    "empty": "Nenhuma transferência neste período.",
+    "allAccounts": "Todas as contas e investimentos",
+    "listHint": "Transferências movem dinheiro entre suas contas e investimentos. Não contam como receita nem despesa.",
+    "deleted": "Transferência excluída",
+    "deleteTitle": "Excluir esta transferência?",
+    "deleteBody": "Ela será desfeita: o dinheiro volta para a origem e os valores dos investimentos voltam ao que eram."
   }
 }

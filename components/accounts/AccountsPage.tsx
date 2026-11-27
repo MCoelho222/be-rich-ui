@@ -31,11 +31,13 @@ import {
   type Card,
 } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { TransferDialog } from "@/components/transfers/TransferDialog";
 import { AccountFormDialog, AdjustDialog, CardFormDialog, DeleteDialog } from "./forms";
 
 type Dialog =
   | { type: "account"; account?: Account }
   | { type: "adjust"; account: Account }
+  | { type: "transfer"; account: Account }
   | { type: "card"; card?: Card }
   | { type: "delete-account"; account: Account }
   | { type: "delete-card"; card: Card }
@@ -103,6 +105,9 @@ export function AccountsPage() {
 
       {dialog?.type === "account" && <AccountFormDialog account={dialog.account} onClose={close} />}
       {dialog?.type === "adjust" && <AdjustDialog account={dialog.account} onClose={close} />}
+      {dialog?.type === "transfer" && (
+        <TransferDialog source={{ kind: "ACCOUNT", id: dialog.account.id }} onClose={close} />
+      )}
       {dialog?.type === "card" && <CardFormDialog card={dialog.card} onClose={close} />}
       {dialog?.type === "delete-account" && (
         <DeleteDialog
@@ -267,6 +272,11 @@ function AccountMenu({ account, onAction }: { account: Account; onAction: (d: Di
         <DropdownMenuItem onSelect={() => onAction({ type: "adjust", account })}>
           {t("adjust")}
         </DropdownMenuItem>
+        {account.is_active && (
+          <DropdownMenuItem onSelect={() => onAction({ type: "transfer", account })}>
+            {t("transfer")}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href={`/entries?account=${account.id}`}>{t("viewEntries")}</Link>
         </DropdownMenuItem>
