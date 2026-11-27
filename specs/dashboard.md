@@ -88,13 +88,14 @@ The dashboard is the home screen. It answers, at a glance:
 ### 4.1 Total balance
 
 - **Shows:** the current balance as the page's one big number, with a second line "End of period: ~R$ 8.420,00" for the projected balance at the end of the selected period (§14). For a period entirely in the past, the second line is "End of period: R$ 8.420,00" (an actual balance, no `~`).
+- **What it's made of:** the total includes the investments counted in the balance (schemas §20.1). When there are any, a line under the big number splits it: "Accounts R$ 5.800,00 · Investments R$ 10.000,00", with Investments linking to `/investments`. With the account filter there is no split, because investments belong to no account.
 - **Outlook:** one line from the projection (§4.4) answers "will we be fine?":
   - while the balance stays positive: "Positive through May/2027 · lowest ~R$ 22.876,00 in Nov/2026";
   - when it goes negative: "Goes negative in Mar/2027 · lowest −R$ 1.240,00 in Apr/2027", in `--negative`.
   - "Through" is the last month of the chart range; the lowest point is the lowest end-of-month balance from the current month on. The line is omitted when the projection has no balances (no accounts yet).
 - **Accounts below zero:** when any account's current balance is negative, an amber line says so: "Itaú joint is at −R$ 9.359,80 today", or "2 accounts are below zero today" when there are several. The household total can look healthy while one account is overdrawn.
 - **With the account filter:** shows that account's balance and outlook.
-- **Interaction:** a "By account" button in the card's header opens a per-account breakdown (name, current balance, end-of-period balance) with a link to the Accounts page. Negative current balances show in `--negative`.
+- **Interaction:** a "By account" button in the card's header opens a per-account breakdown (name, current balance, end-of-period balance), plus an Investments row when there are investments, with a link to the Accounts page. Negative current balances show in `--negative`. The popover is as wide as its table needs (at least 320px, at most the screen width minus a gutter, scrolling sideways past that), so amounts never spill out. It is slightly translucent (80% surface with a light blur).
 - **Empty state:** when no account has an opening balance yet, show the balance as R$ 0,00 with the hint "Set your accounts' opening balances to see real balances".
 - **Data:** `GET /balances` twice: `date` = today, and `date` = the period's `to`. The outlook reads the chart's `GET /projection` (same query, fetched once).
 
@@ -123,7 +124,7 @@ The dashboard is the home screen. It answers, at a glance:
 - Months where the projected balance is negative are shaded in `--negative`, the line and its dots turn `--negative`, and a dashed zero line appears.
 - **Negative warning:** above the chart, "Balance projected to go negative in Mar/2027 · Lowest: −R$ 1.240,00 in Apr/2027", with a "See Mar/2027" button that switches the period to that month (custom range).
 - While "Me" is on, the legend and the top panel's label say "Household balance" (§3.2).
-- Hovering a month shows a breakdown: realized, scheduled future rows (such as installments), projected fixed entries, and the end-of-month balance. The same numbers are available to screen readers as a visually hidden table.
+- Hovering a month shows a breakdown: realized, scheduled future rows (such as installments), projected fixed entries, and the end-of-month balance. The breakdown is anchored to the top of the chart and hangs over both panels, so the chart's scroll box never cuts off its last lines; it follows the hovered month sideways and is slightly translucent. The same numbers are available to screen readers as a visually hidden table.
 - **Range:** the chart always covers at least the current month and the next 5 months, and stretches to cover the selected period. In months: from = the earlier of the period's first month and the current month; to = the later of the period's last month and the current month + 5. The months inside the selected period are highlighted.
 - **Data:** `GET /projection` with that range.
 
@@ -131,7 +132,7 @@ The dashboard is the home screen. It answers, at a glance:
 
 - Listed at the top of the dashboard, shown only when there are any.
 - Each row shows the description, the occurrence date with how late it is ("15/10/2026 · 41 days late"), the expected amount, and the actions **Register** and **Skip**.
-- **Register** opens the pre-filled form from the Fixed page (ui-behavior §8.3), so the real amount and date can be corrected. **Skip** asks for confirmation. Neither acts in one click.
+- **Register** opens the register dialog from the Fixed page (ui-behavior §8.3), which names the fixed entry, so the real amount and date can be corrected. **Skip** asks for confirmation. Neither acts in one click.
 - A note explains: "Not included in projections until registered."
 - **Loading:** nothing is shown while it loads (usually nothing is overdue, so a placeholder would only shift the page). **Error:** a one-line amber message, "Couldn't check for overdue fixed entries", with Retry: a failed check must not pass for "nothing overdue".
 - It always covers the whole household and ignores the period and filters: anything overdue needs someone's attention.
@@ -161,7 +162,8 @@ The dashboard is the home screen. It answers, at a glance:
 ### 4.8 Entry list
 
 - Shows the period's rows: stored expenses and incomes, plus projected occurrences, newest payment date first.
-- Projected occurrences appear as muted rows with a single "Projected" badge (with the repeat icon, since they are always fixed entries) and a **Register** action that opens the pre-filled form (§4.5). They can't be edited directly.
+- Projected occurrences appear as muted rows with a single "Projected" badge (with the repeat icon, since they are always fixed entries) and a **Register** action that opens the register dialog naming the fixed entry and its expected amount (ui-behavior §8.3). They can't be edited directly.
+- Transfers (ui-behavior §13) are not listed here: they are neither income nor expense. They move account balances, so they show in the balances and the projection.
 - Rows follow the badges and formats in ui-behavior §10.
 - "All / Expenses / Incomes" tabs filter the list, with the same colored underline as §4.6.
 - **Pagination:** the first 50 rows, then "Load more".

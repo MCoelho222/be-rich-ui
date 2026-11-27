@@ -589,7 +589,7 @@
     "liquidityMaturity": "Due date",
     "maturityDate": "Due date",
     "maturityAfter": "Must be after the investment date.",
-    "includeHint": "Add it to the household balance and projections. It doesn't take money out of an account; record an expense for that.",
+    "includeHint": "Add it to the household balance and projections. Creating it doesn't take money out of an account; use Transfer on the account for that.",
     "save": "Save",
     "cancel": "Cancel",
     "created": "Investment added.",

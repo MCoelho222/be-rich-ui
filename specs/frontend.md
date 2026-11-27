@@ -98,6 +98,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 │ ⇅ Entries  │                 page content                │
 │ ↻ Fixed    │                                             │
 │ ▤ Accounts │                                             │
+│ ◎ Investments                                            │
 │ ◇ Categories                                             │
 │            │                                             │
 │ ⚙ Settings │                                             │
@@ -107,7 +108,7 @@ The colors in `config/colors.ts` become CSS variables in `app/globals.css`, expo
 
 - **Sidebar:** 232px wide on `--surface`; it can collapse to 64px (icons only), and the choice is remembered in the browser.
 - **Navigation:** the active item has an `--brand` bar at its left and brighter text.
-- **User menu** (bottom): the member's initial and short name. It opens a menu with Profile, the EN/PT toggle, the theme toggle, the household name, and Log out.
+- **User menu** (bottom): the member's photo (or initial, without one) and short name. It opens a menu with Profile, the EN/PT toggle, the theme toggle, the household name, and Log out.
 - **"+ Entry"** is a split button: the main part opens a new expense; the arrow offers "New income" and "New fixed entry". Keyboard shortcut: `N`.
 
 ### 3.2 Tablet (640–1023px)
@@ -136,6 +137,7 @@ The sidebar is collapsed to icons by default.
 | `/entries` | Expenses and incomes | §6.2 |
 | `/fixed` | Fixed entries | §6.3, ui-behavior §8 |
 | `/accounts` | Accounts and cards | §6.4, ui-behavior §4–§5 |
+| `/investments` | Investments | §6.7, ui-behavior §12 |
 | `/categories` | Categories | §6.5 |
 | `/settings` | Household, members, invitations, profile | §6.6, ui-behavior §2–§3 |
 
@@ -190,7 +192,7 @@ Fully specified in [dashboard.md](dashboard.md). The visual rules are:
 
 ### 6.2 Entries (`/entries`)
 
-- **Tabs:** Expenses | Incomes, with the colored underline and a count. The tab is in the URL (`?tab=incomes`).
+- **Tabs:** Expenses | Incomes | Transfers, with the colored underline and a count. The tab is in the URL (`?tab=incomes`, `?tab=transfers`). The Transfers tab has only the period and an account filter (ui-behavior §13).
 - **Filter bar:** period (the same presets as the dashboard), a date basis, search, and a "Filters" popover (account, card, category, person, method, fixed only). Active filters appear as removable chips.
 - **Date basis:** "By purchase date" (the default) or "By payment date" (`?by=payment`). It picks the date the period applies to (`date_field`, api.md §10). A credit purchase made in November and paid with December's bill shows in November by purchase date, and in December by payment date. Links from the dashboard, card bills and fixed entries carry their own range of payment dates, so they open with `by=payment`.
 - **Table:** ui-behavior §10 columns, sorted by the chosen date. When the other date differs, it shows under the date in smaller text ("paid 16/12", or "bought 23/11"). Pagination is "Load more" (api.md §3).
@@ -208,7 +210,8 @@ Fully specified in [dashboard.md](dashboard.md). The visual rules are:
 
 ### 6.4 Accounts and cards (`/accounts`)
 
-- **Account cards** in a grid: name, type icon, current balance as a big number, the end-of-month projection, and an "Adjust balance" action (ui-behavior §4.3).
+- **Account cards** in a grid: name, type icon, current balance as a big number, the end-of-month projection, the opening balance date, and an "Adjust balance" action (ui-behavior §4.3). The ⋯ menu also has **Transfer** (ui-behavior §13).
+- The total balance at the top shows its split between accounts and investments (ui-behavior §4.1).
 - **Card list** below: alias, last four digits, owner, closing/due days, and the next bill (from `/cards/bills`).
 - Archived accounts and cards sit in a collapsed "Archived" section.
 
@@ -221,6 +224,9 @@ A left sub-navigation (a select on phones) with these sections:
 - **Household:** name and default currency.
 - **Members:** list, remove, leave.
 - **Invitations:** send, resend, revoke.
+
+### 6.7 Investments (`/investments`)
+- A header with the amount counted in the balance, then a grid of investment cards, with "Add investment" in the page header. Card contents, the form and the ⋯ menu (Edit, Transfer, Delete) are in ui-behavior §12.
 
 ---
 
