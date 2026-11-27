@@ -447,7 +447,7 @@
     "paidOn": "Paid on",
     "description": "Description",
     "registerTitle": "Register payment",
-    "registerFor": "The occurrence of {date}.",
+    "registerFor": "{name} · expected {amount} · occurrence of {date}.",
     "registered": "Registered.",
     "skipTitle": "Skip this occurrence?",
     "skipBody": "“{name}” on {date} won't be expected or counted in projections. You can undo this later.",

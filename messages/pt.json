@@ -447,7 +447,7 @@
     "paidOn": "Pago em",
     "description": "Descrição",
     "registerTitle": "Registrar pagamento",
-    "registerFor": "A ocorrência de {date}.",
+    "registerFor": "{name} · previsto {amount} · ocorrência de {date}.",
     "registered": "Registrado.",
     "skipTitle": "Pular esta ocorrência?",
     "skipBody": "“{name}” em {date} não será esperado nem entrará nas projeções. Dá para desfazer depois.",

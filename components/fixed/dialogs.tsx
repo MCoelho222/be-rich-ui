@@ -96,6 +96,9 @@ export function RegisterDialog({
   const t = useTranslations("fixed");
   const { run, pending } = useRun();
   const cards = useCards().data ?? [];
+  // Name the fixed entry: two on the same day look alike in the entries list.
+  const categories = useCategories().data ?? [];
+  const name = rec.description || categories.find((c) => c.id === rec.category_id)?.name || "—";
   // A credit card fixed expense's occurrence is a bill's due date (schemas §12.1): the payment
   // gets a purchase date inside that bill.
   const card =
@@ -118,7 +121,11 @@ export function RegisterDialog({
       width="sm"
       onOpenChange={(open) => !open && onClose()}
       title={t("registerTitle")}
-      description={t("registerFor", { date: formatDate(occurrence) })}
+      description={t("registerFor", {
+        name,
+        amount: formatMoney(rec.amount, rec.currency),
+        date: formatDate(occurrence),
+      })}
       footer={
         <Footer
           onCancel={onClose}

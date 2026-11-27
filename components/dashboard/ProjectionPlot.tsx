@@ -215,8 +215,18 @@ export default function ProjectionPlot({
             );
           }}
         />
-        {/* The month's details show once, under the flows panel; here only the column lights up. */}
-        <Tooltip content={() => null} cursor={cursor} />
+        {/* The month's details show once, anchored to the top of the balance panel and hanging over
+            the flows panel: the scroll box clips vertically, and the details are taller than either
+            panel alone, so anchoring at the pointer cut their last lines off. */}
+        <Tooltip
+          content={(props) => (
+            <MonthTooltip active={props.active} payload={props.payload} currency={data.currency} />
+          )}
+          cursor={cursor}
+          position={{ y: 0 }}
+          allowEscapeViewBox={{ x: false, y: true }}
+          wrapperStyle={{ zIndex: 10 }}
+        />
       </ComposedChart>
 
       <p className={cn(panelLabel, "mt-2")}>{t("flows")}</p>
@@ -294,12 +304,8 @@ export default function ProjectionPlot({
           isAnimationActive={false}
           shape={roundedTop(() => true)}
         />
-        <Tooltip
-          content={(props) => (
-            <MonthTooltip active={props.active} payload={props.payload} currency={data.currency} />
-          )}
-          cursor={cursor}
-        />
+        {/* Only the column lights up here; the details show from the balance panel's tooltip. */}
+        <Tooltip content={() => null} cursor={cursor} />
       </ComposedChart>
     </div>
   );
@@ -375,7 +381,7 @@ function MonthTooltip({
     </>
   );
   return (
-    <div className="rounded-lg border border-line bg-surface px-3 py-2.5 text-[13px] shadow-lg shadow-black/10">
+    <div className="rounded-lg border border-line bg-surface/80 px-3 py-2.5 text-[13px] shadow-lg backdrop-blur-sm shadow-black/10">
       <p className="font-semibold">{formatMonth(m.month, locale)}</p>
       <table>
         <tbody>
