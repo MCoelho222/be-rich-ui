@@ -9,6 +9,7 @@ import { Skeleton, WidgetError } from "@/components/dashboard/Widget";
 import { Money } from "@/components/money/Money";
 import { useNewEntry } from "@/components/shell/NewEntry";
 import { PageHeader } from "@/components/shell/PageHeader";
+import { BeforeOpeningPill } from "./BeforeOpeningPill";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -296,6 +297,10 @@ function EntryTable({ kind, view }: { kind: EntryKind; view: EntriesView }) {
   };
   const badges = (entry: Entry) => (
     <>
+      <BeforeOpeningPill
+        paymentDate={entry.payment_date}
+        account={accounts.get(entry.account_id)}
+      />
       {entry.installment_total > 1 && (
         <span className="num rounded-full bg-surface-2 px-2 py-px text-[11px] font-semibold text-text-muted">
           {entry.installment_number}/{entry.installment_total}

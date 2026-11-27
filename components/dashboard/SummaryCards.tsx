@@ -6,6 +6,7 @@
 import { AlertTriangle, ChevronDown, CircleAlert, Repeat, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
+import { BalanceSplit } from "@/components/money/BalanceSplit";
 import { BigMoney, Money } from "@/components/money/Money";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { formatMoney, formatMonth, formatShare } from "@/lib/format";
@@ -180,20 +181,17 @@ function BalanceCard({
           </PopoverContent>
         </Popover>
       </div>
-      <BigMoney amount={now.data.total} currency={now.data.currency} />
+      <div className="flex flex-col gap-1">
+        <BigMoney amount={now.data.total} currency={now.data.currency} />
+        <BalanceSplit
+          total={now.data.total}
+          investments={now.data.investments}
+          currency={now.data.currency}
+        />
+      </div>
       <span className={captionClass}>
         {t("endOfPeriod")}{" "}
         <Money amount={end.data.total} currency={end.data.currency} projected={endProjected} />
-        {Number(now.data.investments) > 0 && (
-          <>
-            {" · "}
-            <Link href="/investments" className="hover:text-text hover:underline">
-              {t("inInvestments", {
-                amount: formatMoney(now.data.investments, now.data.currency),
-              })}
-            </Link>
-          </>
-        )}
       </span>
       <OutlookLine view={view} filters={filters} today={today} />
       {overdrawn.length > 0 && (

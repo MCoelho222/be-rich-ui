@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { MoneyInput } from "@/components/ui/money-input";
 import { PrimaryButton, SecondaryButton } from "@/components/ui/form-dialog";
 import { Switch } from "@/components/ui/switch";
+import { paidBeforeOpening } from "@/lib/accounts";
 import { ApiError } from "@/lib/api";
 import { useMe } from "@/lib/auth";
 import {
@@ -41,6 +42,7 @@ import { fromCents, toCents } from "@/lib/money";
 import { billOnOrAfter, purchaseDateFor } from "@/lib/credit";
 import { todayIso } from "@/lib/period";
 import {
+  byId,
   useAccounts,
   useCards,
   useCategories,
@@ -926,6 +928,7 @@ function PreviewSummary({
   locale: string;
 }) {
   const t = useTranslations("entryForm");
+  const accounts = byId(useAccounts().data);
   if (!show || !preview) return null;
   const partIndexes = [...new Set(preview.items.map((row) => row.part))];
   return (
@@ -942,6 +945,8 @@ function PreviewSummary({
         const last = rows[rows.length - 1];
         const n = rows.length;
         const regular = rows[n > 1 ? 1 : 0].amount;
+        const account = accounts.get(first.account_id);
+        const beforeOpening = account && paidBeforeOpening(first.payment_date, account);
         return (
           <div key={part} className="flex flex-col gap-0.5">
             {split && (
@@ -964,6 +969,14 @@ function PreviewSummary({
               </span>
             ) : (
               <span className="num text-text">{formatMoney(first.amount, first.currency)}</span>
+            )}
+            {beforeOpening && (
+              <span className="text-text-muted">
+                {t("beforeOpening", {
+                  account: account.name,
+                  date: formatDate(account.opening_balance_date),
+                })}
+              </span>
             )}
             {first.payment_method === "CREDIT" && (
               <span className="text-text-muted">

@@ -152,8 +152,9 @@
       "realizedOf": "Realized so far · {amount} projected",
       "allProjected": "Projected · nothing realized yet",
       "fixedShare": "Fixed: {share} of expenses ({amount})",
-      "inInvestments": "Includes {amount} in investments",
-      "investmentsRow": "Investments"
+      "investmentsRow": "Investments",
+      "accountsPart": "Accounts <amount></amount>",
+      "investmentsPart": "Investments <amount></amount>"
     },
     "chart": {
       "title": "Projection",
@@ -322,7 +323,8 @@
     "firstBill": "First bill",
     "firstBillHint": "Due on {date}. If that date has passed, this payment is registered now; otherwise it's the next one.",
     "cardDueDay": "The card's due day",
-    "fixedCreatedFrom": "Fixed entry created. The first one is on {date}."
+    "fixedCreatedFrom": "Fixed entry created. The first one is on {date}.",
+    "beforeOpening": "Before {account}'s opening balance ({date}): it won't change the balance."
   },
   "entries": {
     "title": "Entries",
@@ -371,7 +373,9 @@
     "boughtOn": "bought {date}",
     "receivedOnDate": "dated {date}",
     "paidOnDate": "paid {date}",
-    "expectedOnDate": "received {date}"
+    "expectedOnDate": "received {date}",
+    "beforeOpening": "Before opening balance",
+    "beforeOpeningHint": "Paid on or before {account}'s opening balance ({date}). It's already included in that balance, so it doesn't change it."
   },
   "fixed": {
     "title": "Fixed entries",
@@ -548,7 +552,8 @@
     "inUseTitle": "This is in use",
     "inUseCard": "This card is used by {expenses, plural, one {# expense} other {# expenses}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries.",
     "inUseAccount": "This account is used by {expenses, plural, one {# expense} other {# expenses}}, {incomes, plural, one {# income} other {# incomes}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries; its balance still counts.",
-    "inUseCategory": "This category is used by {expenses, plural, one {# expense} other {# expenses}}, {incomes, plural, one {# income} other {# incomes}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries."
+    "inUseCategory": "This category is used by {expenses, plural, one {# expense} other {# expenses}}, {incomes, plural, one {# income} other {# incomes}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries.",
+    "openingOn": "Opening balance on {date}"
   },
   "investments": {
     "title": "Investments",

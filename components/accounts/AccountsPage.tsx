@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Skeleton, WidgetError } from "@/components/dashboard/Widget";
+import { BalanceSplit } from "@/components/money/BalanceSplit";
 import { BigMoney, Money } from "@/components/money/Money";
 import { PageHeader } from "@/components/shell/PageHeader";
 import {
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useReferenceWrite } from "@/lib/accounts";
 import { useErrorMessage } from "@/lib/errors";
-import { formatDayMonth, formatMoney, formatWeekdayDate, shortName } from "@/lib/format";
+import { formatDayMonth, formatWeekdayDate, shortName } from "@/lib/format";
 import { lastOfMonth, todayIso } from "@/lib/period";
 import {
   byId,
@@ -126,7 +127,6 @@ export function AccountsPage() {
 /** Sum of every account, archived ones included (ui-behavior §4.1). */
 function TotalBalance() {
   const t = useTranslations("accounts");
-  const td = useTranslations("dashboard.cards");
   const now = useBalances(todayIso(), {});
   const end = useBalances(lastOfMonth(todayIso()), {});
   if (now.isPending || end.isPending) return <Skeleton className="h-24 w-full rounded-xl" />;
@@ -137,16 +137,14 @@ function TotalBalance() {
       <div className="flex flex-col gap-2">
         <span className="text-[13px] font-medium text-text-muted">{t("totalBalance")}</span>
         <BigMoney amount={now.data.total} currency={now.data.currency} />
+        <BalanceSplit
+          total={now.data.total}
+          investments={now.data.investments}
+          currency={now.data.currency}
+        />
       </div>
-      <span className="flex flex-col items-end gap-1 text-[13px] text-text-muted">
-        <span>
-          {t("endOfMonth")} <Money amount={end.data.total} currency={end.data.currency} projected />
-        </span>
-        {Number(now.data.investments) > 0 && (
-          <Link href="/investments" className="hover:text-text hover:underline">
-            {td("inInvestments", { amount: formatMoney(now.data.investments, now.data.currency) })}
-          </Link>
-        )}
+      <span className="text-[13px] text-text-muted">
+        {t("endOfMonth")} <Money amount={end.data.total} currency={end.data.currency} projected />
       </span>
     </div>
   );
@@ -187,6 +185,9 @@ function AccountGrid({
             <h3 className="truncate font-medium">{account.name}</h3>
             <p className="text-xs text-text-muted">
               {account.type === "CASH" ? t("typeCash") : t("typeBank")} · {account.currency}
+            </p>
+            <p className="text-xs text-text-muted">
+              {t("openingOn", { date: formatDayMonth(account.opening_balance_date) })}
             </p>
           </div>
           <AccountMenu account={account} onAction={onAction} />
