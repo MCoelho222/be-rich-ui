@@ -3,9 +3,11 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-// In production Caddy serves the UI and the API from one origin (operations.md §1).
-// In development, Next proxies /api to the FastAPI server instead.
-const API_ORIGIN = process.env.API_ORIGIN ?? "http://localhost:8000";
+// The browser only talks to the UI's origin: Next proxies /api to the FastAPI server, so the
+// session and CSRF cookies stay first-party. API_ORIGIN is the API's production domain on Vercel,
+// and localhost in development.
+// A trailing slash would make "//api/…", which Vercel redirects back onto the UI's own domain (a loop).
+const API_ORIGIN = (process.env.API_ORIGIN ?? "http://localhost:8000").replace(/\/+$/, "");
 
 const nextConfig: NextConfig = {
   // The dev-tools badge defaults to bottom-left, on top of the sidebar's user menu.
