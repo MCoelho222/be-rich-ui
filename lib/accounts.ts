@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type Schemas } from "./api";
 import { entriesKey } from "./entries";
-import { keys } from "./queries";
+import { keys, type Account } from "./queries";
 
 export type CardType = Schemas["CardOut"]["type"];
 export type CardPreview = Schemas["CardPreviewOut"];
@@ -61,4 +61,12 @@ export function useCardPreview(bestBuyDay: number | null, dueDay: number | null)
     enabled: !!bestBuyDay && !!dueDay,
     staleTime: 60 * 60_000,
   });
+}
+
+/**
+ * Rows paid on or before an account's opening date are already part of its opening balance,
+ * so they don't move it (schemas §14.1, the API's `account_balance`).
+ */
+export function paidBeforeOpening(paymentDate: string, account?: Account): boolean {
+  return !!account && paymentDate <= account.opening_balance_date;
 }

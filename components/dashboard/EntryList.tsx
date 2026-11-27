@@ -18,6 +18,7 @@ import {
   type ReportFilters,
 } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { BeforeOpeningPill } from "@/components/entries/BeforeOpeningPill";
 import type { DashboardView } from "./view";
 import { CurrencyNote, Skeleton, TypeTabs, WidgetCard, WidgetError, tabId } from "./Widget";
 
@@ -111,6 +112,12 @@ export function EntryList({ view, filters }: { view: DashboardView; filters: Rep
 
   const badges = (row: RowView) => (
     <>
+      {row.item.row && (
+        <BeforeOpeningPill
+          paymentDate={row.item.payment_date}
+          account={accounts.get(row.item.row.account_id)}
+        />
+      )}
       {row.installment && (
         <span className="num rounded-full bg-surface-2 px-2 py-px text-[11px] font-semibold text-text-muted">
           {row.installment}

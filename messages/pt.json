@@ -152,8 +152,9 @@
       "realizedOf": "Realizado até agora · {amount} previsto",
       "allProjected": "Previsto · nada realizado ainda",
       "fixedShare": "Fixos: {share} das despesas ({amount})",
-      "inInvestments": "Inclui {amount} em investimentos",
-      "investmentsRow": "Investimentos"
+      "investmentsRow": "Investimentos",
+      "accountsPart": "Contas <amount></amount>",
+      "investmentsPart": "Investimentos <amount></amount>"
     },
     "chart": {
       "title": "Projeção",
@@ -322,7 +323,8 @@
     "firstBill": "Primeira fatura",
     "firstBillHint": "Vence em {date}. Se essa data já passou, este pagamento é registrado agora; senão, é o próximo.",
     "cardDueDay": "O dia de vencimento do cartão",
-    "fixedCreatedFrom": "Lançamento fixo criado. O primeiro é em {date}."
+    "fixedCreatedFrom": "Lançamento fixo criado. O primeiro é em {date}.",
+    "beforeOpening": "Antes do saldo inicial de {account} ({date}): não vai alterar o saldo."
   },
   "entries": {
     "title": "Lançamentos",
@@ -371,7 +373,9 @@
     "boughtOn": "comprado em {date}",
     "receivedOnDate": "lançado em {date}",
     "paidOnDate": "pago em {date}",
-    "expectedOnDate": "recebido em {date}"
+    "expectedOnDate": "recebido em {date}",
+    "beforeOpening": "Antes do saldo inicial",
+    "beforeOpeningHint": "Pago até a data do saldo inicial de {account} ({date}). Já está incluído nesse saldo, então não o altera."
   },
   "fixed": {
     "title": "Lançamentos fixos",
@@ -443,7 +447,7 @@
     "paidOn": "Pago em",
     "description": "Descrição",
     "registerTitle": "Registrar pagamento",
-    "registerFor": "A ocorrência de {date}.",
+    "registerFor": "{name} · previsto {amount} · ocorrência de {date}.",
     "registered": "Registrado.",
     "skipTitle": "Pular esta ocorrência?",
     "skipBody": "“{name}” em {date} não será esperado nem entrará nas projeções. Dá para desfazer depois.",
@@ -548,7 +552,8 @@
     "inUseTitle": "Está em uso",
     "inUseCard": "Este cartão é usado por {expenses, plural, one {# despesa} other {# despesas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-lo dos novos lançamentos.",
     "inUseAccount": "Esta conta é usada por {expenses, plural, one {# despesa} other {# despesas}}, {incomes, plural, one {# receita} other {# receitas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-la dos novos lançamentos; o saldo continua contando.",
-    "inUseCategory": "Esta categoria é usada por {expenses, plural, one {# despesa} other {# despesas}}, {incomes, plural, one {# receita} other {# receitas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-la dos novos lançamentos."
+    "inUseCategory": "Esta categoria é usada por {expenses, plural, one {# despesa} other {# despesas}}, {incomes, plural, one {# receita} other {# receitas}} e {fixed, plural, one {# fixo} other {# fixos}}. Arquive para escondê-la dos novos lançamentos.",
+    "openingOn": "Saldo inicial em {date}"
   },
   "investments": {
     "title": "Investimentos",
