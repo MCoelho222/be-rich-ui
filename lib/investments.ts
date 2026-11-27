@@ -10,7 +10,7 @@ export type Liquidity = Investment["liquidity"];
 /** The name when there is one, else the bank. */
 export const investmentLabel = (i: Investment) => i.name ?? i.bank;
 
-const investmentsKey = ["investments"] as const;
+export const investmentsKey = ["investments"] as const;
 
 export function useInvestments() {
   return useQuery({

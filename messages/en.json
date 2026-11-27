@@ -375,7 +375,8 @@
     "paidOnDate": "paid {date}",
     "expectedOnDate": "received {date}",
     "beforeOpening": "Before opening balance",
-    "beforeOpeningHint": "Paid on or before {account}'s opening balance ({date}). It's already included in that balance, so it doesn't change it."
+    "beforeOpeningHint": "Paid on or before {account}'s opening balance ({date}). It's already included in that balance, so it doesn't change it.",
+    "transfers": "Transfers"
   },
   "fixed": {
     "title": "Fixed entries",
@@ -553,7 +554,8 @@
     "inUseCard": "This card is used by {expenses, plural, one {# expense} other {# expenses}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries.",
     "inUseAccount": "This account is used by {expenses, plural, one {# expense} other {# expenses}}, {incomes, plural, one {# income} other {# incomes}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries; its balance still counts.",
     "inUseCategory": "This category is used by {expenses, plural, one {# expense} other {# expenses}}, {incomes, plural, one {# income} other {# incomes}} and {fixed, plural, one {# fixed entry} other {# fixed entries}}. Archive it to hide it from new entries.",
-    "openingOn": "Opening balance on {date}"
+    "openingOn": "Opening balance on {date}",
+    "transfer": "Transfer"
   },
   "investments": {
     "title": "Investments",
@@ -594,7 +596,9 @@
     "saved": "Changes saved.",
     "deleted": "Investment deleted.",
     "deleteTitle": "Delete {name}?",
-    "deleteBody": "It will no longer count in your balance or projections, including past months."
+    "deleteBody": "It will no longer count in your balance or projections, including past months.",
+    "transfer": "Transfer",
+    "redeemed": "Redeemed"
   },
   "categories": {
     "title": "Categories",
@@ -732,5 +736,33 @@
       "investments": "Investments",
       "other": "Other"
     }
+  },
+  "transfers": {
+    "title": "Transfer",
+    "from": "From {name}.",
+    "to": "To",
+    "pick": "Choose where to send it",
+    "accounts": "Accounts",
+    "investments": "Investments",
+    "amount": "Amount",
+    "amountSent": "Amount sent",
+    "amountReceived": "Amount received",
+    "receivedHint": "How much arrived, in {currency}.",
+    "available": "Available: {amount}",
+    "date": "Date",
+    "description": "Description",
+    "submit": "Transfer",
+    "cancel": "Cancel",
+    "created": "Transfer made",
+    "deletedInvestment": "deleted",
+    "receivedAs": "received",
+    "delete": "Delete transfer",
+    "route": "From → to",
+    "empty": "No transfers in this period.",
+    "allAccounts": "All accounts and investments",
+    "listHint": "Transfers move money between your accounts and investments. They don't count as income or expense.",
+    "deleted": "Transfer deleted",
+    "deleteTitle": "Delete this transfer?",
+    "deleteBody": "It will be undone: the money goes back to where it came from, and investment amounts change back."
   }
 }
