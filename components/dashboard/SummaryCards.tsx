@@ -106,70 +106,77 @@ function BalanceCard({
             {t("byAccount")}
             <ChevronDown size={14} aria-hidden />
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-0">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs tracking-wide text-text-muted uppercase">
-                  <th className="px-4 pt-3 pb-2 font-medium">{t("account")}</th>
-                  <th className="px-2 pt-3 pb-2 text-right font-medium">{t("now")}</th>
-                  <th className="px-4 pt-3 pb-2 text-right font-medium">{t("endShort")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {now.data.accounts.map((row) => {
-                  const later = endByAccount.get(row.account_id);
-                  const name = names.get(row.account_id)?.name ?? "—";
-                  return (
-                    <tr key={row.account_id} className="border-t border-line">
-                      <td className="max-w-32 truncate px-4 py-2" title={name}>
-                        {name}
+          {/* Sized by its content: amounts never wrap, so a fixed width pushed the End column
+              out of the box. Capped at the screen, where the table scrolls sideways instead. */}
+          <PopoverContent
+            align="end"
+            className="w-auto max-w-[calc(100vw-2rem)] min-w-80 bg-surface/80 p-0 backdrop-blur-sm"
+          >
+            <div className="custom-scrollbar overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs tracking-wide text-text-muted uppercase">
+                    <th className="px-4 pt-3 pb-2 font-medium">{t("account")}</th>
+                    <th className="px-2 pt-3 pb-2 text-right font-medium">{t("now")}</th>
+                    <th className="px-4 pt-3 pb-2 text-right font-medium">{t("endShort")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {now.data.accounts.map((row) => {
+                    const later = endByAccount.get(row.account_id);
+                    const name = names.get(row.account_id)?.name ?? "—";
+                    return (
+                      <tr key={row.account_id} className="border-t border-line">
+                        <td className="max-w-32 truncate px-4 py-2" title={name}>
+                          {name}
+                        </td>
+                        <td className="px-2 py-2 text-right">
+                          {row.balance === null ? (
+                            "—"
+                          ) : (
+                            <Money
+                              amount={row.balance}
+                              currency={row.account_currency}
+                              className={cn(Number(row.balance) < 0 && "text-negative")}
+                            />
+                          )}
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          {later?.balance == null ? (
+                            "—"
+                          ) : (
+                            <Money
+                              amount={later.balance}
+                              currency={later.account_currency}
+                              projected={endProjected}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {(Number(now.data.investments) > 0 || Number(end.data.investments) > 0) && (
+                    <tr className="border-t border-line">
+                      <td className="px-4 py-2">
+                        <Link href="/investments" className="hover:underline">
+                          {t("investmentsRow")}
+                        </Link>
                       </td>
                       <td className="px-2 py-2 text-right">
-                        {row.balance === null ? (
-                          "—"
-                        ) : (
-                          <Money
-                            amount={row.balance}
-                            currency={row.account_currency}
-                            className={cn(Number(row.balance) < 0 && "text-negative")}
-                          />
-                        )}
+                        <Money amount={now.data.investments} currency={now.data.currency} />
                       </td>
                       <td className="px-4 py-2 text-right">
-                        {later?.balance == null ? (
-                          "—"
-                        ) : (
-                          <Money
-                            amount={later.balance}
-                            currency={later.account_currency}
-                            projected={endProjected}
-                          />
-                        )}
+                        <Money
+                          amount={end.data.investments}
+                          currency={end.data.currency}
+                          projected={endProjected}
+                        />
                       </td>
                     </tr>
-                  );
-                })}
-                {(Number(now.data.investments) > 0 || Number(end.data.investments) > 0) && (
-                  <tr className="border-t border-line">
-                    <td className="px-4 py-2">
-                      <Link href="/investments" className="hover:underline">
-                        {t("investmentsRow")}
-                      </Link>
-                    </td>
-                    <td className="px-2 py-2 text-right">
-                      <Money amount={now.data.investments} currency={now.data.currency} />
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      <Money
-                        amount={end.data.investments}
-                        currency={end.data.currency}
-                        projected={endProjected}
-                      />
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
             <div className="border-t border-line px-4 py-2.5">
               <Link
                 href="/accounts"
